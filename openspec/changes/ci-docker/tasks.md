@@ -19,8 +19,8 @@
 
 ## 4. Docs
 
-- [ ] 4.1 Add a "Self-hosting" section to `README.md` (compose up, port, `/data` must be writable by UID 1000, image tags `latest`/`edge`/semver) and verify the commands match `compose.yaml`
-- [ ] 4.2 Add CI and image notes to `AGENTS.md` (workflows, tags, Docker only built in CI) and verify `pnpm lint` passes
+- [x] 4.1 Add a "Self-hosting" section to `README.md` (compose up, port, `/data` must be writable by UID 1000, image tags `latest`/`edge`/semver) and verify the commands match `compose.yaml`
+- [x] 4.2 Add CI and image notes to `AGENTS.md` (workflows, tags, Docker only built in CI) and verify `pnpm lint` passes
 
 ## 5. Verify in GitHub
 
