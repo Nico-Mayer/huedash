@@ -29,7 +29,13 @@ describe('toUpdates', () => {
 		];
 
 		expect(toUpdates(message)).toEqual([
-			{ kind: 'light', id: 'ceiling', mirek: 250, hueSaturation: null }
+			{
+				kind: 'light',
+				id: 'ceiling',
+				mirek: 250,
+				hueSaturation: null,
+				swatch: expect.stringMatching(/^#[0-9a-f]{6}$/)
+			}
 		]);
 	});
 
@@ -48,6 +54,7 @@ describe('toUpdates', () => {
 		const [update] = toUpdates(message);
 		expect(update).toMatchObject({ kind: 'light', id: 'lamp', mirek: null });
 		expect(update).toHaveProperty('hueSaturation.saturation', 100);
+		expect(update).toHaveProperty('swatch', '#ff0000');
 	});
 
 	it('ignores color fields of groups', () => {
@@ -116,7 +123,14 @@ describe('toUpdates', () => {
 		];
 
 		expect(toUpdates(message)).toEqual([
-			{ kind: 'light', id: 'ceiling', on: true, mirek: 300, hueSaturation: null }
+			{
+				kind: 'light',
+				id: 'ceiling',
+				on: true,
+				mirek: 300,
+				hueSaturation: null,
+				swatch: expect.any(String)
+			}
 		]);
 	});
 });

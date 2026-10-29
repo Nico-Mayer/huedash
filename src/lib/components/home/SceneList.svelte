@@ -68,11 +68,16 @@
 					></span>
 					<span class="flex items-center justify-between gap-2">
 						<span class="truncate font-medium">{scene.name}</span>
-						{#if status === 'static'}
-							<Badge>Active</Badge>
-						{:else if status === 'dynamic_palette'}
-							<Badge>Playing</Badge>
-						{/if}
+						<span class="flex shrink-0 items-center gap-2">
+							{#if status === 'static'}
+								<Badge>Active</Badge>
+							{:else if status === 'dynamic_palette'}
+								<Badge>Playing</Badge>
+							{/if}
+							{#if scene.brightness !== null}
+								<span class="text-xs text-muted-foreground tabular-nums">{scene.brightness} %</span>
+							{/if}
+						</span>
 					</span>
 				</button>
 				{#if scene.dynamic}

@@ -1,7 +1,7 @@
 import { applyChange } from './commands.ts';
 import { live } from './live.svelte.ts';
 import type { HueSaturation, StateUpdate } from './live-updates.ts';
-import type { HomeGroup, HomeLight, HomeScene } from './server/hue/home.ts';
+import type { Home, HomeGroup, HomeLight, HomeScene } from './server/hue/home.ts';
 
 export type Change = { on?: boolean; brightness?: number; mirek?: number; color?: HueSaturation };
 
@@ -31,6 +31,27 @@ export function lightHueSaturation(light: HomeLight): HueSaturation | null {
 	return override && 'hueSaturation' in override
 		? (override.hueSaturation ?? null)
 		: light.hueSaturation;
+}
+
+export function lightSwatch(light: HomeLight): string | null {
+	const override = live.lights.get(light.id);
+	return override && 'swatch' in override ? (override.swatch ?? null) : light.swatch;
+}
+
+const shining = (light: HomeLight) => light.reachable && lightOn(light);
+
+// A light without a swatch (a plug, a dim-only bulb) still counts, as null.
+export function onSwatches(group: HomeGroup, limit = 3): (string | null)[] {
+	const swatches = group.lights.filter(shining).map(lightSwatch);
+	return swatches.filter((swatch, i) => swatches.indexOf(swatch) === i).slice(0, limit);
+}
+
+// Lights can be in a room and a zone, so each is counted once.
+export function homeSummary({ rooms, zones }: Home): string {
+	const lights = Object.values(
+		Object.fromEntries([...rooms, ...zones].flatMap((g) => g.lights).map((l) => [l.id, l]))
+	);
+	return `${lights.filter(shining).length} of ${lights.length} lights on`;
 }
 
 export function activeScene(group: HomeGroup): HomeScene | undefined {

@@ -37,11 +37,19 @@ const kitchen: HomeGroup = {
 	colorTemperature: null,
 	color: false,
 	scenes: [
-		{ id: 'scene-relax', name: 'Relax', colors: ['#ffaa55'], dynamic: false, active: 'inactive' },
+		{
+			id: 'scene-relax',
+			name: 'Relax',
+			colors: ['#ffaa55'],
+			brightness: 56,
+			dynamic: false,
+			active: 'inactive'
+		},
 		{
 			id: 'scene-tropical',
 			name: 'Tropical',
 			colors: ['#ff0000', '#00ff00'],
+			brightness: null,
 			dynamic: true,
 			active: 'inactive'
 		}
@@ -101,6 +109,16 @@ describe('SceneList', () => {
 		render(SceneList, { group: { ...kitchen, scenes: [] } });
 
 		await expect.element(page.getByText('No scenes yet')).toBeInTheDocument();
+	});
+});
+
+describe('SceneList brightness', () => {
+	it('shows the scene brightness when it has one', async () => {
+		render(SceneList, { group: kitchen });
+
+		await expect.element(page.getByText('56 %')).toBeInTheDocument();
+		const tropical = page.getByRole('listitem').filter({ hasText: 'Tropical' }).element();
+		expect(tropical.textContent).not.toContain('%');
 	});
 });
 

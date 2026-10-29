@@ -41,7 +41,9 @@ const light: HomeLight = {
 	mirekRange: { minMirek: 153, maxMirek: 500 },
 	color: true,
 	mirek: 366,
-	hueSaturation: null
+	hueSaturation: null,
+	product: null,
+	swatch: null
 };
 
 const kitchen: HomeGroup = {

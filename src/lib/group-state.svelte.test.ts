@@ -3,8 +3,10 @@ import {
 	activeScene,
 	groupOn,
 	groupSummary,
+	homeSummary,
 	lightCounts,
-	lightsSummary
+	lightsSummary,
+	onSwatches
 } from './group-state.svelte.ts';
 import { live } from './live.svelte.ts';
 import type { HomeGroup, HomeLight, HomeScene } from './server/hue/home.ts';
@@ -18,13 +20,16 @@ const light = (id: string, on: boolean, reachable = true): HomeLight => ({
 	mirekRange: null,
 	color: false,
 	mirek: null,
-	hueSaturation: null
+	hueSaturation: null,
+	product: null,
+	swatch: null
 });
 
 const scene = (id: string, active: HomeScene['active'] = 'inactive'): HomeScene => ({
 	id,
 	name: id,
 	colors: [],
+	brightness: null,
 	dynamic: false,
 	active
 });
@@ -115,5 +120,51 @@ describe('lightsSummary', () => {
 
 	it('leaves out unreachable when all lights answer', () => {
 		expect(lightsSummary(group([light('a', true), light('b', false)]))).toBe('1 of 2 lights on');
+	});
+});
+
+describe('onSwatches', () => {
+	const colored = (id: string, swatch: string | null, on = true) => ({
+		...light(id, on),
+		swatch
+	});
+
+	it('lists the swatches of lights that are on, without duplicates, up to three', () => {
+		const lights = [
+			colored('a', '#ff0000'),
+			colored('b', '#ff0000'),
+			colored('c', '#00ff00', false),
+			colored('d', null),
+			colored('e', '#0000ff'),
+			colored('f', '#ffffff')
+		];
+
+		expect(onSwatches(group(lights))).toEqual(['#ff0000', null, '#0000ff']);
+	});
+
+	it('follows live swatches', () => {
+		const home = group([colored('a', '#ff0000')]);
+
+		live.apply({ kind: 'light', id: 'a', swatch: '#00ff00' });
+
+		expect(onSwatches(home)).toEqual(['#00ff00']);
+	});
+});
+
+describe('homeSummary', () => {
+	it('counts each light once and only reachable lights as on', () => {
+		const shared = light('shared', true);
+		const room = { ...group([shared, light('b', false)]), id: 'room' };
+		const zone = { ...group([shared, light('c', true, false)]), id: 'zone', kind: 'zone' as const };
+
+		expect(homeSummary({ rooms: [room], zones: [zone] })).toBe('1 of 3 lights on');
+	});
+
+	it('follows live changes', () => {
+		const home = { rooms: [group([light('a', false)])], zones: [] };
+
+		live.apply({ kind: 'light', id: 'a', on: true });
+
+		expect(homeSummary(home)).toBe('1 of 1 lights on');
 	});
 });
