@@ -12,10 +12,10 @@
 
 ## 3. Project skills
 
-- [ ] 3.1 Read `SKILL.md` of `huntabyte/shadcn-svelte@shadcn-svelte` and `github/awesome-copilot@multi-stage-dockerfile`, then install both with `DISABLE_TELEMETRY=1 npx skills@1.7.4 add <owner/repo> --skill <name> -a claude-code`; verify `npx skills list` shows both under the project
-- [ ] 3.2 Compare `SKILL.md` of `wshobson/agents@github-actions-templates` and `callstackincubator/agent-skills@github-actions`, install the better fit, and verify `npx skills list` shows it
+- [x] 3.1 Read `SKILL.md` of `huntabyte/shadcn-svelte@shadcn-svelte` and `github/awesome-copilot@multi-stage-dockerfile`, then install both with `DISABLE_TELEMETRY=1 npx skills@1.7.4 add <owner/repo> --skill <name> -a claude-code`; verify `npx skills list` shows both under the project
+- [x] 3.2 Compare `SKILL.md` of `wshobson/agents@github-actions-templates` and `callstackincubator/agent-skills@github-actions`, install the better fit, and verify `npx skills list` shows it
 - [ ] 3.3 Read `SKILL.md` of `wshobson/agents@tailwind-design-system`; install it only if it matches Tailwind v4 and shadcn-svelte conventions; verify the decision is recorded in AGENTS.md (task 4.1) and `npx skills list` matches it
-- [ ] 3.4 Verify the existing `.claude` OpenSpec skills and `opsx` commands still load and `skills-lock.json` exists for the installed skills
+- [x] 3.4 Verify the existing `.claude` OpenSpec skills and `opsx` commands still load and `skills-lock.json` exists for the installed skills
 
 ## 4. Guidelines and UI standards
 
