@@ -4,6 +4,10 @@ context: |
   huedash is a self-hosted web dashboard for Philips Hue, aiming for feature
   parity with the official Hue mobile app.
 
+  Desktop first: Philips has a mobile app but no desktop experience, so huedash
+  is designed mainly for desktop browsers. Phone viewports must work, but layout
+  and interaction decisions favor desktop (mouse, keyboard, wide screens).
+
   Deployment:
   - Ships as a Docker image, run with docker compose on the user's LAN.
   - CI on GitHub Actions; images published to GHCR.
