@@ -6,6 +6,7 @@ import ColorControl from './ColorControl.svelte';
 import ColorTemperatureControl from './ColorTemperatureControl.svelte';
 import GroupCard from './GroupCard.svelte';
 import LightRow from './LightRow.svelte';
+import { live } from '#lib/live.svelte.ts';
 
 vi.mock('$app/navigation', () => ({ refreshAll: vi.fn() }));
 vi.mock('$app/paths', () => ({
@@ -136,5 +137,29 @@ describe('ColorControl', () => {
 
 		await expect.poll(() => fetchMock.mock.calls.length).toBeGreaterThan(0);
 		expect(sentBody().body).toEqual({ on: true, color: { hue: 30, saturation: 100 } });
+	});
+});
+
+describe('live updates', () => {
+	afterEach(() => {
+		live.groups.clear();
+		live.lights.clear();
+	});
+
+	it('shows a group change from the bridge without reloading', async () => {
+		render(GroupCard, { group: kitchen });
+
+		live.apply({ kind: 'group', id: 'grouped-kitchen', on: false });
+
+		await expect.element(page.getByText('Off')).toBeInTheDocument();
+		expect(fetchMock).not.toHaveBeenCalled();
+	});
+
+	it('shows a light change from the bridge', async () => {
+		render(LightRow, { light });
+
+		live.apply({ kind: 'light', id: 'ceiling', brightness: 20 });
+
+		await expect.element(page.getByText('On, 20 %')).toBeInTheDocument();
 	});
 });

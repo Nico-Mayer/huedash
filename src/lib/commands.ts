@@ -1,4 +1,3 @@
-import { refreshAll } from '$app/navigation';
 import { toast } from 'svelte-sonner';
 
 type Target = { kind: 'groups' | 'lights'; id: string; name: string };
@@ -16,12 +15,10 @@ export async function sendCommand({ kind, id }: Target, body: object): Promise<b
 	}
 }
 
-// Shows the change at once; restores it and tells the user when the bridge refuses.
+// Shows the change at once; the bridge's live update confirms it. On failure it restores the
+// previous state and tells the user.
 export async function applyChange(target: Target, body: object, revert: () => void) {
-	if (await sendCommand(target, body)) {
-		await refreshAll();
-		return;
-	}
+	if (await sendCommand(target, body)) return;
 	revert();
 	toast.error(`Couldn't change ${target.name}. Check that the bridge is on, then try again.`);
 }

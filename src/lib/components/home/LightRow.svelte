@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { applyChange } from '#lib/commands.ts';
+	import { live } from '#lib/live.svelte.ts';
 	import { Slider } from '#lib/components/ui/slider/index.js';
 	import { Switch } from '#lib/components/ui/switch/index.js';
 	import type { HomeLight } from '#lib/server/hue/home.ts';
 
 	let { light }: { light: HomeLight } = $props();
 
-	let on = $derived(light.on);
-	let brightness = $derived(light.brightness ?? 100);
+	let on = $derived(live.lights.get(light.id)?.on ?? light.on);
+	let brightness = $derived(live.lights.get(light.id)?.brightness ?? light.brightness ?? 100);
 
 	const target = $derived({ kind: 'lights' as const, id: light.id, name: light.name });
 

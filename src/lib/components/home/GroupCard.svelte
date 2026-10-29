@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { applyChange } from '#lib/commands.ts';
+	import { live } from '#lib/live.svelte.ts';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Slider } from '#lib/components/ui/slider/index.js';
 	import { Switch } from '#lib/components/ui/switch/index.js';
@@ -8,8 +9,8 @@
 
 	let { group, link = true }: { group: HomeGroup; link?: boolean } = $props();
 
-	let on = $derived(group.on);
-	let brightness = $derived(group.brightness);
+	let on = $derived(live.groups.get(group.groupedLightId)?.on ?? group.on);
+	let brightness = $derived(live.groups.get(group.groupedLightId)?.brightness ?? group.brightness);
 
 	const target = $derived({ kind: 'groups' as const, id: group.groupedLightId, name: group.name });
 	const href = $derived(

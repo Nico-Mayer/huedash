@@ -18,7 +18,11 @@ export class Live {
 	#reloading: Promise<void> | undefined;
 	#again = false;
 
-	constructor(private createSource: (url: string) => Source = (url) => new EventSource(url)) {}
+	readonly #createSource: (url: string) => Source;
+
+	constructor(createSource: (url: string) => Source = (url) => new EventSource(url)) {
+		this.#createSource = createSource;
+	}
 
 	// Before the first full connection there is nothing to have lost yet.
 	get connected(): boolean {
@@ -27,7 +31,7 @@ export class Live {
 
 	connect() {
 		if (this.#source) return;
-		const source = this.createSource('/api/events');
+		const source = this.#createSource('/api/events');
 		this.#source = source;
 		source.onopen = () => {
 			this.#browserOpen = true;
