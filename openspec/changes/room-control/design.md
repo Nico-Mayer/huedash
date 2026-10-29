@@ -87,3 +87,4 @@ Fixtures gain a small home: rooms "Kitchen" (color light "Ceiling", ambiance lig
 - Brightness and color changes also send `on: true`, as in the Hue app: dimming or coloring a room that is off turns it on.
 - Kelvin and mirek conversion lives in `src/lib/color-temperature.ts`, so client components can use it; `culori` stays in server code.
 - `/api/*` requests are excluded from the setup redirect. Without a bridge they answer `409` themselves instead of redirecting a `fetch` to the setup HTML.
+- A group command held by the throttle is sent up to one second later. If the user changes a single light in that second, the late group command can override it (seen in e2e). Rare in normal use; live updates will show the real state. E2E tests wait for each command response before the next step.

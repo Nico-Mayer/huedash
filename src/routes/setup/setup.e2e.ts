@@ -31,8 +31,11 @@ test('finds the bridge and pairs over TLS', async ({ page }) => {
 	await expect(page.getByText('Press the link button')).toBeVisible();
 	await expect(page.getByText('Mock Bridge')).toBeVisible();
 
-	await expect(page.getByText('Connected to Mock Bridge')).toBeVisible({ timeout: 15_000 });
+	await expect(page.getByRole('heading', { name: 'Rooms' })).toBeVisible({ timeout: 15_000 });
 	await expect(page).toHaveURL(/\/$/);
+
+	await page.goto('/settings');
+	await expect(page.getByText('Connected to Mock Bridge')).toBeVisible();
 });
 
 test('setup is closed once a bridge is paired', async ({ page }) => {
@@ -42,7 +45,7 @@ test('setup is closed once a bridge is paired', async ({ page }) => {
 });
 
 test('forgets the bridge and returns to setup', async ({ page }) => {
-	await page.goto('/');
+	await page.goto('/settings');
 
 	await page.getByRole('button', { name: 'Forget bridge' }).click();
 	await page.getByRole('alertdialog').getByRole('button', { name: 'Forget bridge' }).click();
@@ -56,5 +59,5 @@ test('pairs with a manually entered address', async ({ page }) => {
 	await page.getByLabel('Bridge IP address').fill(E2E_BRIDGE_ADDRESS);
 	await page.getByRole('button', { name: 'Connect' }).click();
 
-	await expect(page.getByText('Connected to Mock Bridge')).toBeVisible({ timeout: 15_000 });
+	await expect(page.getByRole('heading', { name: 'Rooms' })).toBeVisible({ timeout: 15_000 });
 });

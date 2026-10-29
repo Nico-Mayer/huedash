@@ -24,7 +24,7 @@
 
 ## 5. End to end, docs, verification
 
-- [ ] 5.1 Update e2e: after pairing, home lists Kitchen, Living room, Downstairs; toggle Kitchen off and back; set Kitchen brightness; open Kitchen, switch Ceiling off; Plug shows unreachable; settings shows "Connected to Mock Bridge" and forget still returns to setup. Verify `pnpm test:e2e` passes
+- [x] 5.1 Update e2e: after pairing, home lists Kitchen, Living room, Downstairs; toggle Kitchen off and back; set Kitchen brightness; open Kitchen, switch Ceiling off; Plug shows unreachable; settings shows "Connected to Mock Bridge" and forget still returns to setup. Verify `pnpm test:e2e` passes
 - [ ] 5.2 Update `README.md` (what the dashboard controls now) and `AGENTS.md` (home model, command endpoints, throttle, mock home fixtures); verify `pnpm lint` passes
 - [ ] 5.3 Verify `pnpm test`, `pnpm check`, `pnpm lint`, `pnpm build` exit 0 and `server.js` runs without `node_modules`; commit in atomic conventional commits with no co-author lines
 
