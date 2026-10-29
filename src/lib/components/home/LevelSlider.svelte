@@ -23,7 +23,7 @@
 	type="single"
 	{value}
 	class={cn(
-		'group/slider relative flex w-full touch-none items-center select-none data-disabled:opacity-50',
+		'group/slider relative flex w-full cursor-pointer touch-none items-center select-none has-data-active:cursor-grabbing data-disabled:cursor-not-allowed data-disabled:opacity-50',
 		className
 	)}
 	{...restProps}
@@ -43,8 +43,8 @@
 				aria-label={thumbLabel}
 				aria-valuetext={format(value)}
 				class={[
-					'block w-2.5 rounded-full border-2 border-primary bg-primary-foreground shadow-sm ring-ring/50 outline-hidden transition-shadow ring-inset focus-visible:ring-4',
-					size === 'lg' ? 'h-6' : 'h-3.5'
+					'block w-3 cursor-grab rounded-full border-2 border-primary bg-primary-foreground shadow-sm ring-ring/50 outline-hidden transition-shadow ring-inset focus-visible:ring-4 data-disabled:cursor-not-allowed data-active:cursor-grabbing',
+					size === 'lg' ? 'h-7' : 'h-4.5'
 				]}
 			/>
 			<SliderPrimitive.ThumbLabel
