@@ -7,8 +7,8 @@
 
 ## 2. Mock bridge
 
-- [ ] 2.1 Add `msw` and create `src/mocks/bridge/` with a fixture bridge resource and a handler for `GET https://192.0.2.10/clip/v2/resource/bridge`; verify `pnpm check` passes
-- [ ] 2.2 Add a Vitest setup file for the `server` project that starts `setupServer` with `onUnhandledRequest: 'error'` and resets handlers after each test; verify a unit smoke test fetching the bridge resource passes and an unmocked bridge URL fails the test
+- [x] 2.1 Add `msw` and create `src/mocks/bridge/` with a fixture bridge resource and a handler for `GET https://192.0.2.10/clip/v2/resource/bridge`; verify `pnpm check` passes
+- [x] 2.2 Add a Vitest setup file for the `server` project that starts `setupServer` with `onUnhandledRequest: 'error'` and resets handlers after each test; verify a unit smoke test fetching the bridge resource passes and an unmocked bridge URL fails the test
 
 ## 3. Playwright
 
