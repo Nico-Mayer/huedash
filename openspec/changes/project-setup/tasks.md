@@ -8,13 +8,13 @@
 
 - [x] 2.1 On a clean git tree, run `pnpm dlx sv@1.1.1 create . --template minimal --types ts --no-add-ons --install pnpm --no-dir-check` and verify `pnpm dev` serves the default page
 - [x] 2.2 Review `git diff` for files `sv` overwrote (`.gitignore`, `README.md`) and merge back the previous entries; verify `git diff .gitignore` shows no removed project entries (`/data/`, `.env`, `.claude/settings.local.json`)
-- [ ] 2.3 Run `pnpm dlx sv@1.1.1 add prettier eslint tailwindcss sveltekit-adapter="adapter:node"` and verify `svelte.config.js` imports `@sveltejs/adapter-node` and `pnpm build` writes `build/index.js`
-- [ ] 2.4 Approve only required install scripts with `pnpm approve-builds` and verify a fresh `pnpm install` prints no ignored-build warnings
+- [x] 2.3 Run `pnpm dlx sv@1.1.1 add prettier eslint tailwindcss sveltekit-adapter="adapter:node"` and verify `vite.config.ts` (SvelteKit 3 has no `svelte.config.js`) imports `@sveltejs/adapter-node` and `pnpm build` writes `build/index.js`
+- [x] 2.4 Approve only required install scripts with `pnpm approve-builds` and verify a fresh `pnpm install` prints no ignored-build warnings
 
 ## 3. Lint and format
 
-- [ ] 3.1 Add `prettier-plugin-tailwindcss` to the Prettier config (after `prettier-plugin-svelte`) and verify `pnpm format` sorts Tailwind classes in a test edit
-- [ ] 3.2 Verify `pnpm lint` and `pnpm check` pass with zero errors on the scaffold
+- [x] 3.1 Add `prettier-plugin-tailwindcss` to the Prettier config (after `prettier-plugin-svelte`) and verify `pnpm format` sorts Tailwind classes in a test edit
+- [x] 3.2 Verify `pnpm lint` and `pnpm check` pass with zero errors on the scaffold
 
 ## 4. shadcn-svelte
 

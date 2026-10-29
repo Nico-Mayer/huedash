@@ -30,16 +30,16 @@ Before writing code we would have to maintain, search for a maintained library: 
 
 Use these skills for the matching work.
 
-| Work | Skill | Where |
-|---|---|---|
-| Svelte components and modules | `svelte:svelte-code-writer`, `svelte:svelte-core-bestpractices`, `svelte:svelte-file-editor` agent, Svelte MCP | Global plugin `svelte` from marketplace `sveltejs/ai-tools` |
-| shadcn-svelte components, theming | `shadcn-svelte` | Project |
-| Dockerfile | `multi-stage-dockerfile` | Project |
-| GitHub Actions workflows | `github-actions-templates` | Project |
-| Interface design | `interface-design` | Global, `npx skills add dammyjay93/interface-design -g` |
-| UI copy | `ux-writing` | Global, `npx skills add content-designer/ux-writing-skill -g` |
-| Browser checks and e2e | `playwright-cli` | Global, `npx skills add microsoft/playwright-cli -g` |
-| Library docs | `find-docs` | Global, from Context7 (`npx ctx7`) |
+| Work                              | Skill                                                                                                          | Where                                                         |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Svelte components and modules     | `svelte:svelte-code-writer`, `svelte:svelte-core-bestpractices`, `svelte:svelte-file-editor` agent, Svelte MCP | Global plugin `svelte` from marketplace `sveltejs/ai-tools`   |
+| shadcn-svelte components, theming | `shadcn-svelte`                                                                                                | Project                                                       |
+| Dockerfile                        | `multi-stage-dockerfile`                                                                                       | Project                                                       |
+| GitHub Actions workflows          | `github-actions-templates`                                                                                     | Project                                                       |
+| Interface design                  | `interface-design`                                                                                             | Global, `npx skills add dammyjay93/interface-design -g`       |
+| UI copy                           | `ux-writing`                                                                                                   | Global, `npx skills add content-designer/ux-writing-skill -g` |
+| Browser checks and e2e            | `playwright-cli`                                                                                               | Global, `npx skills add microsoft/playwright-cli -g`          |
+| Library docs                      | `find-docs`                                                                                                    | Global, from Context7 (`npx ctx7`)                            |
 
 Notes:
 
