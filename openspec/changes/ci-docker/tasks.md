@@ -25,7 +25,7 @@
 ## 5. Verify in GitHub
 
 - [x] 5.1 Commit on a `ci-docker` branch in atomic conventional commits and verify `git log --oneline` shows them with no co-author lines
-- [ ] 5.2 After the user pushes the branch, open a PR with `gh pr create` and verify both workflows pass with `gh pr checks`
+- [x] 5.2 After the user pushes the branch, open a PR with `gh pr create` and verify both workflows pass with `gh pr checks`
 - [ ] 5.3 After the user merges, verify the `main` image run publishes `edge` and `sha-*` tags for amd64 and arm64 with `gh run view` and the GHCR package page, and remind the user to make the package public
 
 ## Workflow follow-up
