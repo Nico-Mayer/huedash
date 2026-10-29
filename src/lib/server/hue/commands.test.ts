@@ -33,10 +33,11 @@ describe('command schemas', () => {
 		}
 	);
 
-	it('does not accept color for single lights', () => {
-		expect(lightCommandSchema.safeParse({ color: { hue: 0, saturation: 100 } }).success).toBe(
-			false
-		);
+	it('accepts white and color for single lights', () => {
+		expect(lightCommandSchema.parse({ mirek: 600, color: { hue: 0, saturation: 100 } })).toEqual({
+			mirek: 500,
+			color: { hue: 0, saturation: 100 }
+		});
 	});
 });
 

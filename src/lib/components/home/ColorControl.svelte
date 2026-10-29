@@ -1,21 +1,15 @@
 <script lang="ts">
-	import { applyChange } from '#lib/commands.ts';
 	import { Slider } from '#lib/components/ui/slider/index.js';
-	import type { HomeGroup } from '#lib/server/hue/home.ts';
+	import type { ControlTarget } from '#lib/control-target.svelte.ts';
 
-	let { group }: { group: HomeGroup } = $props();
+	let { control }: { control: ControlTarget } = $props();
 
-	// The bridge does not report a group's color, so the picker starts neutral.
-	let hue = $state(30);
-	let saturation = $state(0);
+	// Without a reported color, for example for a group, the picker starts neutral.
+	let hue = $derived(control.hueSaturation?.hue ?? 30);
+	let saturation = $derived(control.hueSaturation?.saturation ?? 0);
 
 	function commit() {
-		const previous = { hue, saturation };
-		applyChange(
-			{ kind: 'groups', id: group.groupedLightId, name: group.name },
-			{ on: true, color: { hue, saturation } },
-			() => ({ hue, saturation } = previous)
-		);
+		control.apply({ on: true, color: { hue, saturation } });
 	}
 </script>
 
@@ -34,7 +28,7 @@
 		min={0}
 		max={360}
 		onValueCommit={commit}
-		thumbLabel="{group.name} hue"
+		thumbLabel="{control.name} hue"
 	/>
 	<Slider
 		type="single"
@@ -42,6 +36,6 @@
 		min={0}
 		max={100}
 		onValueCommit={commit}
-		thumbLabel="{group.name} saturation"
+		thumbLabel="{control.name} saturation"
 	/>
 </div>

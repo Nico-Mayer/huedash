@@ -1,5 +1,7 @@
 import { failureFromError, failureFromResponse, type BridgeFailure } from './bridge.ts';
+import type { HueSaturation } from '../../live-updates.ts';
 import { createHueClient } from './client.ts';
+import { xyToHueSaturation } from './color.ts';
 import type { Connection } from './connection.ts';
 import { sceneColors } from './scene-colors.ts';
 import type { paths } from './schema.d.ts';
@@ -26,8 +28,11 @@ export type HomeLight = {
 	on: boolean;
 	brightness: number | null;
 	reachable: boolean;
-	colorTemperature: boolean;
+	mirekRange: MirekRange | null;
 	color: boolean;
+	// Only one of these is set: the bridge reports either a white or a color for the light.
+	mirek: number | null;
+	hueSaturation: HueSaturation | null;
 };
 
 export type HomeScene = {
@@ -90,16 +95,15 @@ export function buildHome(resources: HomeResources): Home {
 		return status === undefined || status === 'connected';
 	}
 
-	const mirekRanges = new Map<string, MirekRange>();
 	const lights = new Map<string, HomeLight>(
 		resources.lights.map((light) => {
 			const schema = light.color_temperature?.mirek_schema;
-			if (schema?.mirek_minimum !== undefined && schema.mirek_maximum !== undefined) {
-				mirekRanges.set(light.id, {
-					minMirek: schema.mirek_minimum,
-					maxMirek: schema.mirek_maximum
-				});
-			}
+			const mirekRange =
+				schema?.mirek_minimum !== undefined && schema.mirek_maximum !== undefined
+					? { minMirek: schema.mirek_minimum, maxMirek: schema.mirek_maximum }
+					: null;
+			const white = light.color_temperature?.mirek_valid ? light.color_temperature.mirek : null;
+			const xy = light.color?.xy;
 			return [
 				light.id,
 				{
@@ -108,8 +112,10 @@ export function buildHome(resources: HomeResources): Home {
 					on: light.on.on ?? false,
 					brightness: light.dimming ? Math.round(light.dimming.brightness ?? 0) : null,
 					reachable: reachable(light),
-					colorTemperature: schema !== undefined,
-					color: light.color !== undefined
+					mirekRange,
+					color: light.color !== undefined,
+					mirek: white ?? null,
+					hueSaturation: white == null && xy ? xyToHueSaturation(xy) : null
 				}
 			];
 		})
@@ -132,7 +138,7 @@ export function buildHome(resources: HomeResources): Home {
 			.map((id) => lights.get(id))
 			.filter((light) => light !== undefined)
 			.sort(byName);
-		const ranges = members.flatMap((light) => mirekRanges.get(light.id) ?? []);
+		const ranges = members.flatMap((light) => light.mirekRange ?? []);
 		const state = groupedLights.get(groupedLightId);
 
 		return {

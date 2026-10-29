@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { kelvinToMirek, mirekToKelvin } from '../../color-temperature.ts';
-import { hueSaturationToXy } from './color.ts';
+import { hueSaturationToXy, xyToHueSaturation } from './color.ts';
 
 describe('hueSaturationToXy', () => {
 	it.each([
@@ -30,5 +30,23 @@ describe('color temperature', () => {
 	it('maps the Hue range ends', () => {
 		expect(mirekToKelvin(153)).toBe(6536);
 		expect(mirekToKelvin(500)).toBe(2000);
+	});
+});
+
+describe('xyToHueSaturation', () => {
+	it.each([
+		[0, 100],
+		[120, 100],
+		[240, 100],
+		[30, 50]
+	])('turns hue %i and saturation %i into xy and back', (hue, saturation) => {
+		const back = xyToHueSaturation(hueSaturationToXy(hue, saturation));
+
+		expect(back.hue).toBeCloseTo(hue, -1);
+		expect(back.saturation).toBeCloseTo(saturation, -1);
+	});
+
+	it('gives no saturation for the white point', () => {
+		expect(xyToHueSaturation({ x: 0.3127, y: 0.329 }).saturation).toBeLessThan(2);
 	});
 });

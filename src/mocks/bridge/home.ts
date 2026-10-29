@@ -52,7 +52,13 @@ const ref = (rid: string, rtype: string): Ref => ({ rid, rtype });
 function light(
 	id: string,
 	name: string,
-	options: { on: boolean; brightness?: number; mirek?: [number, number]; color?: boolean }
+	options: {
+		on: boolean;
+		brightness?: number;
+		mirek?: [number, number];
+		color?: boolean;
+		showsColor?: boolean;
+	}
 ): MockLight {
 	return {
 		id,
@@ -65,8 +71,8 @@ function light(
 		}),
 		...(options.mirek && {
 			color_temperature: {
-				mirek: 366,
-				mirek_valid: true,
+				mirek: options.showsColor ? null : 366,
+				mirek_valid: !options.showsColor,
 				mirek_schema: { mirek_minimum: options.mirek[0], mirek_maximum: options.mirek[1] }
 			}
 		}),
@@ -78,7 +84,13 @@ function initialHome() {
 	const lights = [
 		light('ceiling', 'Ceiling', { on: true, brightness: 70, mirek: [153, 500], color: true }),
 		light('counter', 'Counter', { on: true, brightness: 50, mirek: [153, 454] }),
-		light('lamp', 'Lamp', { on: false, brightness: 30, mirek: [153, 500], color: true }),
+		light('lamp', 'Lamp', {
+			on: false,
+			brightness: 30,
+			mirek: [153, 500],
+			color: true,
+			showsColor: true
+		}),
 		light('plug', 'Plug', { on: false })
 	];
 
@@ -237,8 +249,15 @@ function applyToLight(target: MockLight, update: LightUpdate) {
 	if (update.dimming && target.dimming) target.dimming.brightness = update.dimming.brightness;
 	if (update.color_temperature && target.color_temperature) {
 		target.color_temperature.mirek = update.color_temperature.mirek;
+		target.color_temperature.mirek_valid = true;
 	}
-	if (update.color && target.color) target.color.xy = update.color.xy;
+	if (update.color && target.color) {
+		target.color.xy = update.color.xy;
+		if (target.color_temperature) {
+			target.color_temperature.mirek = null;
+			target.color_temperature.mirek_valid = false;
+		}
+	}
 }
 
 export type BridgeEvent = {
@@ -282,7 +301,14 @@ function publishLightChanges(changed: MockLight[]) {
 				id: l.id,
 				type: 'light',
 				on: l.on,
-				...(l.dimming && { dimming: { brightness: l.dimming.brightness } })
+				...(l.dimming && { dimming: { brightness: l.dimming.brightness } }),
+				...(l.color_temperature && {
+					color_temperature: {
+						mirek: l.color_temperature.mirek,
+						mirek_valid: l.color_temperature.mirek_valid
+					}
+				}),
+				...(l.color && { color: { xy: l.color.xy } })
 			})),
 			...groups.map((g) => ({ id: g.id, type: 'grouped_light', on: g.on, dimming: g.dimming }))
 		])

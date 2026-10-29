@@ -16,12 +16,7 @@ const brightness = z.number().transform(clamp(1, 100));
 
 const nonEmpty = (command: object) => Object.keys(command).length > 0;
 
-export const lightCommandSchema = z
-	.object({ on: z.boolean().optional(), brightness: brightness.optional() })
-	.strict()
-	.refine(nonEmpty);
-
-export const groupCommandSchema = z
+const stateCommandSchema = z
 	.object({
 		on: z.boolean().optional(),
 		brightness: brightness.optional(),
@@ -33,6 +28,9 @@ export const groupCommandSchema = z
 	})
 	.strict()
 	.refine(nonEmpty);
+
+export const lightCommandSchema = stateCommandSchema;
+export const groupCommandSchema = stateCommandSchema;
 
 export const sceneCommandSchema = z.object({ mode: z.enum(['active', 'dynamic']) }).strict();
 

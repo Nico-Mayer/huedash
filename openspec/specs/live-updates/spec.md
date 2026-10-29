@@ -19,7 +19,7 @@ While at least one browser tab listens for updates, the server SHALL hold exactl
 - **THEN** the server closes the bridge event stream connection
 
 ### Requirement: Show on/off and brightness changes in place
-When the bridge reports a new on/off state or brightness for a light, room, or zone, every open page that shows it SHALL update within one second, without reloading the page.
+When the bridge reports a new on/off state or brightness for a light, room, or zone, or a new color temperature or color for a light, every open page that shows it SHALL update within one second, without reloading the page.
 
 #### Scenario: Change in the Hue app
 - **WHEN** the user turns the Kitchen off in the Hue app
@@ -28,6 +28,10 @@ When the bridge reports a new on/off state or brightness for a light, room, or z
 #### Scenario: Change in another tab
 - **WHEN** the user dims the Kitchen in one huedash tab
 - **THEN** another open huedash tab shows the new Kitchen brightness
+
+#### Scenario: Light color changes
+- **WHEN** "Ceiling" is selected and the user sets it to red in the Hue app
+- **THEN** the inspector shows the Color tab at red without a reload
 
 ### Requirement: Reload on structural changes
 When the bridge reports a change that the page cannot apply in place (a room, zone, or light added, removed, or renamed, or a change in reachability), the system SHALL reload the page data once, at most once per second.
