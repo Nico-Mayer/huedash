@@ -66,17 +66,17 @@ ControlTarget {
   apply(change: { on?, brightness?, mirek?, color? }): void
 }
 ```
-`groupTarget(group)` sends one group command through `changeGroup`. `lightsTarget(lights)` uses the first selected light (name order) for current values, the intersection of the lights' ranges for `mirekRange`, `color` only when every light has color, and calls `changeLight` for each light. `ColorTemperatureControl` and `ColorControl` take a target instead of a group. The tab starts on Color when the target's current state is a color, otherwise White.
+`groupTarget(group)` sends one group command through `changeGroup`. `lightsTarget(lights)` uses the first selected light (name order) for current values, the intersection of the lights' ranges for `mirekRange`, `color` only when every light has color, and calls `changeLight` for each light. `ColorTemperatureControl` and `ColorControl` take a target instead of a group, as a prop named `control` (`target` collides with Svelte's mount option in component tests). The tab starts on Color when the target's current state is a color, otherwise White.
 
 ### Presets
-`BrightnessPresets`: buttons 10/25/50/100 % → `apply({ on: true, brightness })`. `WhitePresets`: Warm 2200 K, Soft 2700 K, Neutral 4000 K, Daylight 6500 K → `apply({ on: true, mirek })` with `mirek = clamp(kelvinToMirek(k), range)`. Plain `Button variant="outline" size="sm"` in a 4-column grid, each with a small swatch from the existing color-temperature helpers. A toggle group does not fit, because a preset is an action, not a lasting state.
+`BrightnessPresets`: buttons 10/25/50/100 % → `apply({ on: true, brightness })`. `WhitePresets`: Warm 2200 K, Soft 2700 K, Neutral 4000 K, Daylight 6500 K → `apply({ on: true, mirek })` with `mirek = clamp(kelvinToMirek(k), range)`. Plain `Button variant="outline" size="sm"` in a 4-column grid with text labels only: the kelvin-to-color helper (`chroma-js`) is server only, and fixed swatch colors would bypass the theme. A toggle group does not fit, because a preset is an action, not a lasting state.
 
 ### Placement and bottom sheet
 `IsMobile(1280)` (the existing hook with a custom breakpoint) decides the layout:
 - **Wide:** the right column shows `Controls(selection ? lightsTarget : groupTarget)`.
 - **Narrow:** the top card always shows `Controls(groupTarget)`. When the selection is not empty and select mode is off, a `Sheet side="bottom"` opens with `Controls(lightsTarget)`. In select mode, a sticky bar at the bottom shows "Control N lights"; it ends select mode and opens the sheet. Closing the sheet clears the selection.
 
-The sheet is modal, which is why select mode on narrow screens collects lights first and opens the sheet afterwards.
+The sheet is modal, which is why select mode on narrow screens collects lights first and opens the sheet afterwards. Inside the sheet there is no "Back to room" button: the sheet's own close button does the same and the two would overlap.
 
 ### Copy
 "Select" / "Done" in the Lights header. "Controlling", "2 lights", "Back to room". Preset labels "10 %", "25 %", "50 %", "100 %", "Warm", "Soft", "Neutral", "Daylight". Sticky bar "Control 2 lights".
