@@ -18,7 +18,7 @@
 
 ## 4. End to end, docs, verification
 
-- [ ] 4.1 Add e2e tests: Kitchen page lists Bright, Relax, Tropical; selecting Relax marks it active and the home card shows "Relax"; play on Tropical marks it playing; a second page sees the active scene change without reload. Verify `pnpm test:e2e` passes
+- [x] 4.1 Add e2e tests: Kitchen page lists Bright, Relax, Tropical; selecting Relax marks it active and the home card shows "Relax"; play on Tropical marks it playing; a second page sees the active scene change without reload. Verify `pnpm test:e2e` passes
 - [ ] 4.2 Update `README.md` features and `AGENTS.md` (scenes in the home model, endpoint, mock scenes); verify `pnpm lint` passes
 - [ ] 4.3 Verify `pnpm test`, `pnpm check`, `pnpm lint`, `pnpm build`, and `pnpm check:standalone` exit 0; commit in atomic conventional commits with no co-author lines
 
