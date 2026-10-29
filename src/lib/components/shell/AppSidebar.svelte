@@ -4,7 +4,7 @@
 	import { page } from '$app/state';
 	import GroupSwitch from '#lib/components/home/GroupSwitch.svelte';
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
-	import { groupSummary } from '#lib/group-state.svelte.ts';
+	import { groupSummary, homeSummary, onSwatches } from '#lib/group-state.svelte.ts';
 	import { live } from '#lib/live.svelte.ts';
 	import type { HomeGroup, HomeResult } from '#lib/server/hue/home.ts';
 
@@ -32,7 +32,12 @@
 
 <Sidebar.Root collapsible="offcanvas">
 	<Sidebar.Header>
-		<a href={resolve('/(app)')} class="px-2 py-1 font-semibold" onclick={closeOnPhone}>huedash</a>
+		<div class="flex flex-col px-2 py-1">
+			<a href={resolve('/(app)')} class="font-semibold" onclick={closeOnPhone}>huedash</a>
+			{#if result.status === 'ok'}
+				<span class="text-xs text-muted-foreground tabular-nums">{homeSummary(result.home)}</span>
+			{/if}
+		</div>
 	</Sidebar.Header>
 
 	<Sidebar.Content>
@@ -54,9 +59,20 @@
 										>
 											<span class="flex min-w-0 flex-col">
 												<span class="truncate">{group.name}</span>
-												<span class="truncate text-xs text-muted-foreground"
-													>{groupSummary(group)}</span
-												>
+												<span class="flex items-center gap-1.5 text-xs text-muted-foreground">
+													{#each onSwatches(group) as swatch, i (i)}
+														<span
+															class={[
+																'size-1.5 shrink-0 rounded-full',
+																swatch ? 'bg-(--swatch)' : 'bg-foreground/60'
+															]}
+															style:--swatch={swatch}
+															data-swatch={swatch ?? 'none'}
+															aria-hidden="true"
+														></span>
+													{/each}
+													<span class="truncate">{groupSummary(group)}</span>
+												</span>
 											</span>
 										</a>
 									{/snippet}
