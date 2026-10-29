@@ -2,7 +2,7 @@
 
 ## 1. Mock bridge home
 
-- [ ] 1.1 Add home fixtures (rooms Kitchen and Living room, zone Downstairs, devices, lights with varied capabilities, grouped lights, zigbee connectivity with the Plug unreachable) and handlers for the six reads plus stateful `PUT` on `grouped_light` and `light` with a resettable command log; verify a unit test reads each resource and sees a `PUT` change the state
+- [x] 1.1 Add home fixtures (rooms Kitchen and Living room, zone Downstairs, devices, lights with varied capabilities, grouped lights, zigbee connectivity with the Plug unreachable) and handlers for the six reads plus stateful `PUT` on `grouped_light` and `light` with a resettable command log; verify a unit test reads each resource and sees a `PUT` change the state
 
 ## 2. Server: model, commands, throttle
 
