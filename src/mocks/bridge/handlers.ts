@@ -2,7 +2,14 @@ import { http, HttpResponse, type HttpHandler } from 'msw/http';
 import { createOpenApiHttp } from 'openapi-msw';
 import type { paths } from '../../lib/server/hue/schema.d.ts';
 import { bridge, MOCK_APP_KEY, MOCK_CLIENT_KEY, publicConfig } from './fixtures.ts';
-import { groupedLights, home, onBridgeEvents, updateGroupedLight, updateLight } from './home.ts';
+import {
+	groupedLights,
+	home,
+	onBridgeEvents,
+	recallScene,
+	updateGroupedLight,
+	updateLight
+} from './home.ts';
 
 // TEST-NET-1 address, never routable, so a missed mock cannot reach a real device.
 export const MOCK_BRIDGE_IP = '192.0.2.10';
@@ -102,8 +109,25 @@ handlers.push(
 	collection('light', () => home.lights),
 	collection('grouped_light', groupedLights),
 	collection('zigbee_connectivity', () => home.connectivity),
+	collection('scene', () => home.scenes),
 	command('light', updateLight),
-	command('grouped_light', updateGroupedLight)
+	command('grouped_light', updateGroupedLight),
+	http.put('*/clip/v2/resource/scene/:id', async ({ request, params }) => {
+		const denied = unauthorized(request);
+		if (denied) return denied;
+
+		const body = (await request.json()) as {
+			recall?: { action?: 'active' | 'static' | 'dynamic_palette' };
+		};
+		const action = body.recall?.action;
+		if (!action || !recallScene(String(params.id), action)) {
+			return HttpResponse.json(
+				{ errors: [{ description: 'invalid scene recall' }] },
+				{ status: 404 }
+			);
+		}
+		return HttpResponse.json({ errors: [], data: [{ rid: params.id, rtype: 'scene' }] });
+	})
 );
 
 export const discoveredBridges = [

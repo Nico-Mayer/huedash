@@ -2,7 +2,7 @@
 
 ## 1. Mock bridge scenes
 
-- [ ] 1.1 Add scene fixtures (Kitchen Bright, Relax, Tropical with palette; Living room Reading), `GET /resource/scene`, and stateful `PUT /resource/scene/{id}` recall that applies actions, sets status (others in the group inactive), logs the command, and publishes light, grouped light, and scene events; verify with unit tests for recall state and published events
+- [x] 1.1 Add scene fixtures (Kitchen Bright, Relax, Tropical with palette; Living room Reading), `GET /resource/scene`, and stateful `PUT /resource/scene/{id}` recall that applies actions, sets status (others in the group inactive), logs the command, and publishes light, grouped light, and scene events; verify with unit tests for recall state and published events
 
 ## 2. Server
 

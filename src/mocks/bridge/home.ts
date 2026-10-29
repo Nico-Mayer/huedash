@@ -15,6 +15,30 @@ type MockLight = {
 	color?: { xy: { x: number; y: number }; gamut_type: string };
 };
 
+type SceneAction = {
+	target: Ref;
+	action: {
+		on?: { on: boolean };
+		dimming?: { brightness: number };
+		color?: { xy: { x: number; y: number } };
+		color_temperature?: { mirek: number };
+	};
+};
+
+type MockScene = {
+	id: string;
+	type: 'scene';
+	group: Ref;
+	metadata: { name: string };
+	actions: SceneAction[];
+	palette?: {
+		color: { color: { xy: { x: number; y: number } }; dimming: { brightness: number } }[];
+	};
+	speed: number;
+	auto_dynamic: boolean;
+	status: { active: 'inactive' | 'static' | 'dynamic_palette' };
+};
+
 type MockGroup = {
 	id: string;
 	type: 'room' | 'zone';
@@ -99,10 +123,65 @@ function initialHome() {
 		}
 	];
 
-	return { lights, devices, connectivity, rooms, zones };
+	const act = (light: string, action: SceneAction['action']): SceneAction => ({
+		target: ref(light, 'light'),
+		action: { on: { on: true }, ...action }
+	});
+	const scene = (
+		id: string,
+		group: string,
+		name: string,
+		actions: SceneAction[],
+		palette?: MockScene['palette']
+	): MockScene => ({
+		id,
+		type: 'scene',
+		group: ref(group, 'room'),
+		metadata: { name },
+		actions,
+		...(palette && { palette }),
+		speed: 0.6,
+		auto_dynamic: false,
+		status: { active: 'inactive' }
+	});
+
+	const scenes: MockScene[] = [
+		scene('scene-bright', 'room-kitchen', 'Bright', [
+			act('ceiling', { dimming: { brightness: 100 }, color_temperature: { mirek: 233 } }),
+			act('counter', { dimming: { brightness: 100 }, color_temperature: { mirek: 233 } })
+		]),
+		scene('scene-relax', 'room-kitchen', 'Relax', [
+			act('ceiling', { dimming: { brightness: 56 }, color_temperature: { mirek: 447 } }),
+			act('counter', { dimming: { brightness: 56 }, color_temperature: { mirek: 447 } })
+		]),
+		scene(
+			'scene-tropical',
+			'room-kitchen',
+			'Tropical',
+			[
+				act('ceiling', { dimming: { brightness: 80 }, color: { xy: { x: 0.6, y: 0.3 } } }),
+				act('counter', { dimming: { brightness: 80 }, color_temperature: { mirek: 300 } })
+			],
+			{
+				color: [
+					{ color: { xy: { x: 0.6, y: 0.3 } }, dimming: { brightness: 80 } },
+					{ color: { xy: { x: 0.2, y: 0.6 } }, dimming: { brightness: 80 } }
+				]
+			}
+		),
+		scene('scene-reading', 'room-living', 'Reading', [
+			act('lamp', { dimming: { brightness: 90 }, color_temperature: { mirek: 300 } })
+		])
+	];
+
+	return { lights, devices, connectivity, rooms, zones, scenes };
 }
 
-export type CommandLogEntry = { rtype: 'light' | 'grouped_light'; id: string; body: unknown };
+export type CommandLogEntry = {
+	rtype: 'light' | 'grouped_light' | 'scene';
+	id: string;
+	body: unknown;
+};
 
 export const home = {
 	...initialHome(),
@@ -191,8 +270,14 @@ function publishLightChanges(changed: MockLight[]) {
 		const group = [...home.rooms, ...home.zones].find((g) => g.id === grouped.owner.rid);
 		return group && lightsOfGroup(group).some((l) => ids.has(l.id));
 	});
+	const groupIds = new Set(groups.map((g) => g.owner.rid));
+	const ended = home.scenes.filter(
+		(sc) => groupIds.has(sc.group.rid) && sc.status.active !== 'inactive'
+	);
+	for (const sc of ended) sc.status = { active: 'inactive' };
 	publishEvents([
 		updateEvent([
+			...ended.map((sc) => ({ id: sc.id, type: 'scene', status: sc.status })),
 			...changed.map((l) => ({
 				id: l.id,
 				type: 'light',
@@ -220,5 +305,24 @@ export function updateGroupedLight(id: string, update: LightUpdate): boolean {
 	for (const member of members) applyToLight(member, update);
 	home.commands.push({ rtype: 'grouped_light', id, body: update });
 	publishLightChanges(members);
+	return true;
+}
+
+export function recallScene(id: string, action: 'active' | 'static' | 'dynamic_palette'): boolean {
+	const scene = home.scenes.find((sc) => sc.id === id);
+	if (!scene) return false;
+
+	const lights = scene.actions.flatMap(({ target, action: change }) => {
+		const light = home.lights.find((l) => l.id === target.rid);
+		if (!light) return [];
+		applyToLight(light, change);
+		return [light];
+	});
+	home.commands.push({ rtype: 'scene', id, body: { recall: { action } } });
+	publishLightChanges(lights);
+
+	const dynamic = action === 'dynamic_palette' || (action === 'active' && scene.auto_dynamic);
+	scene.status = { active: dynamic && scene.palette ? 'dynamic_palette' : 'static' };
+	publishEvents([updateEvent([{ id: scene.id, type: 'scene', status: scene.status }])]);
 	return true;
 }
