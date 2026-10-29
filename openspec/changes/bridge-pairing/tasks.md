@@ -2,8 +2,8 @@
 
 ## 1. Hue client foundation
 
-- [ ] 1.1 Add `openapi-fetch`, `undici@^7`, `zod` (runtime) and `openapi-typescript`, `openapi-msw` (dev); verify `pnpm build` and `pnpm check` pass
-- [ ] 1.2 Vendor `openhue.yaml` from openhue-api release 1.2 into `src/lib/server/hue/`, add `pnpm gen:hue` (openapi-typescript), generate and commit `schema.d.ts`; verify `pnpm gen:hue` produces no diff on a second run and `paths` includes `/clip/v2/resource/bridge` and `/api`
+- [x] 1.1 Add `openapi-fetch`, `undici@^7`, `zod` (runtime) and `openapi-typescript`, `openapi-msw` (dev); verify `pnpm build` and `pnpm check` pass
+- [x] 1.2 Vendor `openhue.yaml` from openhue-api release 1.2 into `src/lib/server/hue/`, add `pnpm gen:hue` (openapi-typescript), generate and commit `schema.d.ts`; verify `pnpm gen:hue` produces no diff on a second run and `paths` includes `/clip/v2/resource/bridge` and `/api`
 - [ ] 1.3 Implement `address.ts` (parse `host[:port]`, default 443, reject invalid input) with unit tests for IPv4, hostname, port, and invalid cases
 - [ ] 1.4 Generate two test certificates with `openssl` into `src/mocks/bridge/tls/`; implement `tls.ts` (capture and pinned modes, normalized SHA-256) with unit tests against a local HTTPS server: capture records the fingerprint, matching pin succeeds, mismatched pin fails with `CertificateMismatchError` before the request body is sent
 - [ ] 1.5 Implement `client.ts` (openapi-fetch with pinned dispatcher, `hue-application-key` header, 5 s timeout) and `bridge.ts` (`getPublicConfig`, `requestAppKey`, `checkBridge`) with unit tests against the MSW mock, including timeout and error 101

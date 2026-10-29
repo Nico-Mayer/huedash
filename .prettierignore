@@ -12,3 +12,6 @@ bun.lockb
 /.claude/
 /openspec/
 skills-lock.json
+
+# Vendored from openhue-api
+src/lib/server/hue/openhue.yaml

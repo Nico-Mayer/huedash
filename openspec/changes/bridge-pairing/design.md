@@ -107,3 +107,8 @@ Test certificates are generated once with `openssl` and committed; they protect 
 - [In-memory pending pairing] → Lost on restart; the user starts setup again. Single instance only, which matches the self-hosted model.
 - [undici major must match Node] → Pinned to `^7`; a Node upgrade that bundles undici 8 needs a matching bump. Covered by the TLS unit tests.
 - [`schema.d.ts` drift from bridge firmware] → Regenerate when bumping the vendored spec; types are only compile-time.
+
+## Changes found during implementation
+
+- Runtime libraries (`openapi-fetch`, `undici`, `zod`) are devDependencies, like everything else. SvelteKit externalizes `dependencies` from the server bundle, and the runtime image has no `node_modules`. Task 6.3 re-checks that `node build` runs without `node_modules`.
+- `openapi-typescript` 7.13 declares a peer of TypeScript 5; the project uses TypeScript 6. Generation is checked in task 1.2.
