@@ -50,7 +50,7 @@
 
 		<div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
 			<aside class="xl:sticky xl:top-6 xl:col-start-2 xl:row-start-1" aria-label="Controls">
-				{#key narrow.current ? '' : selectionKey}
+				{#key `${group.id}:${narrow.current ? '' : selectionKey}`}
 					{#if selected.length > 0 && !narrow.current}
 						<Controls control={lightsTarget(selected)} onBack={() => selection.clear()} />
 					{:else}
