@@ -3,10 +3,11 @@
 	import { Switch } from '#lib/components/ui/switch/index.js';
 	import type { HomeGroup } from '#lib/server/hue/home.ts';
 
-	let { group }: { group: HomeGroup } = $props();
+	let { group, size }: { group: HomeGroup; size?: 'default' | 'lg' } = $props();
 </script>
 
 <Switch
+	{size}
 	checked={groupOn(group)}
 	onCheckedChange={(on) => changeGroup(group, { on })}
 	aria-label={group.name}

@@ -21,19 +21,19 @@
 </script>
 
 <section
-	class="flex flex-col gap-4 border-b bg-background px-6 py-4 md:sticky md:top-0 md:z-10"
+	class="flex flex-col gap-6 border-b bg-background px-6 py-8 md:sticky md:top-0 md:z-10"
 	aria-label="{group.name} controls"
 >
-	<div class="flex items-start justify-between gap-4">
-		<div class="flex min-w-0 flex-col gap-1">
-			<h1 class="truncate text-2xl font-semibold">{group.name}</h1>
-			<p class="text-sm text-muted-foreground tabular-nums">{status}</p>
-		</div>
-		<div class="flex shrink-0 items-center gap-3">
+	<div class="flex min-w-0 flex-col gap-1.5">
+		<h1 class="truncate text-2xl font-semibold">{group.name}</h1>
+		<p class="text-sm text-muted-foreground tabular-nums">{status}</p>
+	</div>
+	<div class="flex flex-wrap items-center gap-x-6 gap-y-5">
+		<div class="flex items-center gap-4">
+			<GroupSwitch {group} size="lg" />
 			{#if group.colorTemperature || group.color}
 				<Button
 					variant="outline"
-					size="sm"
 					onclick={onOpenColor}
 					aria-haspopup="dialog"
 					aria-label="Color and white for {group.name}"
@@ -51,24 +51,23 @@
 					Color and white
 				</Button>
 			{/if}
-			<GroupSwitch {group} />
 		</div>
-	</div>
-	<div class="flex items-center gap-4">
-		<LevelSlider
-			value={brightness.current}
-			min={1}
-			max={100}
-			format={(value) => `${value} %`}
-			onValueChange={(value) => brightness.input(value)}
-			onValueCommit={(value) => {
-				brightness.commit(value);
-				changeGroup(group, { on: true, brightness: value });
-			}}
-			thumbLabel="{group.name} brightness"
-		/>
-		<span class="w-12 shrink-0 text-right text-sm text-muted-foreground tabular-nums">
-			{brightness.current} %
-		</span>
+		<div class="flex min-w-0 basis-full items-center gap-4 sm:flex-1 sm:basis-0">
+			<LevelSlider
+				value={brightness.current}
+				min={1}
+				max={100}
+				format={(value) => `${value} %`}
+				onValueChange={(value) => brightness.input(value)}
+				onValueCommit={(value) => {
+					brightness.commit(value);
+					changeGroup(group, { on: true, brightness: value });
+				}}
+				thumbLabel="{group.name} brightness"
+			/>
+			<span class="w-12 shrink-0 text-right text-sm text-muted-foreground tabular-nums">
+				{brightness.current} %
+			</span>
+		</div>
 	</div>
 </section>
