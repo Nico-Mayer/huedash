@@ -113,3 +113,18 @@ describe('Live', () => {
 		expect(live.groups.size).toBe(0);
 	});
 });
+
+describe('Live scenes', () => {
+	it('tracks scene status and clears it after a reload', async () => {
+		connect();
+
+		source.send({ kind: 'scene', id: 'scene-relax', active: 'static' });
+		source.send({ kind: 'scene', id: 'scene-bright', active: 'inactive' });
+
+		expect(live.scenes.get('scene-relax')).toBe('static');
+		expect(live.scenes.get('scene-bright')).toBe('inactive');
+
+		await live.reload();
+		expect(live.scenes.size).toBe(0);
+	});
+});

@@ -1,6 +1,6 @@
 import { refreshAll } from '$app/navigation';
 import { SvelteMap } from 'svelte/reactivity';
-import type { LiveUpdate, StateUpdate } from './live-updates.ts';
+import type { LiveUpdate, SceneStatus, StateUpdate } from './live-updates.ts';
 
 type Source = Pick<EventSource, 'onopen' | 'onerror' | 'onmessage' | 'close'>;
 
@@ -9,6 +9,7 @@ const RELOAD_GAP_MS = 1000;
 export class Live {
 	readonly lights = new SvelteMap<string, StateUpdate>();
 	readonly groups = new SvelteMap<string, StateUpdate>();
+	readonly scenes = new SvelteMap<string, SceneStatus>();
 
 	#browserOpen = $state(false);
 	#bridgeOpen = $state(false);
@@ -56,6 +57,9 @@ export class Live {
 			case 'group':
 				this.groups.set(update.id, { ...this.groups.get(update.id), ...update });
 				break;
+			case 'scene':
+				this.scenes.set(update.id, update.active);
+				break;
 			case 'reload':
 				this.reload();
 				break;
@@ -77,6 +81,7 @@ export class Live {
 			.then(() => {
 				this.lights.clear();
 				this.groups.clear();
+				this.scenes.clear();
 			})
 			.finally(() =>
 				setTimeout(() => {

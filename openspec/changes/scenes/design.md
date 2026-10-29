@@ -64,3 +64,4 @@ Fixtures add scenes: Kitchen "Bright" (color temperature), "Relax" (warm color t
 - [Color strip differs from the Hue app's scene image] → The bridge does not expose scene images; colors come from the scene's own actions.
 - [A light changed after a recall makes the bridge set the scene inactive] → Shown as such, matching the Hue app.
 - [Two color libraries on the server] → Both are server-only and bundled; `chroma-js` is used for one function. Revisit if one library covers both later.
+- `live` keeps a plain status per scene instead of "newest active wins per group": the bridge reports the previous scene as `inactive` when another starts, so per-scene status is already correct.
