@@ -19,8 +19,8 @@
 	const target = $derived({ kind: 'groups' as const, id: group.groupedLightId, name: group.name });
 	const href = $derived(
 		group.kind === 'room'
-			? resolve('/rooms/[id]', { id: group.id })
-			: resolve('/zones/[id]', { id: group.id })
+			? resolve('/(app)/rooms/[id]', { id: group.id })
+			: resolve('/(app)/zones/[id]', { id: group.id })
 	);
 
 	function setOn(next: boolean) {

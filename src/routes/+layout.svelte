@@ -36,10 +36,10 @@
 
 <div class="flex min-h-svh flex-col" data-live={live.open ? 'open' : 'closed'}>
 	<header class="flex items-center justify-between border-b px-6 py-3">
-		<a href={resolve('/')} class="font-semibold">huedash</a>
+		<a href={resolve('/(app)')} class="font-semibold">huedash</a>
 		{#if !inSetup}
 			<a
-				href={resolve('/settings')}
+				href={resolve('/(app)/settings')}
 				class={buttonVariants({ variant: 'ghost', size: 'icon' })}
 				aria-label="Settings"
 			>

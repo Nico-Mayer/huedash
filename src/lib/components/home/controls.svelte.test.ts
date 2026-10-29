@@ -10,7 +10,8 @@ import { live } from '#lib/live.svelte.ts';
 
 vi.mock('$app/navigation', () => ({ refreshAll: vi.fn() }));
 vi.mock('$app/paths', () => ({
-	resolve: (route: string, params?: { id: string }) => route.replace('[id]', params?.id ?? '')
+	resolve: (route: string, params?: { id: string }) =>
+		route.replace('/(app)', '').replace('[id]', params?.id ?? '')
 }));
 
 const toast = vi.hoisted(() => ({ error: vi.fn() }));

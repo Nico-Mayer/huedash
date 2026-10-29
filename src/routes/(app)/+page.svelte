@@ -16,7 +16,7 @@
 			<BridgeStatusView name={data.bridgeName} status={data.result.status} />
 			<div class="flex gap-2">
 				<Button onclick={() => refreshAll()}>Try again</Button>
-				<a href={resolve('/settings')} class={buttonVariants({ variant: 'outline' })}>
+				<a href={resolve('/(app)/settings')} class={buttonVariants({ variant: 'outline' })}>
 					Open settings
 				</a>
 			</div>

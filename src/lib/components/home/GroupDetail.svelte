@@ -18,7 +18,7 @@
 </script>
 
 <main class="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6">
-	<a href={resolve('/')} class="text-sm text-muted-foreground hover:underline">← All rooms</a>
+	<a href={resolve('/(app)')} class="text-sm text-muted-foreground hover:underline">← All rooms</a>
 
 	{#if data.status !== 'ok'}
 		<BridgeStatusView name={data.bridgeName} status={data.status} />
@@ -32,7 +32,9 @@
 				</Empty.Description>
 			</Empty.Header>
 			<Empty.Content>
-				<a href={resolve('/')} class={buttonVariants({ variant: 'outline' })}>Go to all rooms</a>
+				<a href={resolve('/(app)')} class={buttonVariants({ variant: 'outline' })}
+					>Go to all rooms</a
+				>
 			</Empty.Content>
 		</Empty.Root>
 	{:else}

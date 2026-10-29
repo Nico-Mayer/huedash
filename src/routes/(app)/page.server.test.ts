@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw/http';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MOCK_APP_KEY } from '../mocks/bridge/fixtures.ts';
-import { MOCK_BRIDGE_IP } from '../mocks/bridge/handlers.ts';
-import { server } from '../mocks/server.ts';
+import { MOCK_APP_KEY } from '../../mocks/bridge/fixtures.ts';
+import { MOCK_BRIDGE_IP } from '../../mocks/bridge/handlers.ts';
+import { server } from '../../mocks/server.ts';
 import type { PageServerLoadEvent } from './$types';
 import { load } from './+page.server.ts';
 
