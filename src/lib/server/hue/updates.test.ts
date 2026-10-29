@@ -16,6 +16,50 @@ describe('toUpdates', () => {
 		]);
 	});
 
+	it('reports a valid color temperature as white', () => {
+		const message = [
+			event('update', [
+				{
+					id: 'ceiling',
+					type: 'light',
+					color_temperature: { mirek: 250, mirek_valid: true },
+					color: { xy: { x: 0.38, y: 0.38 } }
+				}
+			])
+		];
+
+		expect(toUpdates(message)).toEqual([
+			{ kind: 'light', id: 'ceiling', mirek: 250, hueSaturation: null }
+		]);
+	});
+
+	it('reports xy without a valid color temperature as a color', () => {
+		const message = [
+			event('update', [
+				{
+					id: 'lamp',
+					type: 'light',
+					color_temperature: { mirek: null, mirek_valid: false },
+					color: { xy: { x: 0.64, y: 0.33 } }
+				}
+			])
+		];
+
+		const [update] = toUpdates(message);
+		expect(update).toMatchObject({ kind: 'light', id: 'lamp', mirek: null });
+		expect(update).toHaveProperty('hueSaturation.saturation', 100);
+	});
+
+	it('ignores color fields of groups', () => {
+		const message = [
+			event('update', [
+				{ id: 'grouped-kitchen', type: 'grouped_light', color_temperature: { mirek: 250 } }
+			])
+		];
+
+		expect(toUpdates(message)).toEqual([]);
+	});
+
 	it('turns grouped light state into a group update', () => {
 		const message = [
 			event('update', [{ id: 'grouped-kitchen', type: 'grouped_light', on: { on: false } }])
@@ -50,13 +94,13 @@ describe('toUpdates', () => {
 
 	it('drops updates without state, error events and malformed messages', () => {
 		expect(
-			toUpdates([event('update', [{ id: 'l', type: 'light', color: { xy: { x: 0.3, y: 0.3 } } }])])
+			toUpdates([event('update', [{ id: 'l', type: 'light', effects: { status: 'no_effect' } }])])
 		).toEqual([]);
 		expect(toUpdates([event('error', [{ id: 'l', type: 'light' }])])).toEqual([]);
 		expect(toUpdates({ not: 'an array' })).toEqual([]);
 	});
 
-	it('passes on only kind, id, on and brightness', () => {
+	it('passes on only the state the pages show', () => {
 		const message = [
 			event('update', [
 				{
@@ -65,12 +109,15 @@ describe('toUpdates', () => {
 					type: 'light',
 					owner: { rid: 'device', rtype: 'device' },
 					on: { on: true },
-					color: { xy: { x: 0.3, y: 0.3 } }
+					effects: { status: 'no_effect' },
+					color_temperature: { mirek: 300, mirek_valid: true, mirek_schema: {} }
 				}
 			])
 		];
 
-		expect(toUpdates(message)).toEqual([{ kind: 'light', id: 'ceiling', on: true }]);
+		expect(toUpdates(message)).toEqual([
+			{ kind: 'light', id: 'ceiling', on: true, mirek: 300, hueSaturation: null }
+		]);
 	});
 });
 

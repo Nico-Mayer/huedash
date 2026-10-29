@@ -65,7 +65,9 @@ describe('createEventHub', () => {
 
 		for (const { updates } of [first, second]) {
 			await vi.waitFor(() =>
-				expect(updates).toContainEqual({ kind: 'light', id: 'lamp', on: true, brightness: 30 })
+				expect(updates).toContainEqual(
+					expect.objectContaining({ kind: 'light', id: 'lamp', on: true, brightness: 30 })
+				)
 			);
 		}
 		stopFirst();

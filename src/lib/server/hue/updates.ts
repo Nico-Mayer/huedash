@@ -1,11 +1,16 @@
 import { z } from 'zod';
 import type { LiveUpdate, StateUpdate } from '../../live-updates.ts';
+import { xyToHueSaturation } from './color.ts';
 
 const resourceSchema = z.looseObject({
 	id: z.string(),
 	type: z.string(),
 	on: z.object({ on: z.boolean() }).optional(),
 	dimming: z.object({ brightness: z.number() }).optional(),
+	color_temperature: z
+		.object({ mirek: z.number().nullable(), mirek_valid: z.boolean().optional() })
+		.optional(),
+	color: z.object({ xy: z.object({ x: z.number(), y: z.number() }) }).optional(),
 	metadata: z.unknown().optional(),
 	status: z.unknown().optional()
 });
@@ -29,11 +34,20 @@ const SHOWN_TYPES = new Set([
 	'scene'
 ]);
 
+function colorOf(resource: Resource): Pick<StateUpdate, 'mirek' | 'hueSaturation'> {
+	const white = resource.color_temperature;
+	if (white?.mirek_valid !== false && white?.mirek != null)
+		return { mirek: white.mirek, hueSaturation: null };
+	if (resource.color) return { mirek: null, hueSaturation: xyToHueSaturation(resource.color.xy) };
+	return {};
+}
+
 function stateOf(resource: Resource): StateUpdate | null {
 	const update: StateUpdate = { id: resource.id };
 	if (resource.on) update.on = resource.on.on;
 	if (resource.dimming) update.brightness = Math.round(resource.dimming.brightness);
-	return update.on === undefined && update.brightness === undefined ? null : update;
+	if (resource.type === 'light') Object.assign(update, colorOf(resource));
+	return Object.keys(update).length === 1 ? null : update;
 }
 
 // Light and group state is applied in place; anything else the page shows needs a reload.

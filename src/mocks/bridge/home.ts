@@ -249,8 +249,15 @@ function applyToLight(target: MockLight, update: LightUpdate) {
 	if (update.dimming && target.dimming) target.dimming.brightness = update.dimming.brightness;
 	if (update.color_temperature && target.color_temperature) {
 		target.color_temperature.mirek = update.color_temperature.mirek;
+		target.color_temperature.mirek_valid = true;
 	}
-	if (update.color && target.color) target.color.xy = update.color.xy;
+	if (update.color && target.color) {
+		target.color.xy = update.color.xy;
+		if (target.color_temperature) {
+			target.color_temperature.mirek = null;
+			target.color_temperature.mirek_valid = false;
+		}
+	}
 }
 
 export type BridgeEvent = {
@@ -294,7 +301,14 @@ function publishLightChanges(changed: MockLight[]) {
 				id: l.id,
 				type: 'light',
 				on: l.on,
-				...(l.dimming && { dimming: { brightness: l.dimming.brightness } })
+				...(l.dimming && { dimming: { brightness: l.dimming.brightness } }),
+				...(l.color_temperature && {
+					color_temperature: {
+						mirek: l.color_temperature.mirek,
+						mirek_valid: l.color_temperature.mirek_valid
+					}
+				}),
+				...(l.color && { color: { xy: l.color.xy } })
 			})),
 			...groups.map((g) => ({ id: g.id, type: 'grouped_light', on: g.on, dimming: g.dimming }))
 		])
