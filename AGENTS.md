@@ -45,7 +45,8 @@ Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder:
 ## Tests
 
 - Unit tests: `*.test.ts` (Node). Component tests: `*.svelte.test.ts` (browser). E2E tests: `*.e2e.ts`.
-- The mock Hue bridge lives in `src/mocks/bridge/` (MSW handlers and fixtures). Unit tests reach it at `192.0.2.10` through MSW; requests without a handler fail.
+- The mock Hue bridge lives in `src/mocks/bridge/` (MSW handlers and fixtures). Unit tests reach it at `192.0.2.10` through MSW; requests without a handler fail. `home.ts` holds a small home (Kitchen, Living room, zone Downstairs, an unreachable Plug) whose state changes with commands and resets after each unit test; `home.commands` logs what was sent.
+- E2E runs in two Playwright projects: `setup` pairs the bridge, then `app` runs the other tests against the paired bridge. Wait for a command response before reloading, because group commands may be held by the throttle.
 - MSW hides real TLS certificates. Tests of certificate pinning stop the MSW server for their file. E2E runs a real HTTPS mock bridge at `127.0.0.1:8443` and a discovery mock at `127.0.0.1:8080` (`src/mocks/preload.ts`), with a fresh data directory per run.
 - Files in `src/mocks/` import each other with `.ts` extensions, because Node loads them directly in the e2e preload.
 
@@ -59,6 +60,9 @@ Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder:
 ## Hue bridge code
 
 - `src/lib/server/hue/`: typed CLIP v2 client (`openapi-fetch`), certificate pinning (`tls.ts`), discovery, pairing calls. Types in `schema.d.ts` are generated from the vendored `openhue.yaml` with `pnpm gen:hue`; do not edit them by hand.
+- `src/lib/server/hue/home.ts`: loads rooms, zones, devices, lights, grouped lights, and connectivity in parallel and builds the home model (`HomeGroup`, `HomeLight`). Pages use this model; they never read CLIP resources directly.
+- `src/lib/server/hue/commands.ts` and `PUT /api/groups/[id]`, `PUT /api/lights/[id]`: validated, clamped commands, throttled per id (1 s for groups, as Hue recommends; 100 ms for lights). The browser calls them through `src/lib/commands.ts`, which updates the UI optimistically and reverts with a toast on failure.
+- Color conversion to CIE xy uses `culori` on the server only. Kelvin and mirek helpers in `src/lib/color-temperature.ts` are shared with the browser.
 - `src/lib/server/config/`: bridge config from env vars or `$HUE_DATA_DIR/config.json`.
 - Only server code talks to the bridge. Never send the app key or client key to the browser.
 - `server.js` is the production entry. It marks direct requests as `http` so SvelteKit's CSRF check accepts form posts on the LAN.

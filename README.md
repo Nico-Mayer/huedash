@@ -2,6 +2,13 @@
 
 Self-hosted web dashboard for Philips Hue.
 
+## Features
+
+- Pair with your Hue bridge from the browser.
+- See all rooms and zones. Turn them on and off and set their brightness.
+- Open a room or zone to set its white color temperature and color, and to control single lights.
+- Changes you make elsewhere, for example in the Hue app, show up when you return to the huedash tab.
+
 ## Self-hosting
 
 Run huedash on a machine in the same network as your Hue Bridge.
