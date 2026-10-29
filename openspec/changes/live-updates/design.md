@@ -74,3 +74,14 @@ The mock home gets an emitter: `updateLight` and `updateGroupedLight` publish CL
 - [Optimistic value briefly replaced by an older event] → Events come in bridge order; the last event for a resource wins, and it reflects the command once the bridge applied it.
 - [Proxies buffering `text/event-stream`] → Heartbeat comments every 25 s and `cache-control: no-store`; README notes that reverse proxies must not buffer `/api/events`.
 - [`eventsource` with a pinned `fetch`] → The library only needs a fetch that returns a streaming `Response`; covered by a unit test against a local HTTPS server like the TLS tests.
+
+## Changes found during implementation
+
+- MSW's `sse()` handler requires a global `EventSource`, which Node 24 does not have. The mock event stream is a plain `http.get` that returns a streaming `text/event-stream` body.
+- Aborting a streamed response inside MSW's socket interceptor trips an undici `assert(!this.aborted)`. Event hub tests run against a real local HTTPS mock bridge (`handlersListener`), like the TLS and e2e tests; production never uses MSW.
+- `eventsource` retries network errors itself but stops after an error response (for example `503`). The hub restarts it after 5 s while tabs still listen.
+- `toUpdates` lives in `src/lib/server/hue/updates.ts`; the `LiveUpdate` type is in `src/lib/live-updates.ts` so the browser can import it.
+- The browser connects to `/api/events` only outside `/setup`: without a bridge the endpoint answers `409`, and `EventSource` would not retry.
+- The bridge reports `reconnecting` until its stream first opens, so the browser only treats the connection as lost after it has been fully open once. This avoids a notice and a reload on every page load.
+- A reload requested during the one-second gap runs once afterwards instead of being dropped.
+- The idle-close test uses short real timeouts instead of fake timers, because fake timers would also stop `eventsource`'s internal timers.
