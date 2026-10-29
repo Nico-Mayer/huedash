@@ -7,7 +7,7 @@ Self-hosted web dashboard for Philips Hue.
 - Pair with your Hue bridge from the browser.
 - See all rooms and zones. Turn them on and off and set their brightness.
 - Open a room or zone to set its white color temperature and color, and to control single lights.
-- Changes you make elsewhere, for example in the Hue app, show up when you return to the huedash tab.
+- Live updates: changes from the Hue app, a wall switch, or another huedash tab show up right away.
 
 ## Self-hosting
 
@@ -49,7 +49,7 @@ huedash pins the bridge's TLS certificate when it pairs. If the home page says t
 
 ### Behind a reverse proxy
 
-huedash works over plain http on your network. If you put a TLS reverse proxy in front, make sure it sends `X-Forwarded-Proto: https`.
+huedash works over plain http on your network. If you put a TLS reverse proxy in front, make sure it sends `X-Forwarded-Proto: https` and does not buffer `/api/events`, which streams live updates.
 
 ### Image tags
 
