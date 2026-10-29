@@ -44,7 +44,7 @@ A class in `src/lib/smooth-value.svelte.ts` built on `Tween`:
 Alternative: put the logic inside the new slider component. Rejected: hue and saturation keep the shadcn slider and need the same behavior, and the status text outside the slider must read the same moving value.
 
 ### New component: `LevelSlider`
-`src/lib/components/level-slider/level-slider.svelte`, a custom component on `SliderPrimitive` (bits-ui), not a shadcn component, so `pnpm dlx shadcn-svelte add slider` cannot overwrite it.
+`src/lib/components/home/LevelSlider.svelte`, a custom component on `SliderPrimitive` (bits-ui), not a shadcn component, so `pnpm dlx shadcn-svelte add slider` cannot overwrite it.
 
 ```
  size="lg" (inspector, h-10)          size="sm" (card, h-6)
