@@ -22,7 +22,7 @@ Clicking a light's card outside its switch and slider SHALL select that light an
 - **THEN** no light is selected
 
 ### Requirement: Select several lights
-Shift-click or Cmd/Ctrl-click on a light's card SHALL add the light to the selection or remove it. A "Select" button in the Lights header SHALL start a select mode in which each card shows a checkbox and a tap adds or removes the light; "Done" SHALL end the mode and keep the selection.
+Shift-click or Cmd/Ctrl-click on a light's card SHALL add the light to the selection or remove it. A "Select" button in the Lights header SHALL start a select mode in which a plain tap on a card adds or removes the light; "Done" SHALL end the mode and keep the selection. A selected card SHALL show one ring and no other selection mark.
 
 #### Scenario: Add with Shift
 - **WHEN** "Ceiling" is selected and the user Shift-clicks "Counter"
@@ -34,7 +34,11 @@ Shift-click or Cmd/Ctrl-click on a light's card SHALL add the light to the selec
 
 #### Scenario: Select mode
 - **WHEN** the user selects "Select" and taps "Ceiling" and "Counter"
-- **THEN** both cards show a checked checkbox and both lights are selected
+- **THEN** both cards show the selection ring and both lights are selected
+
+#### Scenario: One ring after Shift-click
+- **WHEN** the user Shift-clicks "Counter"
+- **THEN** the "Counter" card shows only its selection ring, without a separate focus ring inside the card
 
 ### Requirement: Control selected lights
 While lights are selected, the inspector SHALL control them instead of the whole group: on/off, brightness, white, and color. White SHALL show when every selected light supports color temperature, and color when every selected light supports color. Each selected light SHALL receive its own command. "Back to room" SHALL clear the selection.

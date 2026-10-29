@@ -3,7 +3,7 @@
 ## 1. Setup
 
 - [x] 1.1 Create the stacked branch `light-selection` on top of `app-shell` with `git-spice branch create light-selection`; verify `git-spice log short` shows it above `app-shell`
-- [x] 1.2 Add `pnpm dlx shadcn-svelte@latest add checkbox` (restore any overwritten existing files with `git restore`), then `pnpm format`; verify `src/lib/components/ui/checkbox/` exists and `pnpm check` passes
+- [x] 1.2 (Removed again after review: select mode needs no checkbox.) Add `pnpm dlx shadcn-svelte@latest add checkbox` (restore any overwritten existing files with `git restore`), then `pnpm format`; verify `src/lib/components/ui/checkbox/` exists and `pnpm check` passes
 
 ## 2. Light state on the server
 
@@ -14,7 +14,7 @@
 ## 3. Selection
 
 - [x] 3.1 Add `src/lib/selection.svelte.ts` (`only`, `toggle`, `clear`, `start`, `done`, `forGroup`); verify unit tests
-- [x] 3.2 Add the selection button, checkbox in select mode, and selected ring to `LightCard`, and "Select" / "Done" to the Lights header in `GroupDetail`; clear on group change; verify with the Svelte autofixer and component tests for click, Shift-click, Cmd/Ctrl-click, select mode, unreachable, and switch not selecting
+- [x] 3.2 Add the selection button covering the whole card, plain-click toggling in select mode, and one selected ring to `LightCard`, and "Select" / "Done" to the Lights header in `GroupDetail`; clear on group change; verify with the Svelte autofixer and component tests for click, Shift-click, Cmd/Ctrl-click, select mode, unreachable, and switch not selecting
 
 ## 4. Inspector for group and lights
 
@@ -28,7 +28,7 @@
 
 ## 6. End to end, docs, verification
 
-- [x] 6.1 Add `selection.e2e.ts`: click and Shift-click on desktop, inspector says "2 lights", a brightness preset reaches both lights and not the group, select mode with checkboxes, room change clears the selection, 1024 px sheet keeps the scroll position, 390 px "Control 2 lights" bar, and a light color change from another tab shows in the inspector; verify `pnpm test:e2e` passes
+- [x] 6.1 Add `selection.e2e.ts`: click and Shift-click on desktop, inspector says "2 lights", a brightness preset reaches both lights and not the group, select mode with plain clicks, room change clears the selection, 1024 px sheet keeps the scroll position, 390 px "Control 2 lights" bar, and a light color change from another tab shows in the inspector; verify `pnpm test:e2e` passes
 - [x] 6.2 Take screenshots of a selection at 1440, 1024, and 390 px in light and dark; fix layout issues with shadcn tokens only; verify by the screenshots
 - [x] 6.3 Update `README.md` features (select lights, presets); verify `pnpm lint` passes
 - [x] 6.4 Verify `pnpm test`, `pnpm check`, `pnpm lint`, `pnpm build`, and `pnpm check:standalone` exit 0; commit in atomic conventional commits with no co-author lines

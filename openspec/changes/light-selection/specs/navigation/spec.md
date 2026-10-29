@@ -24,7 +24,7 @@ Room and zone pages SHALL show an inspector. Without a selection it SHALL contro
 - **AND** the page keeps its scroll position
 
 #### Scenario: Select mode on a narrow screen
-- **WHEN** the user is in select mode on a screen 390 px wide and has checked two lights
+- **WHEN** the user is in select mode on a screen 390 px wide and has selected two lights
 - **THEN** a bar shows "Control 2 lights", and selecting it opens the bottom sheet
 
 #### Scenario: Close the sheet

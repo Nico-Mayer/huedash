@@ -9,7 +9,7 @@
 - `ColorTemperatureControl` and `ColorControl` take a `HomeGroup` and send group commands. The color picker starts neutral because the bridge does not report a group color.
 - huedash is mainly a desktop app; phones must work, but desktop gets the best experience.
 
-Library evidence (2026-10-29): no new packages. `culori` (installed) converts xy to hue/saturation on the server. shadcn-svelte 1.7.1 `checkbox` (bits-ui `Checkbox`) for select mode; `sheet` (bits-ui `Dialog`) is installed.
+Library evidence (2026-10-29): no new packages. `culori` (installed) converts xy to hue/saturation on the server. `sheet` (bits-ui `Dialog`) is installed.
 
 ## Goals / Non-Goals
 
@@ -46,9 +46,11 @@ HomeLight {
 ### Selection state
 New `src/lib/selection.svelte.ts`: one `Selection` instance with `ids: SvelteSet<string>`, `selecting: boolean` (select mode), and `groupId`. `GroupDetail` calls `selection.forGroup(group.id)` in an effect, which clears the selection when the group changes. Methods: `only(id)`, `toggle(id)`, `clear()`, `start()`, `done()`.
 
-`LightCard` gets a selection button that wraps the name and state text (`aria-pressed`, label "Select Ceiling"). Click without modifiers calls `only`; Shift, Cmd, or Ctrl calls `toggle`; in select mode a click toggles and the card shows a `Checkbox` instead. The switch and slider stay outside that button, so they never change the selection. Unreachable cards disable the button. A selected card gets `ring-2 ring-primary`.
+`LightCard` gets a selection button that holds the name and state text (`aria-pressed`). Its `::after` stretches over the whole card, so a click anywhere on the card selects; the switch and slider are positioned above it, so they never change the selection. Click without modifiers calls `only`; Shift, Cmd, or Ctrl calls `toggle`; in select mode a plain click toggles. Unreachable cards disable the button.
 
-Alternative: make the whole card clickable with a `click` handler that ignores clicks from the switch or slider. Rejected: not keyboard accessible without extra roles, and fragile with bits-ui's nested elements.
+The card draws exactly one ring: `ring-2 ring-primary` when selected, otherwise the focus ring while the button has keyboard focus. The button has no ring of its own, because holding Shift makes the browser treat a click as keyboard focus, which drew a second ring inside the selected card. Select mode shows no checkbox; the selection ring is enough (a first version had both, which repeated the same information).
+
+Alternative: a `click` handler on the card that ignores clicks from the switch or slider. Rejected: not keyboard accessible without extra roles, and fragile with bits-ui's nested elements.
 
 ### One inspector for group and lights
 ```
@@ -84,7 +86,7 @@ The sheet is modal, which is why select mode on narrow screens collects lights f
 ### Tests
 - Unit: `lightCommandSchema` with mirek and color; `buildHome` current mirek and hue/saturation, including `mirek_valid: false`; `toUpdates` for light color temperature and color; mirek clamping helper.
 - Component: `Selection`; `LightCard` click, Shift-click, select mode, disabled when unreachable, switch does not select; `lightsTarget` range intersection and color support; presets send the right commands; tab starts on Color for a light in color mode.
-- E2E: desktop click and Shift-click, inspector says "2 lights", brightness preset reaches both lights and not the group; select mode with checkboxes; 1024 px sheet opens and scroll position stays; 390 px "Control 2 lights" bar; changing rooms clears the selection.
+- E2E: desktop click and Shift-click, inspector says "2 lights", brightness preset reaches both lights and not the group; select mode with plain clicks; card selects from its padding; 1024 px sheet opens and scroll position stays; 390 px "Control 2 lights" bar; changing rooms clears the selection.
 
 ## Risks / Trade-offs
 
