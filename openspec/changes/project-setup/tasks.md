@@ -26,7 +26,7 @@
 ## 5. Docs and commit
 
 - [x] 5.1 Add a "Commands" section to `AGENTS.md` (`pnpm dev`, `pnpm build`, `pnpm check`, `pnpm lint`, `pnpm format`, adding shadcn-svelte components) and verify each listed command runs
-- [ ] 5.2 Commit in atomic conventional commits (tooling, scaffold, lint/format, shadcn-svelte, docs) and verify `git log --oneline` shows them with no co-author lines
+- [x] 5.2 Commit in atomic conventional commits (tooling, scaffold, lint/format, shadcn-svelte, docs) and verify `git log --oneline` shows them with no co-author lines
 
 ## Workflow follow-up
 
