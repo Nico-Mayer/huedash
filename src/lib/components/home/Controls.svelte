@@ -11,15 +11,19 @@
 	import ColorTemperatureControl from './ColorTemperatureControl.svelte';
 	import WhitePresets from './WhitePresets.svelte';
 
-	let { control, scene, onBack }: { control: ControlTarget; scene?: string; onBack?: () => void } =
-		$props();
+	let {
+		control,
+		scene,
+		onBack,
+		class: className
+	}: { control: ControlTarget; scene?: string; onBack?: () => void; class?: string } = $props();
 
 	let brightness = $derived(control.brightness);
 	// Read once: the tab follows the light's mode when it is opened, not every live change.
 	const startTab = untrack(() => (control.hueSaturation ? 'color' : 'white'));
 </script>
 
-<Card.Root>
+<Card.Root class={className}>
 	<Card.Header>
 		<Card.Description>Controlling</Card.Description>
 		<Card.Title>{control.name}</Card.Title>
