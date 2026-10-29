@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw/http';
 import { describe, expect, it } from 'vitest';
 import { MOCK_APP_KEY } from '../../../mocks/bridge/fixtures.ts';
 import { MOCK_BRIDGE_IP } from '../../../mocks/bridge/handlers.ts';
+import { home as mockHome } from '../../../mocks/bridge/home.ts';
 import { server } from '../../../mocks/server.ts';
 import { loadHome, type Home } from './home.ts';
 
@@ -57,6 +58,28 @@ describe('loadHome', () => {
 			['Lamp', true],
 			['Plug', false]
 		]);
+	});
+
+	it('attaches scenes to their room, sorted by name, with colors and a dynamic flag', async () => {
+		const [kitchen, living] = (await home()).rooms;
+
+		expect(kitchen.scenes.map((s) => [s.name, s.dynamic, s.active])).toEqual([
+			['Bright', false, 'inactive'],
+			['Relax', false, 'inactive'],
+			['Tropical', true, 'inactive']
+		]);
+		expect(kitchen.scenes[2].colors).toHaveLength(2);
+		expect(living.scenes.map((s) => s.name)).toEqual(['Reading']);
+		expect((await home()).zones[0].scenes).toEqual([]);
+	});
+
+	it('reports the active scene', async () => {
+		const homeScene = mockHome.scenes.find((s) => s.id === 'scene-relax')!;
+		homeScene.status = { active: 'static' };
+
+		const relax = (await home()).rooms[0].scenes.find((s) => s.name === 'Relax');
+
+		expect(relax?.active).toBe('static');
 	});
 
 	it('reports a refused key', async () => {

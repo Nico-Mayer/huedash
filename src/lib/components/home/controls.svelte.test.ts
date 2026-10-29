@@ -45,7 +45,8 @@ const kitchen: HomeGroup = {
 	brightness: 60,
 	lights: [light],
 	colorTemperature: { minMirek: 153, maxMirek: 500 },
-	color: true
+	color: true,
+	scenes: []
 };
 
 function sentBody() {

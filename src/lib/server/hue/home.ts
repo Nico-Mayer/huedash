@@ -1,6 +1,7 @@
 import { failureFromError, failureFromResponse, type BridgeFailure } from './bridge.ts';
 import { createHueClient } from './client.ts';
 import type { Connection } from './connection.ts';
+import { sceneColors } from './scene-colors.ts';
 import type { paths } from './schema.d.ts';
 
 type ResourceData<P extends keyof paths> = paths[P] extends {
@@ -15,6 +16,7 @@ type Device = ResourceData<'/clip/v2/resource/device'>;
 type Light = ResourceData<'/clip/v2/resource/light'>;
 type GroupedLight = ResourceData<'/clip/v2/resource/grouped_light'>;
 type Connectivity = ResourceData<'/clip/v2/resource/zigbee_connectivity'>;
+type Scene = ResourceData<'/clip/v2/resource/scene'>;
 
 export type MirekRange = { minMirek: number; maxMirek: number };
 
@@ -28,6 +30,14 @@ export type HomeLight = {
 	color: boolean;
 };
 
+export type HomeScene = {
+	id: string;
+	name: string;
+	colors: string[];
+	dynamic: boolean;
+	active: 'inactive' | 'static' | 'dynamic_palette';
+};
+
 export type HomeGroup = {
 	kind: 'room' | 'zone';
 	id: string;
@@ -38,6 +48,7 @@ export type HomeGroup = {
 	lights: HomeLight[];
 	colorTemperature: MirekRange | null;
 	color: boolean;
+	scenes: HomeScene[];
 };
 
 export type Home = { rooms: HomeGroup[]; zones: HomeGroup[] };
@@ -49,6 +60,7 @@ export type HomeResources = {
 	lights: Light[];
 	groupedLights: GroupedLight[];
 	connectivity: Connectivity[];
+	scenes: Scene[];
 };
 
 const byName = <T extends { name: string }>(a: T, b: T) => a.name.localeCompare(b.name);
@@ -57,6 +69,19 @@ export function buildHome(resources: HomeResources): Home {
 	const devices = new Map(resources.devices.map((d) => [d.id, d]));
 	const connectivity = new Map(resources.connectivity.map((c) => [c.id, c.status]));
 	const groupedLights = new Map(resources.groupedLights.map((g) => [g.id, g]));
+	const scenesByGroup = Map.groupBy(
+		resources.scenes.map((scene) => ({
+			groupId: scene.group.rid,
+			scene: {
+				id: scene.id,
+				name: scene.metadata.name ?? 'Scene',
+				colors: sceneColors(scene.actions),
+				dynamic: (scene.palette?.color?.length ?? 0) > 0,
+				active: scene.status?.active ?? 'inactive'
+			} satisfies HomeScene
+		})),
+		(entry) => entry.groupId
+	);
 
 	function reachable(light: Light): boolean {
 		const device = devices.get(light.owner.rid);
@@ -124,7 +149,8 @@ export function buildHome(resources: HomeResources): Home {
 						maxMirek: Math.max(...ranges.map((r) => r.maxMirek))
 					}
 				: null,
-			color: members.some((light) => light.color)
+			color: members.some((light) => light.color),
+			scenes: (scenesByGroup.get(group.id) ?? []).map((entry) => entry.scene).sort(byName)
 		};
 	}
 
@@ -145,13 +171,14 @@ export async function loadHome(connection: Connection & { appKey: string }): Pro
 			client.GET('/clip/v2/resource/device'),
 			client.GET('/clip/v2/resource/light'),
 			client.GET('/clip/v2/resource/grouped_light'),
-			client.GET('/clip/v2/resource/zigbee_connectivity')
+			client.GET('/clip/v2/resource/zigbee_connectivity'),
+			client.GET('/clip/v2/resource/scene')
 		]);
 
 		const failed = responses.find(({ response }) => !response.ok);
 		if (failed) return { status: failureFromResponse(failed.response) };
 
-		const [rooms, zones, devices, lights, groupedLights, connectivity] = responses.map(
+		const [rooms, zones, devices, lights, groupedLights, connectivity, scenes] = responses.map(
 			({ data }) => data?.data ?? []
 		);
 		return {
@@ -162,7 +189,8 @@ export async function loadHome(connection: Connection & { appKey: string }): Pro
 				devices: devices as Device[],
 				lights: lights as Light[],
 				groupedLights: groupedLights as GroupedLight[],
-				connectivity: connectivity as Connectivity[]
+				connectivity: connectivity as Connectivity[],
+				scenes: scenes as Scene[]
 			})
 		};
 	} catch (error) {
