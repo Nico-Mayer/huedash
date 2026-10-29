@@ -36,7 +36,7 @@ Checked versions (2026-10-29):
 - `runtime` stage on the target platform: copy `build/` and `package.json`, `ENV NODE_ENV=production PORT=3000`, `USER node`, `VOLUME /data`, `EXPOSE 3000`, `CMD ["node", "build"]`.
 - `HEALTHCHECK` runs `node -e "fetch('http://127.0.0.1:3000/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"`. No `wget` or `curl` needed.
 - pnpm version comes from a build arg that defaults to the major in `mise.toml`, installed with `npm install -g pnpm@$PNPM_VERSION`.
-- If the self-contained build check fails (task 1.1), the runtime stage adds `pnpm install --prod --frozen-lockfile`.
+- Verified (task 1.1): `node build` serves the app from a folder with only `build/` and `package.json`, so the runtime stage installs no dependencies.
 
 Alternatives:
 - Distroless Node image. Rejected for now: no shell makes debugging on home servers harder; small size gain.

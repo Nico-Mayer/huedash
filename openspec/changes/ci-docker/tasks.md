@@ -2,9 +2,9 @@
 
 ## 1. Health endpoint
 
-- [ ] 1.1 Verify the build is self-contained: copy `build/` and `package.json` to a temp folder without `node_modules`, run `node build`, and check `/` answers 200; record the result in design.md
-- [ ] 1.2 Add `src/routes/healthz/+server.ts` returning `{"status":"ok"}` with `Cache-Control: no-store` and a unit test for status, body, content type, and header; verify `pnpm test:unit --run` passes
-- [ ] 1.3 Add an e2e test that `GET /healthz` on the production build returns 200 while the mock bridge has no handler for it; verify `pnpm test:e2e` passes
+- [x] 1.1 Verify the build is self-contained: copy `build/` and `package.json` to a temp folder without `node_modules`, run `node build`, and check `/` answers 200; record the result in design.md
+- [x] 1.2 Add `src/routes/healthz/+server.ts` returning `{"status":"ok"}` with `Cache-Control: no-store` and a unit test for status, body, content type, and header; verify `pnpm test:unit --run` passes
+- [x] 1.3 Add an e2e test that `GET /healthz` on the production build returns 200 while the mock bridge has no handler for it; verify `pnpm test:e2e` passes
 
 ## 2. Docker image
 
