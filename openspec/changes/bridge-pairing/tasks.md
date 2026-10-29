@@ -17,7 +17,7 @@
 ## 3. Mock bridge
 
 - [x] 3.1 Switch bridge handlers to origin wildcards and typed `openapi-msw` handlers for CLIP v2; add `/api/0/config`, stateful `POST /api` with `pressLinkButton()` and reset, and the discovery handler; verify existing mock tests still pass
-- [ ] 3.2 Add the e2e mock servers to the preload without MSW interception: HTTPS mock bridge on `127.0.0.1:8443` (in-memory certificate) and HTTP discovery mock on `127.0.0.1:8080`, both answering via `getResponse(handlers, request)`; update `playwright.config.ts` (`HUE_DATA_DIR` temp dir, `HUE_DISCOVERY_URL=http://127.0.0.1:8080/`, no `HUE_BRIDGE_IP`); verify the existing e2e tests pass
+- [x] 3.2 Add the e2e mock servers to the preload without MSW interception: HTTPS mock bridge on `127.0.0.1:8443` (in-memory certificate) and HTTP discovery mock on `127.0.0.1:8080`, both answering via `getResponse(handlers, request)`; update `playwright.config.ts` (`HUE_DATA_DIR` temp dir, `HUE_DISCOVERY_URL=http://127.0.0.1:8080/`, no `HUE_BRIDGE_IP`); verify the existing e2e tests pass
 
 ## 4. Setup flow
 

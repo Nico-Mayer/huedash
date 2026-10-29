@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-test('home page shows the app name', async ({ page }) => {
+test('home page redirects to setup while no bridge is paired', async ({ page }) => {
 	await page.goto('/');
 
-	await expect(page.getByText('huedash')).toBeVisible();
+	await expect(page).toHaveURL(/\/setup$/);
 });
