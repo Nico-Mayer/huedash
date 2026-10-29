@@ -57,6 +57,23 @@ describe('PUT /api/lights/[id]', () => {
 		expect(home.commands).toEqual([{ rtype: 'light', id: 'lamp', body: { on: { on: true } } }]);
 	});
 
+	it('sets the white of a light', async () => {
+		expect((await call(putLight, 'ceiling', { mirek: 250 })).status).toBe(204);
+
+		expect(home.commands).toEqual([
+			{ rtype: 'light', id: 'ceiling', body: { color_temperature: { mirek: 250 } } }
+		]);
+	});
+
+	it('sets the color of a light as xy', async () => {
+		expect((await call(putLight, 'lamp', { color: { hue: 0, saturation: 100 } })).status).toBe(204);
+
+		const [command] = home.commands;
+		expect(command.body).toEqual({
+			color: { xy: { x: expect.any(Number), y: expect.any(Number) } }
+		});
+	});
+
 	it('answers 409 without a configured bridge', async () => {
 		vi.stubEnv('HUE_BRIDGE_IP', '');
 		vi.stubEnv('HUE_APP_KEY', '');
