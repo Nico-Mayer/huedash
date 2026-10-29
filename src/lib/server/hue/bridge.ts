@@ -84,18 +84,25 @@ export async function requestAppKey(
 }
 
 export type BridgeStatus = 'ok' | 'unauthorized' | 'unreachable' | 'certificate-mismatch';
+export type BridgeFailure = Exclude<BridgeStatus, 'ok'>;
+
+export function failureFromResponse(response: Response): BridgeFailure {
+	return response.status === 401 || response.status === 403 ? 'unauthorized' : 'unreachable';
+}
+
+export function failureFromError(error: unknown): BridgeFailure {
+	return toBridgeError(error).kind === 'certificate-mismatch'
+		? 'certificate-mismatch'
+		: 'unreachable';
+}
 
 export async function checkBridge(
 	connection: Connection & { appKey: string }
 ): Promise<BridgeStatus> {
 	try {
 		const { response } = await createHueClient(connection).GET('/clip/v2/resource/bridge');
-		if (response.ok) return 'ok';
-		if (response.status === 401 || response.status === 403) return 'unauthorized';
-		return 'unreachable';
+		return response.ok ? 'ok' : failureFromResponse(response);
 	} catch (error) {
-		return toBridgeError(error).kind === 'certificate-mismatch'
-			? 'certificate-mismatch'
-			: 'unreachable';
+		return failureFromError(error);
 	}
 }
