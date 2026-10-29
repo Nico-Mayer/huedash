@@ -12,9 +12,9 @@
 
 ## 3. Playwright
 
-- [ ] 3.1 Run `pnpm dlx sv@1.1.1 add playwright="demo:no" --install pnpm`, install Chromium with `pnpm exec playwright install chromium`, and verify `pnpm exec playwright --version` reports 1.64.x
-- [ ] 3.2 Add `e2e/mock-bridge` preload and set `webServer` to build and run `node --import <preload> build` on a fixed port with `HUE_BRIDGE_IP=192.0.2.10`; verify the server log shows the mock bridge line
-- [ ] 3.3 Add `e2e/home.test.ts` that opens `/` and asserts the "huedash" title; verify `pnpm test:e2e` passes
+- [x] 3.1 Run `pnpm dlx sv@1.1.1 add playwright="demo:no" --install pnpm`, install Chromium with `pnpm exec playwright install chromium`, and verify `pnpm exec playwright --version` reports 1.64.x
+- [x] 3.2 Add `e2e/mock-bridge` preload and set `webServer` to build and run `node --import <preload> build` on a fixed port with `HUE_BRIDGE_IP=192.0.2.10`; verify the server log shows the mock bridge line
+- [x] 3.3 Add `e2e/home.test.ts` that opens `/` and asserts the "huedash" title; verify `pnpm test:e2e` passes
 
 ## 4. Scripts and docs
 
