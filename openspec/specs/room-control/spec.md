@@ -7,7 +7,7 @@ Lets the user see all rooms and zones of their Hue system and control each one a
 ## Requirements
 
 ### Requirement: List rooms and zones
-The sidebar SHALL list every room and every zone from the bridge, rooms first, each group sorted by name. Each entry SHALL show the name, an on/off switch for the group, and a short state: the active scene's name, otherwise how many of its reachable lights are on ("3 of 5 on"), or "All off".
+The sidebar SHALL list every room and every zone from the bridge, rooms first, each group sorted by name. Each entry SHALL show the name, an on/off switch for the group, a short state (the active scene's name, otherwise how many of its reachable lights are on ("3 of 5 on"), or "All off"), and up to three color dots for lights that are on.
 
 #### Scenario: Rooms and zones present
 - **WHEN** the bridge has rooms "Kitchen" and "Living room" and a zone "Downstairs"
@@ -19,7 +19,11 @@ The sidebar SHALL list every room and every zone from the bridge, rooms first, e
 
 #### Scenario: Group off
 - **WHEN** all Living room lights are off
-- **THEN** the Living room entry shows "All off" and its switch is off
+- **THEN** the Living room entry shows "All off", no color dots, and its switch is off
+
+#### Scenario: Color dots
+- **WHEN** "Ceiling" shows red and "Counter" a warm white, and both are on
+- **THEN** the Kitchen entry shows a red dot and a warm white dot
 
 #### Scenario: Nothing set up
 - **WHEN** the bridge has no rooms and no zones
