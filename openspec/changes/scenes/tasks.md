@@ -8,7 +8,7 @@
 
 - [x] 2.1 Add `chroma-js`; implement scene colors (xy via `culori`, mirek via `chroma.temperature`, up to five distinct hex colors) with unit tests for xy, mirek, mixed, and empty actions
 - [x] 2.2 Add scenes to the home model (seventh read, attach to groups, sort, `dynamic`, `active`) with unit tests
-- [ ] 2.3 Add `PUT /api/scenes/[id]` (`mode: active | dynamic` to recall action, throttled, `204/400/502`) with unit tests that check the command log
+- [x] 2.3 Add `PUT /api/scenes/[id]` (`mode: active | dynamic` to recall action, throttled, `204/400/502`) with unit tests that check the command log
 - [ ] 2.4 Map `scene` events in `toUpdates` (status to `scene` update, add/delete/metadata to reload) with unit tests
 
 ## 3. Browser

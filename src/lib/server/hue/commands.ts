@@ -34,7 +34,10 @@ export const groupCommandSchema = z
 	.strict()
 	.refine(nonEmpty);
 
+export const sceneCommandSchema = z.object({ mode: z.enum(['active', 'dynamic']) }).strict();
+
 export type LightCommand = z.infer<typeof lightCommandSchema>;
+export type SceneCommand = z.infer<typeof sceneCommandSchema>;
 export type GroupCommand = z.infer<typeof groupCommandSchema>;
 
 type ClipBody = components['schemas']['GroupedLightPut'] & components['schemas']['LightPut'];
@@ -66,7 +69,11 @@ async function settle(request: Promise<{ response: Response }>): Promise<Command
 	}
 }
 
-export function createCommandSender({ groupWindowMs = 1000, lightWindowMs = 100 } = {}) {
+export function createCommandSender({
+	groupWindowMs = 1000,
+	lightWindowMs = 100,
+	sceneWindowMs = 1000
+} = {}) {
 	const sendGroup = createThrottle(groupWindowMs, (id: string, { target, body }: Pending) =>
 		settle(
 			createHueClient(target).PUT('/clip/v2/resource/grouped_light/{groupedLightId}', {
@@ -84,11 +91,24 @@ export function createCommandSender({ groupWindowMs = 1000, lightWindowMs = 100 
 		)
 	);
 
+	const sendScene = createThrottle(
+		sceneWindowMs,
+		(id: string, { target, command }: { target: Target; command: SceneCommand }) =>
+			settle(
+				createHueClient(target).PUT('/clip/v2/resource/scene/{sceneId}', {
+					params: { path: { sceneId: id } },
+					body: { recall: { action: command.mode === 'dynamic' ? 'dynamic_palette' : 'active' } }
+				})
+			)
+	);
+
 	return {
 		setGroup: (target: Target, groupedLightId: string, command: GroupCommand) =>
 			sendGroup(groupedLightId, { target, body: toClipBody(command) }),
 		setLight: (target: Target, lightId: string, command: LightCommand) =>
-			sendLight(lightId, { target, body: toClipBody(command) })
+			sendLight(lightId, { target, body: toClipBody(command) }),
+		setScene: (target: Target, sceneId: string, command: SceneCommand) =>
+			sendScene(sceneId, { target, command })
 	};
 }
 
