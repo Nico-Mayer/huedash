@@ -58,15 +58,25 @@ describe('LightCard selection', () => {
 		expect([...selection.ids]).toEqual(['ceiling']);
 	});
 
-	it('shows checkboxes in select mode', async () => {
+	it('adds and removes lights with plain clicks in select mode', async () => {
 		selection.start();
 		renderCards(light('ceiling', 'Ceiling'), light('counter', 'Counter'));
 
-		await page.getByRole('checkbox', { name: 'Select Ceiling' }).click();
+		await card('Ceiling').click();
 		await card('Counter').click();
-
 		expect([...selection.ids]).toEqual(['ceiling', 'counter']);
-		await expect.element(page.getByRole('checkbox', { name: 'Select Counter' })).toBeChecked();
+
+		await card('Ceiling').click();
+		expect([...selection.ids]).toEqual(['counter']);
+		await expect.element(card('Counter')).toHaveAttribute('aria-pressed', 'true');
+	});
+
+	it('selects from anywhere on the card', async () => {
+		renderCards(light('ceiling', 'Ceiling'));
+
+		await page.getByRole('listitem').click({ position: { x: 6, y: 6 } });
+
+		expect([...selection.ids]).toEqual(['ceiling']);
 	});
 
 	it('does not select an unreachable light', async () => {

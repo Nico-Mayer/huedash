@@ -45,16 +45,16 @@ test.describe('desktop', () => {
 		expect(groupCalls).toEqual([]);
 	});
 
-	test('selects lights with checkboxes in select mode', async ({ page }) => {
+	test('selects lights with plain clicks in select mode', async ({ page }) => {
 		await openKitchen(page);
 
 		await page.getByRole('button', { name: 'Select', exact: true }).click();
-		await page.getByRole('checkbox', { name: 'Select Ceiling' }).click();
-		await page.getByRole('checkbox', { name: 'Select Counter' }).click();
+		await card(page, 'Ceiling').click();
+		await card(page, 'Counter').click();
 
 		await expect(inspector(page).getByText('2 lights')).toBeVisible();
 		await page.getByRole('button', { name: 'Done' }).click();
-		await expect(page.getByRole('checkbox')).toHaveCount(0);
+		await expect(page.getByRole('button', { name: 'Select', exact: true })).toBeVisible();
 		await expect(inspector(page).getByText('2 lights')).toBeVisible();
 	});
 
@@ -119,8 +119,8 @@ test.describe('phone', () => {
 		await openKitchen(page);
 
 		await page.getByRole('button', { name: 'Select', exact: true }).click();
-		await page.getByRole('checkbox', { name: 'Select Ceiling' }).click();
-		await page.getByRole('checkbox', { name: 'Select Counter' }).click();
+		await card(page, 'Ceiling').click();
+		await card(page, 'Counter').click();
 		await expect(page.getByRole('dialog')).toBeHidden();
 
 		await page.getByRole('button', { name: 'Control 2 lights' }).click();
