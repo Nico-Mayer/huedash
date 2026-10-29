@@ -2,7 +2,7 @@
 
 ## 1. Mock event stream
 
-- [ ] 1.1 Add an emitter to the mock home that publishes CLIP `update` events for changed lights and affected grouped lights, a helper to publish arbitrary events, and an MSW `sse` handler on `*/eventstream/clip/v2` that requires the app key; verify a unit test receives the update events after a `PUT`
+- [x] 1.1 Add an emitter to the mock home that publishes CLIP `update` events for changed lights and affected grouped lights, a helper to publish arbitrary events, and an MSW `sse` handler on `*/eventstream/clip/v2` that requires the app key; verify a unit test receives the update events after a `PUT`
 - [ ] 1.2 Make `src/mocks/serve.ts` stream response bodies instead of buffering; verify the existing e2e tests still pass and a manual request to the e2e mock stream receives an event
 
 ## 2. Server

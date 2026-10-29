@@ -162,18 +162,63 @@ function applyToLight(target: MockLight, update: LightUpdate) {
 	if (update.color && target.color) target.color.xy = update.color.xy;
 }
 
+export type BridgeEvent = {
+	id: string;
+	type: 'add' | 'update' | 'delete' | 'error';
+	creationtime: string;
+	data: ({ id: string; type: string } & Record<string, unknown>)[];
+};
+
+const listeners = new Set<(events: BridgeEvent[]) => void>();
+
+export function onBridgeEvents(listener: (events: BridgeEvent[]) => void) {
+	listeners.add(listener);
+	return () => listeners.delete(listener);
+}
+
+export function publishEvents(events: BridgeEvent[]) {
+	for (const listener of listeners) listener(events);
+}
+
+export function updateEvent(data: BridgeEvent['data']): BridgeEvent {
+	return { id: crypto.randomUUID(), type: 'update', creationtime: new Date().toISOString(), data };
+}
+
+// Like the bridge, report the changed lights and every group whose aggregate state follows them.
+function publishLightChanges(changed: MockLight[]) {
+	const ids = new Set(changed.map((l) => l.id));
+	const groups = groupedLights().filter((grouped) => {
+		const group = [...home.rooms, ...home.zones].find((g) => g.id === grouped.owner.rid);
+		return group && lightsOfGroup(group).some((l) => ids.has(l.id));
+	});
+	publishEvents([
+		updateEvent([
+			...changed.map((l) => ({
+				id: l.id,
+				type: 'light',
+				on: l.on,
+				...(l.dimming && { dimming: { brightness: l.dimming.brightness } })
+			})),
+			...groups.map((g) => ({ id: g.id, type: 'grouped_light', on: g.on, dimming: g.dimming }))
+		])
+	]);
+}
+
 export function updateLight(id: string, update: LightUpdate): boolean {
 	const target = home.lights.find((l) => l.id === id);
 	if (!target) return false;
 	applyToLight(target, update);
 	home.commands.push({ rtype: 'light', id, body: update });
+	publishLightChanges([target]);
 	return true;
 }
 
 export function updateGroupedLight(id: string, update: LightUpdate): boolean {
 	const group = groupOfGroupedLight(id);
 	if (!group) return false;
-	for (const member of lightsOfGroup(group)) applyToLight(member, update);
+	const members = lightsOfGroup(group);
+	for (const member of members) applyToLight(member, update);
 	home.commands.push({ rtype: 'grouped_light', id, body: update });
+	publishLightChanges(members);
 	return true;
 }

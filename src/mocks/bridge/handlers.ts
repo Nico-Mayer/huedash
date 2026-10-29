@@ -2,7 +2,7 @@ import { http, HttpResponse, type HttpHandler } from 'msw/http';
 import { createOpenApiHttp } from 'openapi-msw';
 import type { paths } from '../../lib/server/hue/schema.d.ts';
 import { bridge, MOCK_APP_KEY, MOCK_CLIENT_KEY, publicConfig } from './fixtures.ts';
-import { groupedLights, home, updateGroupedLight, updateLight } from './home.ts';
+import { groupedLights, home, onBridgeEvents, updateGroupedLight, updateLight } from './home.ts';
 
 // TEST-NET-1 address, never routable, so a missed mock cannot reach a real device.
 export const MOCK_BRIDGE_IP = '192.0.2.10';
@@ -71,7 +71,34 @@ const command = (rtype: 'light' | 'grouped_light', apply: (id: string, body: nev
 		return HttpResponse.json({ errors: [], data: [{ rid: id, rtype }] });
 	});
 
+let eventCount = 0;
+
+// A plain streaming response: MSW's sse() needs a global EventSource, which Node does not have.
+const eventStream = http.get('*/eventstream/clip/v2', ({ request }) => {
+	const denied = unauthorized(request);
+	if (denied) return denied;
+
+	const encoder = new TextEncoder();
+	let stop = () => {};
+	const body = new ReadableStream<Uint8Array>({
+		start(controller) {
+			controller.enqueue(encoder.encode(': hi\n\n'));
+			stop = onBridgeEvents((events) => {
+				const id = `${Math.floor(Date.now() / 1000)}:${eventCount++}`;
+				controller.enqueue(encoder.encode(`id: ${id}\ndata: ${JSON.stringify(events)}\n\n`));
+			});
+			request.signal.addEventListener('abort', () => {
+				stop();
+				controller.close();
+			});
+		},
+		cancel: () => stop()
+	});
+	return new HttpResponse(body, { headers: { 'content-type': 'text/event-stream' } });
+});
+
 handlers.push(
+	eventStream,
 	collection('room', () => home.rooms),
 	collection('zone', () => home.zones),
 	collection('device', () => home.devices),
