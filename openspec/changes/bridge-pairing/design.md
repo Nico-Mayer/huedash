@@ -118,3 +118,4 @@ Test certificates are generated once with `openssl` and committed; they protect 
   - The e2e preload starts no MSW interception. It runs real servers that answer with the MSW handlers through `getResponse`: the HTTPS mock bridge on `127.0.0.1:8443` and an HTTP discovery mock on `127.0.0.1:8080`.
   - Discovery reads its URL from `HUE_DISCOVERY_URL` (default `https://discovery.meethue.com/`), so e2e can point it at the local mock.
 - `tls.ts` exports `fetchWith(dispatcher)`, because the DOM `RequestInit` type does not declare Node's `dispatcher` option.
+- `pnpm gen:hue` uses `--empty-objects-unknown`. Without it, openapi-typescript turns empty `allOf` parts into `Record<string, never>`, which makes types like `BridgeGet` impossible to satisfy.

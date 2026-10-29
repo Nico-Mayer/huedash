@@ -6,7 +6,7 @@
 - [x] 1.2 Vendor `openhue.yaml` from openhue-api release 1.2 into `src/lib/server/hue/`, add `pnpm gen:hue` (openapi-typescript), generate and commit `schema.d.ts`; verify `pnpm gen:hue` produces no diff on a second run and `paths` includes `/clip/v2/resource/bridge` and `/api`
 - [x] 1.3 Implement `address.ts` (parse `host[:port]`, default 443, reject invalid input) with unit tests for IPv4, hostname, port, and invalid cases
 - [x] 1.4 Generate test certificates in memory with `selfsigned` (`src/mocks/bridge/certificate.ts`, no committed keys); implement `tls.ts` (capture and pinned modes, normalized SHA-256) with unit tests against a local HTTPS server: capture records the fingerprint, matching pin succeeds, mismatched pin fails with `CertificateMismatchError` before the request body is sent
-- [ ] 1.5 Implement `client.ts` (openapi-fetch with pinned dispatcher, `hue-application-key` header, 5 s timeout) and `bridge.ts` (`getPublicConfig`, `requestAppKey`, `checkBridge`) with unit tests against the MSW mock, including timeout and error 101
+- [x] 1.5 Implement `client.ts` (openapi-fetch with pinned dispatcher, `hue-application-key` header, 5 s timeout) and `bridge.ts` (`getPublicConfig`, `requestAppKey`, `checkBridge`) with unit tests against the MSW mock, including timeout and error 101
 
 ## 2. Configuration
 
@@ -16,7 +16,7 @@
 
 ## 3. Mock bridge
 
-- [ ] 3.1 Switch bridge handlers to origin wildcards and typed `openapi-msw` handlers for CLIP v2; add `/api/0/config`, stateful `POST /api` with `pressLinkButton()` and reset, and the discovery handler; verify existing mock tests still pass
+- [x] 3.1 Switch bridge handlers to origin wildcards and typed `openapi-msw` handlers for CLIP v2; add `/api/0/config`, stateful `POST /api` with `pressLinkButton()` and reset, and the discovery handler; verify existing mock tests still pass
 - [ ] 3.2 Add the e2e mock servers to the preload without MSW interception: HTTPS mock bridge on `127.0.0.1:8443` (in-memory certificate) and HTTP discovery mock on `127.0.0.1:8080`, both answering via `getResponse(handlers, request)`; update `playwright.config.ts` (`HUE_DATA_DIR` temp dir, `HUE_DISCOVERY_URL=http://127.0.0.1:8080/`, no `HUE_BRIDGE_IP`); verify the existing e2e tests pass
 
 ## 4. Setup flow
