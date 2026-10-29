@@ -21,6 +21,8 @@ export default defineConfig({
 		projects: [
 			{
 				extends: './vite.config.ts',
+				// Pre-bundled, the icons load a second Svelte runtime and fail to render in tests.
+				optimizeDeps: { exclude: ['@lucide/svelte'] },
 				test: {
 					name: 'client',
 					browser: {
