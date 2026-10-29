@@ -7,7 +7,7 @@ export default defineConfig({
 	testMatch: '**/*.e2e.{ts,js}',
 	use: { baseURL: `http://localhost:${E2E_APP_PORT}` },
 	webServer: {
-		command: 'pnpm build && node --import ./src/mocks/preload.ts build',
+		command: 'pnpm build && node --import ./src/mocks/preload.ts server.js',
 		port: E2E_APP_PORT,
 		stdout: 'pipe',
 		env: {
