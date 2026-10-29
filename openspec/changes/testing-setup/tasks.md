@@ -2,8 +2,8 @@
 
 ## 1. Vitest
 
-- [ ] 1.1 Run `pnpm dlx sv@1.1.1 add vitest="usages:unit,component" --install pnpm`, review the diff against SvelteKit 3 config (`vite.config.ts`, `#lib` aliases), and verify `pnpm test:unit --run` runs the generated demo tests
-- [ ] 1.2 Replace the generated demo tests with a component smoke test (`src/routes/page.svelte.test.ts`) that renders the home page and asserts the "huedash" title; verify it passes in the `client` project
+- [x] 1.1 Run `pnpm dlx sv@1.1.1 add vitest="usages:unit,component" --install pnpm`, review the diff against SvelteKit 3 config (`vite.config.ts`, `#lib` aliases), and verify `pnpm test:unit --run` runs the generated demo tests
+- [x] 1.2 Replace the generated demo tests with a component smoke test (`src/routes/page.svelte.test.ts`) that renders the home page and asserts the "huedash" title; verify it passes in the `client` project
 
 ## 2. Mock bridge
 
