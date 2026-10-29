@@ -9,7 +9,8 @@ describe('setupRedirect', () => {
 		['/healthz', false, null],
 		['/', true, null],
 		['/setup', true, '/'],
-		['/healthz', true, null]
+		['/healthz', true, null],
+		['/api/groups/x', false, null]
 	])('%s with configured=%s redirects to %s', (path, configured, target) => {
 		expect(setupRedirect(path, configured)).toBe(target);
 	});
