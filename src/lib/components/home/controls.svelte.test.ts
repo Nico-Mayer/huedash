@@ -38,8 +38,10 @@ const light: HomeLight = {
 	on: true,
 	brightness: 70,
 	reachable: true,
-	colorTemperature: true,
-	color: true
+	mirekRange: { minMirek: 153, maxMirek: 500 },
+	color: true,
+	mirek: 366,
+	hueSaturation: null
 };
 
 const kitchen: HomeGroup = {

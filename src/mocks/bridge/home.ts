@@ -52,7 +52,13 @@ const ref = (rid: string, rtype: string): Ref => ({ rid, rtype });
 function light(
 	id: string,
 	name: string,
-	options: { on: boolean; brightness?: number; mirek?: [number, number]; color?: boolean }
+	options: {
+		on: boolean;
+		brightness?: number;
+		mirek?: [number, number];
+		color?: boolean;
+		showsColor?: boolean;
+	}
 ): MockLight {
 	return {
 		id,
@@ -65,8 +71,8 @@ function light(
 		}),
 		...(options.mirek && {
 			color_temperature: {
-				mirek: 366,
-				mirek_valid: true,
+				mirek: options.showsColor ? null : 366,
+				mirek_valid: !options.showsColor,
 				mirek_schema: { mirek_minimum: options.mirek[0], mirek_maximum: options.mirek[1] }
 			}
 		}),
@@ -78,7 +84,13 @@ function initialHome() {
 	const lights = [
 		light('ceiling', 'Ceiling', { on: true, brightness: 70, mirek: [153, 500], color: true }),
 		light('counter', 'Counter', { on: true, brightness: 50, mirek: [153, 454] }),
-		light('lamp', 'Lamp', { on: false, brightness: 30, mirek: [153, 500], color: true }),
+		light('lamp', 'Lamp', {
+			on: false,
+			brightness: 30,
+			mirek: [153, 500],
+			color: true,
+			showsColor: true
+		}),
 		light('plug', 'Plug', { on: false })
 	];
 

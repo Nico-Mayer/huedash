@@ -15,8 +15,10 @@ const light = (id: string, on: boolean, reachable = true): HomeLight => ({
 	on,
 	brightness: 50,
 	reachable,
-	colorTemperature: false,
-	color: false
+	mirekRange: null,
+	color: false,
+	mirek: null,
+	hueSaturation: null
 });
 
 const scene = (id: string, active: HomeScene['active'] = 'inactive'): HomeScene => ({

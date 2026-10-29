@@ -1,3 +1,5 @@
+export type HueSaturation = { hue: number; saturation: number };
+
 export type StateUpdate = { id: string; on?: boolean; brightness?: number };
 
 export type SceneStatus = 'inactive' | 'static' | 'dynamic_palette';

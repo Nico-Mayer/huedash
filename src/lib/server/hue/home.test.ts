@@ -46,8 +46,28 @@ describe('loadHome', () => {
 		expect(kitchen.color).toBe(true);
 		expect(living.lights.find((l) => l.name === 'Plug')).toMatchObject({
 			brightness: null,
-			colorTemperature: false,
+			mirekRange: null,
 			color: false
+		});
+	});
+
+	it('reports the current white or color of each light', async () => {
+		const [kitchen, living] = (await home()).rooms;
+		const lamp = living.lights.find((l) => l.name === 'Lamp');
+
+		expect(kitchen.lights[0]).toMatchObject({
+			mirekRange: { minMirek: 153, maxMirek: 500 },
+			mirek: 366,
+			hueSaturation: null
+		});
+		expect(lamp?.mirek).toBeNull();
+		expect(lamp?.hueSaturation).toEqual({
+			hue: expect.any(Number),
+			saturation: expect.any(Number)
+		});
+		expect(living.lights.find((l) => l.name === 'Plug')).toMatchObject({
+			mirek: null,
+			hueSaturation: null
 		});
 	});
 
