@@ -30,7 +30,7 @@
 						<Sheet.Description>{description}</Sheet.Description>
 					{/if}
 				</Sheet.Header>
-				<Controls {control} class="px-4 pb-6" />
+				<Controls {control} class="px-6 pb-6" />
 			{/if}
 		</Sheet.Content>
 	</Sheet.Root>
