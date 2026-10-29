@@ -25,33 +25,33 @@
 	aria-label="{group.name} controls"
 >
 	<div class="flex min-w-0 flex-col gap-1.5">
-		<h1 class="truncate text-2xl font-semibold">{group.name}</h1>
+		<div class="flex items-center gap-4">
+			<h1 class="truncate text-2xl font-semibold">{group.name}</h1>
+			<GroupSwitch {group} size="lg" />
+		</div>
 		<p class="text-sm text-muted-foreground tabular-nums">{status}</p>
 	</div>
 	<div class="flex flex-wrap items-center gap-x-6 gap-y-5">
-		<div class="flex items-center gap-4">
-			<GroupSwitch {group} size="lg" />
-			{#if group.colorTemperature || group.color}
-				<Button
-					variant="outline"
-					onclick={onOpenColor}
-					aria-haspopup="dialog"
-					aria-label="Color and white for {group.name}"
-				>
-					{#if swatches.length > 0}
-						<span class="flex -space-x-1" aria-hidden="true">
-							{#each swatches as swatch, i (i)}
-								<span
-									class="size-3 rounded-full bg-(--swatch) ring-2 ring-background"
-									style:--swatch={swatch}
-								></span>
-							{/each}
-						</span>
-					{/if}
-					Color and white
-				</Button>
-			{/if}
-		</div>
+		{#if group.colorTemperature || group.color}
+			<Button
+				variant="outline"
+				onclick={onOpenColor}
+				aria-haspopup="dialog"
+				aria-label="Color and white for {group.name}"
+			>
+				{#if swatches.length > 0}
+					<span class="flex -space-x-1" aria-hidden="true">
+						{#each swatches as swatch, i (i)}
+							<span
+								class="size-3 rounded-full bg-(--swatch) ring-2 ring-background"
+								style:--swatch={swatch}
+							></span>
+						{/each}
+					</span>
+				{/if}
+				Color and white
+			</Button>
+		{/if}
 		<div class="flex min-w-0 basis-full items-center gap-4 sm:flex-1 sm:basis-0">
 			<LevelSlider
 				value={brightness.current}
