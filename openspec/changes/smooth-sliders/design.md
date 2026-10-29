@@ -36,10 +36,10 @@ A class in `src/lib/smooth-value.svelte.ts` built on `Tween`:
 ```
 
 - Created with a getter for the live value: `new SmoothValue(() => control.brightness)`. The tween starts at the live value, so nothing animates on first render.
-- An `$effect.pre` sets `tween.target` when the live value changes, with `duration: 0` while `prefersReducedMotion.current` is true. Duration about 300 ms, `cubicOut`.
-- `value` is a getter/setter for `bind:value`. Reading returns the local value while interacting, otherwise the rounded `tween.current`. Writing sets the local value and marks interacting.
+- `Tween.of` follows the live value. Its `duration` is a function that returns 0 while `prefersReducedMotion.current` is true, otherwise 300 ms, `cubicOut`.
+- `current` returns the user's input while interacting, otherwise `tween.current` rounded to a whole number.
+- `input(v)` comes from `onValueChange`, which bits-ui calls only on user input, so no two-way binding is needed. It stores the local value and marks interacting.
 - `commit(v)` jumps the tween to `v` with `duration: 0` and ends interacting. The optimistic update then sets the same target, so nothing moves back toward the old value (spec: No animation for the user's own input).
-- Rounded to the slider's step, so the label and status text show whole numbers.
 
 Alternative: put the logic inside the new slider component. Rejected: hue and saturation keep the shadcn slider and need the same behavior, and the status text outside the slider must read the same moving value.
 
