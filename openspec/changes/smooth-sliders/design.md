@@ -53,11 +53,11 @@ Alternative: put the logic inside the new slider component. Rejected: hue and sa
  +-------+--+---+----------------+   +###########|---------+
  |##########|                    |
  +----------+--------------------+
-  Range fills the track; thumb is a short vertical bar inside the track
+  Fill is a rounded pill; thumb is a short light line inside its end
 ```
 
 - Props: `value` (bindable), `min`, `max`, `step`, `size: 'sm' | 'lg'`, `format: (value) => string` for the label, `thumbLabel` (accessible name), `onValueCommit`, `disabled`, and rest props to the root.
-- Track `rounded-md bg-muted`, Range `bg-primary`, thumb `w-1.5` rounded bar in `bg-primary-foreground` with a focus ring. `thumbPositioning="contain"` keeps the thumb inside the rounded track. Semantic shadcn tokens only.
+- Track `rounded-lg bg-muted`. The fill is our own `bg-primary` span, not `Slider.Range`: bits-ui sets the range end as `right: x%`, which cannot round the end. The thumb is a transparent `w-6` box with a `bg-primary-foreground` line inside; `thumbPositioning="contain"` places that box so its right edge is at `fraction * (100% - 1.5rem) + 1.5rem`, the fill width. Semantic shadcn tokens only.
 - Label: `Slider.ThumbLabel` with `position="top"`, a small popover style (`bg-popover text-popover-foreground`, `text-xs tabular-nums`). Shown with CSS: `group-hover`, `group-focus-within`, and the root's `data-active` / pointer state while dragging. It is `aria-hidden`, because the thumb already exposes `aria-valuenow`; `aria-valuetext` carries the formatted value.
 
 Alternative: the shadcn slider with larger classes. Rejected: the shadcn file is generated and gets overwritten by updates, and its round thumb does not fit the filled-bar look.
