@@ -35,35 +35,6 @@ Opening `/` SHALL open the first room in sidebar order. Without rooms it SHALL o
 - **AND** the user opens `/`
 - **THEN** the Downstairs page opens
 
-### Requirement: Inspector for the open group
-Room and zone pages SHALL show an inspector. Without a selection it SHALL control the whole group (on/off, brightness, white, color); with selected lights it SHALL control those lights. On screens 1280 px and wider the inspector SHALL be a column on the right; on narrower screens the group controls SHALL be at the top of the page and selected lights SHALL be controlled in a bottom sheet. White and color SHALL be two tabs when both are available.
-
-#### Scenario: Wide screen
-- **WHEN** the Kitchen page is open on a screen 1440 px wide
-- **THEN** the sidebar, the scenes and lights, and the inspector are side by side
-
-#### Scenario: Tablet
-- **WHEN** the Kitchen page is open on a screen 1024 px wide
-- **THEN** the sidebar is visible and the inspector is above the scenes
-
-#### Scenario: White and color
-- **WHEN** the group supports color temperature and color
-- **THEN** the inspector shows the White tab selected and a Color tab
-
-#### Scenario: Select a light on a narrow screen
-- **WHEN** the Kitchen page is open on a screen 1024 px wide, scrolled to the lights
-- **AND** the user taps the "Ceiling" card
-- **THEN** a bottom sheet opens with the controls for "Ceiling"
-- **AND** the page keeps its scroll position
-
-#### Scenario: Select mode on a narrow screen
-- **WHEN** the user is in select mode on a screen 390 px wide and has selected two lights
-- **THEN** a bar shows "Control 2 lights", and selecting it opens the bottom sheet
-
-#### Scenario: Close the sheet
-- **WHEN** the bottom sheet is open and the user closes it
-- **THEN** the selection is cleared
-
 ### Requirement: Sidebar on small screens
 On screens narrower than 768 px the sidebar SHALL be hidden behind a menu button in a top bar that also shows the page title. Selecting an entry SHALL open the page and close the sidebar.
 
@@ -89,3 +60,34 @@ The sidebar header SHALL show how many lights in the home are on, counting each 
 #### Scenario: Live change
 - **WHEN** another light turns on in the Hue app
 - **THEN** the home summary counts it without a reload
+
+### Requirement: Room page layout
+Room and zone pages SHALL show the room header at the top, then the scenes and the lights at the full width of the page column. On screens 768 px and wider the header SHALL stay at the top of the page column while the page scrolls. On narrower screens it SHALL scroll with the page.
+
+#### Scenario: Wide screen
+- **WHEN** the Kitchen page is open on a screen 1440 px wide
+- **THEN** the sidebar is on the left, and the header, scenes, and lights are in one column next to it
+
+#### Scenario: Sticky header
+- **WHEN** the Kitchen page is open on a screen 1024 px wide and the user scrolls down to the lights
+- **THEN** the header with the switch and brightness slider stays visible at the top
+
+#### Scenario: Phone
+- **WHEN** the Kitchen page is open on a screen 390 px wide and the user scrolls down
+- **THEN** the header scrolls out of view
+
+### Requirement: Control dialog
+The control dialog for a room, zone, or light SHALL open centered over the page on screens 768 px and wider, and as a bottom sheet on narrower screens. White and color SHALL be two tabs when both are available. Closing the dialog SHALL keep the page's scroll position.
+
+#### Scenario: Wide screen
+- **WHEN** the user opens the "Ceiling" dialog on a screen 1440 px wide
+- **THEN** the dialog shows centered over the page
+
+#### Scenario: Phone
+- **WHEN** the user taps the "Ceiling" card on a screen 390 px wide, scrolled to the lights
+- **THEN** a bottom sheet opens with the controls for "Ceiling"
+- **AND** after closing it, the page keeps its scroll position
+
+#### Scenario: White and color
+- **WHEN** the Kitchen supports color temperature and color and the user opens its dialog
+- **THEN** the dialog shows a White tab and a Color tab
