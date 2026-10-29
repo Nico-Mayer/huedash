@@ -53,7 +53,7 @@ Alternative: keep the root layout and branch on `page.url.pathname` for setup (a
 The sidebar keeps its open state in a `sidebar_state` cookie. We leave this as it is; it is a UI preference and has no server effect.
 
 ### Shared group state
-New `src/lib/group-state.svelte.ts` with functions that merge `live` overrides over loaded data: `groupOn(group)`, `groupBrightness(group)`, `lightOn(light)`, `activeScene(group)`, `lightCounts(group)` (`{ on, total, unreachable }`, on means reachable and on). The sidebar entry, the page header, and the inspector use these, so all three agree. `GroupCard`'s switch and slider logic moves to `GroupControls` (inspector) and `GroupSwitch` (sidebar), both using `applyChange` as today.
+New `src/lib/group-state.svelte.ts` with functions that merge `live` overrides over loaded data: `groupOn(group)`, `groupBrightness(group)`, `lightOn(light)`, `activeScene(group)`, `lightCounts(group)` (`{ on, total, unreachable }`, on means reachable and on). The sidebar entry, the page header, and the inspector use these, so all three agree. `GroupCard`'s switch and slider logic moves to `GroupControls` (inspector) and `GroupSwitch` (sidebar). Because the same group now shows in two places, `changeGroup` and `changeLight` write the optimistic change into the `live` overrides and restore the previous override if the command fails, instead of each component keeping its own copy.
 
 ### Page layout
 `GroupDetail` becomes:
