@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { Slider } from '#lib/components/ui/slider/index.js';
 	import { Switch } from '#lib/components/ui/switch/index.js';
-	import { changeLight, lightBrightness, lightOn } from '#lib/group-state.svelte.ts';
+	import { changeLight, lightBrightness, lightOn, lightSwatch } from '#lib/group-state.svelte.ts';
 	import { selection } from '#lib/selection.svelte.ts';
 	import type { HomeLight } from '#lib/server/hue/home.ts';
+	import LightIndicator from './LightIndicator.svelte';
 
 	let { light }: { light: HomeLight } = $props();
 
@@ -32,22 +33,28 @@
 	<div class="flex items-center justify-between gap-3">
 		<button
 			type="button"
-			class="flex min-w-0 flex-1 flex-col text-left outline-none after:absolute after:inset-0 after:rounded-xl enabled:cursor-pointer"
+			class="flex min-w-0 flex-1 items-center gap-3 text-left outline-none after:absolute after:inset-0 after:rounded-xl enabled:cursor-pointer"
 			aria-pressed={selected}
 			disabled={!light.reachable}
 			onclick={select}
 		>
-			<span class="truncate font-medium">{light.name}</span>
-			<span class="text-sm text-muted-foreground tabular-nums">
-				{#if !light.reachable}
-					Unreachable
-				{:else if !on}
-					Off
-				{:else if light.brightness !== null}
-					On, {brightness} %
-				{:else}
-					On
-				{/if}
+			<LightIndicator swatch={lightSwatch(light)} on={light.reachable && on} />
+			<span class="flex min-w-0 flex-col">
+				<span class="truncate font-medium">{light.name}</span>
+				<span class="truncate text-sm text-muted-foreground tabular-nums">
+					{#if !light.reachable}
+						Unreachable
+					{:else if !on}
+						Off
+					{:else if light.brightness !== null}
+						On, {brightness} %
+					{:else}
+						On
+					{/if}
+					{#if light.product}
+						· {light.product}
+					{/if}
+				</span>
 			</span>
 		</button>
 		<Switch

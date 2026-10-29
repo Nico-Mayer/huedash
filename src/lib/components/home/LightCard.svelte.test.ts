@@ -1,6 +1,7 @@
 import { page } from 'vitest/browser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
+import { live } from '#lib/live.svelte.ts';
 import { selection } from '#lib/selection.svelte.ts';
 import type { HomeLight } from '#lib/server/hue/home.ts';
 import LightCard from './LightCard.svelte';
@@ -15,6 +16,7 @@ beforeEach(() => {
 afterEach(() => {
 	vi.unstubAllGlobals();
 	selection.clear();
+	live.lights.clear();
 });
 
 const light = (id: string, name: string, reachable = true): HomeLight => ({
@@ -95,5 +97,33 @@ describe('LightCard selection', () => {
 
 		expect(selection.ids.size).toBe(0);
 		await expect.poll(() => fetchMock.mock.calls.length).toBe(1);
+	});
+});
+
+describe('LightCard details', () => {
+	const indicator = () =>
+		page.getByRole('listitem').element().querySelector('[data-lit]') as HTMLElement;
+
+	it('shows the product next to the state', async () => {
+		render(LightCard, { light: { ...light('ceiling', 'Ceiling'), product: 'Hue Signe' } });
+
+		await expect.element(page.getByText('On, 50 % · Hue Signe')).toBeInTheDocument();
+	});
+
+	it('lights the indicator in the swatch color', async () => {
+		render(LightCard, { light: { ...light('ceiling', 'Ceiling'), swatch: '#ff0000' } });
+
+		await expect.poll(indicator).toBeTruthy();
+		expect(indicator().dataset.lit).toBe('true');
+		expect(indicator().style.getPropertyValue('--swatch')).toBe('#ff0000');
+	});
+
+	it('mutes the indicator of a light that is off or has no swatch', async () => {
+		render(LightCard, {
+			light: { ...light('ceiling', 'Ceiling'), on: false, swatch: '#ff0000' }
+		});
+		render(LightCard, { light: light('plug', 'Plug') });
+
+		await expect.poll(() => document.querySelectorAll('[data-lit="false"]').length).toBe(2);
 	});
 });
