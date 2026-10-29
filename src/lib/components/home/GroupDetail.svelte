@@ -3,10 +3,11 @@
 	import BridgeStatusView from '#lib/components/bridge/BridgeStatusView.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Empty from '#lib/components/ui/empty/index.js';
-	import { lightsSummary } from '#lib/group-state.svelte.ts';
+	import { groupTarget } from '#lib/control-target.svelte.ts';
+	import { activeScene, lightsSummary } from '#lib/group-state.svelte.ts';
 	import { selection } from '#lib/selection.svelte.ts';
 	import type { GroupPageData } from '#lib/server/group-page.ts';
-	import GroupInspector from './GroupInspector.svelte';
+	import Controls from './Controls.svelte';
 	import LightCard from './LightCard.svelte';
 	import SceneList from './SceneList.svelte';
 
@@ -41,7 +42,7 @@
 
 		<div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
 			<aside class="xl:sticky xl:top-6 xl:col-start-2 xl:row-start-1" aria-label="Controls">
-				<GroupInspector {group} />
+				<Controls control={groupTarget(group)} scene={activeScene(group)?.name} />
 			</aside>
 
 			<div class="flex min-w-0 flex-col gap-8">

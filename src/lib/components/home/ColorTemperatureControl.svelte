@@ -1,23 +1,16 @@
 <script lang="ts">
-	import { applyChange } from '#lib/commands.ts';
 	import { kelvinToMirek, mirekToKelvin } from '#lib/color-temperature.ts';
 	import { Slider } from '#lib/components/ui/slider/index.js';
-	import type { HomeGroup, MirekRange } from '#lib/server/hue/home.ts';
+	import type { ControlTarget } from '#lib/control-target.svelte.ts';
+	import type { MirekRange } from '#lib/server/hue/home.ts';
 
-	let { group, range }: { group: HomeGroup; range: MirekRange } = $props();
+	let { control, range }: { control: ControlTarget; range: MirekRange } = $props();
 
 	const warmest = $derived(mirekToKelvin(range.maxMirek));
 	const coolest = $derived(mirekToKelvin(range.minMirek));
-	let kelvin = $derived(Math.round((warmest + coolest) / 2));
-
-	function commit(value: number) {
-		const previous = kelvin;
-		applyChange(
-			{ kind: 'groups', id: group.groupedLightId, name: group.name },
-			{ on: true, mirek: kelvinToMirek(value) },
-			() => (kelvin = previous)
-		);
-	}
+	let kelvin = $derived(
+		control.mirek !== null ? mirekToKelvin(control.mirek) : Math.round((warmest + coolest) / 2)
+	);
 </script>
 
 <div class="flex flex-col gap-3">
@@ -31,8 +24,8 @@
 		min={warmest}
 		max={coolest}
 		step={50}
-		onValueCommit={commit}
-		thumbLabel="{group.name} color temperature"
+		onValueCommit={(value) => control.apply({ on: true, mirek: kelvinToMirek(value) })}
+		thumbLabel="{control.name} color temperature"
 	/>
 	<div class="flex justify-between text-xs text-muted-foreground">
 		<span>Warm</span>
