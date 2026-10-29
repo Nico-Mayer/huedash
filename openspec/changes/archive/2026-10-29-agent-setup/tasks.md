@@ -25,7 +25,7 @@
 ## 5. Publish
 
 - [x] 5.1 Make atomic conventional commits for groups 1-4 and verify `git log --oneline` shows one commit per group with no co-author lines
-- [ ] 5.2 Create the public GitHub repo with `gh repo create huedash --public --source . --push` and verify `gh repo view` shows the pushed `main` branch
+- [x] 5.2 Create the public GitHub repo with `gh repo create huedash --public --source . --push` and verify `gh repo view` shows the pushed `main` branch
 
 ## Workflow follow-up
 
