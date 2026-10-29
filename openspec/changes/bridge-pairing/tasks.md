@@ -23,7 +23,7 @@
 
 - [x] 4.1 Implement `discovery.ts` (`HUE_DISCOVERY_URL` override, 10 s timeout, 429 and errors mapped to a failure result) with unit tests for found, empty, error, and timeout
 - [x] 4.2 Implement `/setup` actions `discover`, `check`, `pair` (pending pairing in memory with httpOnly token cookie, 5 min expiry, `devicetype` truncation) with unit tests for each action's success and error results
-- [ ] 4.3 Build the `/setup` page with shadcn-svelte components (address field, "Find bridge" list, bridge name and ID, link button countdown with 2 s polling, errors from the specs) and copy written with the `ux-writing` skill; verify with the Svelte autofixer and a component test for the countdown and error states
+- [x] 4.3 Build the `/setup` page with shadcn-svelte components (address field, "Find bridge" list, bridge name and ID, link button countdown with 2 s polling, errors from the specs) and copy written with the `ux-writing` skill; verify with the Svelte autofixer and a component test for the countdown and error states
 
 ## 5. Home page
 
