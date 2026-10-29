@@ -24,6 +24,14 @@ export function handlersListener(handlers: RequestHandler[]): RequestListener {
 			new Response('No mock handler', { status: 404 });
 
 		reply.writeHead(response.status, Object.fromEntries(response.headers));
-		reply.end(Buffer.from(await response.arrayBuffer()));
+		if (!response.body) return reply.end();
+
+		// Streamed, not buffered, so endless responses like the event stream work.
+		const reader = response.body.getReader();
+		reply.on('close', () => reader.cancel().catch(() => {}));
+		for (let chunk = await reader.read(); !chunk.done; chunk = await reader.read()) {
+			reply.write(chunk.value);
+		}
+		reply.end();
 	};
 }
