@@ -1,15 +1,16 @@
 <script lang="ts">
-	import { Slider } from '#lib/components/ui/slider/index.js';
 	import { Switch } from '#lib/components/ui/switch/index.js';
 	import { changeLight, lightBrightness, lightOn, lightSwatch } from '#lib/group-state.svelte.ts';
 	import { selection } from '#lib/selection.svelte.ts';
 	import type { HomeLight } from '#lib/server/hue/home.ts';
+	import { SmoothValue } from '#lib/smooth-value.svelte.ts';
+	import LevelSlider from './LevelSlider.svelte';
 	import LightIndicator from './LightIndicator.svelte';
 
 	let { light }: { light: HomeLight } = $props();
 
 	const on = $derived(lightOn(light));
-	let brightness = $derived(lightBrightness(light));
+	const brightness = new SmoothValue(() => lightBrightness(light));
 	const selected = $derived(selection.has(light.id));
 
 	function select(event: MouseEvent) {
@@ -47,7 +48,7 @@
 					{:else if !on}
 						Off
 					{:else if light.brightness !== null}
-						On, {brightness} %
+						On, {brightness.current} %
 					{:else}
 						On
 					{/if}
@@ -66,13 +67,17 @@
 		/>
 	</div>
 	{#if light.brightness !== null}
-		<Slider
-			class="relative"
-			type="single"
-			bind:value={brightness}
+		<LevelSlider
+			size="sm"
+			value={brightness.current}
 			min={1}
 			max={100}
-			onValueCommit={(value) => changeLight(light, { on: true, brightness: value })}
+			format={(value) => `${value} %`}
+			onValueChange={(value) => brightness.input(value)}
+			onValueCommit={(value) => {
+				brightness.commit(value);
+				changeLight(light, { on: true, brightness: value });
+			}}
 			disabled={!light.reachable}
 			thumbLabel="{light.name} brightness"
 		/>
