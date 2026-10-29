@@ -43,7 +43,7 @@
 				aria-label={thumbLabel}
 				aria-valuetext={format(value)}
 				class={[
-					'block w-1.5 rounded-full bg-primary-foreground shadow-sm ring-ring/50 outline-hidden transition-shadow ring-inset focus-visible:ring-4',
+					'block w-2.5 rounded-full border-2 border-primary bg-primary-foreground shadow-sm ring-ring/50 outline-hidden transition-shadow ring-inset focus-visible:ring-4',
 					size === 'lg' ? 'h-6' : 'h-3.5'
 				]}
 			/>
