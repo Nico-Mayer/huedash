@@ -14,8 +14,8 @@
 
 ## 3. GitHub Actions
 
-- [ ] 3.1 Add `.github/workflows/ci.yml` (mise-action with `install_args: node pnpm`, frozen install, lint, check, Chromium install, unit and e2e tests, report upload on failure, concurrency, read-only permissions); verify it parses with `yq` and every action uses the major from design.md
-- [ ] 3.2 Add `.github/workflows/image.yml` (QEMU, Buildx, GHCR login skipped on PRs, metadata tags, build-push with `type=gha` cache, amd64-only no-push on PRs, both platforms on `main` and `v*`); verify it parses with `yq` and permissions are `contents: read, packages: write`
+- [x] 3.1 Add `.github/workflows/ci.yml` (mise-action with `install_args: node pnpm`, frozen install, lint, check, Chromium install, unit and e2e tests, report upload on failure, concurrency, read-only permissions); verify it parses with `yq` and every action uses the major from design.md
+- [x] 3.2 Add `.github/workflows/image.yml` (QEMU, Buildx, GHCR login skipped on PRs, metadata tags, build-push with `type=gha` cache, amd64-only no-push on PRs, both platforms on `main` and `v*`); verify it parses with `yq` and permissions are `contents: read, packages: write`
 
 ## 4. Docs
 
