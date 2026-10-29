@@ -65,3 +65,9 @@ Fixtures add scenes: Kitchen "Bright" (color temperature), "Relax" (warm color t
 - [A light changed after a recall makes the bridge set the scene inactive] → Shown as such, matching the Hue app.
 - [Two color libraries on the server] → Both are server-only and bundled; `chroma-js` is used for one function. Revisit if one library covers both later.
 - `live` keeps a plain status per scene instead of "newest active wins per group": the bridge reports the previous scene as `inactive` when another starts, so per-scene status is already correct.
+
+## Changes found during implementation
+
+- Browser component tests failed to render lucide icons: Vite pre-bundled `@lucide/svelte` with a second Svelte runtime (`get_first_child` errors). The `client` test project now excludes `@lucide/svelte` from `optimizeDeps`. This is likely also the cause of the `effect_orphan` error seen in bridge-pairing (the spinner there is a lucide icon). Production builds are not affected.
+- Scene `status` is validated only for `scene` resources; `zigbee_connectivity` uses a plain string `status`, and a shared object schema broke parsing of those events.
+- The optimistic scene state is kept for 2 s after a successful recall, because the confirming live update can arrive shortly after the command's response.

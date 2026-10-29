@@ -12,6 +12,10 @@
 	let on = $derived(live.groups.get(group.groupedLightId)?.on ?? group.on);
 	let brightness = $derived(live.groups.get(group.groupedLightId)?.brightness ?? group.brightness);
 
+	const activeScene = $derived(
+		group.scenes.find((scene) => (live.scenes.get(scene.id) ?? scene.active) !== 'inactive')
+	);
+
 	const target = $derived({ kind: 'groups' as const, id: group.groupedLightId, name: group.name });
 	const href = $derived(
 		group.kind === 'room'
@@ -42,7 +46,13 @@
 			{/if}
 		</Card.Title>
 		<Card.Description class="tabular-nums">
-			{on ? `On, ${brightness} %` : 'Off'}
+			{#if !on}
+				Off
+			{:else if activeScene}
+				{activeScene.name}, {brightness} %
+			{:else}
+				On, {brightness} %
+			{/if}
 		</Card.Description>
 		<Card.Action>
 			<Switch checked={on} onCheckedChange={setOn} aria-label={group.name} />

@@ -14,7 +14,7 @@
 ## 3. Browser
 
 - [x] 3.1 Add `scenes` to `live` (newest active wins per group, cleared on reload) with unit tests
-- [ ] 3.2 Build `SceneList` (color strip, name, Active/Playing badge, play button for dynamic scenes, empty state, optimistic recall with toast on failure) and add it to `GroupDetail`; show the active scene name on `GroupCard`; verify with the Svelte autofixer and component tests
+- [x] 3.2 Build `SceneList` (color strip, name, Active/Playing badge, play button for dynamic scenes, empty state, optimistic recall with toast on failure) and add it to `GroupDetail`; show the active scene name on `GroupCard`; verify with the Svelte autofixer and component tests
 
 ## 4. End to end, docs, verification
 

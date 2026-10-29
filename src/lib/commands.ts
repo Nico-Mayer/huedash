@@ -1,6 +1,6 @@
 import { toast } from 'svelte-sonner';
 
-type Target = { kind: 'groups' | 'lights'; id: string; name: string };
+type Target = { kind: 'groups' | 'lights' | 'scenes'; id: string; name: string };
 
 export async function sendCommand({ kind, id }: Target, body: object): Promise<boolean> {
 	try {

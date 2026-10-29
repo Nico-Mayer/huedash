@@ -10,6 +10,7 @@
 	import ColorTemperatureControl from './ColorTemperatureControl.svelte';
 	import GroupCard from './GroupCard.svelte';
 	import LightRow from './LightRow.svelte';
+	import SceneList from './SceneList.svelte';
 
 	let { data }: { data: GroupPageData } = $props();
 
@@ -37,6 +38,15 @@
 	{:else}
 		{@const group = data.group}
 		<GroupCard {group} link={false} />
+
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Scenes</Card.Title>
+			</Card.Header>
+			<Card.Content>
+				<SceneList {group} />
+			</Card.Content>
+		</Card.Root>
 
 		{#if group.colorTemperature || group.color}
 			<Card.Root>
