@@ -22,9 +22,6 @@ huedash is starting from an empty folder. Before any code exists, agents and hum
   - Reuse skills already installed globally where they fit (for example the Svelte plugin skills, `interface-design`, `ux-writing`, `playwright-cli`, `find-docs`) and reference them in the guidelines instead of installing duplicates.
   - Search the skills.sh directory for maintained skills covering the remaining gaps (for example SvelteKit, shadcn-svelte, bits-ui, Tailwind, Docker, GitHub Actions) and install them per project with the `npx skills` CLI.
   - Review the existing `.claude` OpenSpec skills and commands and keep them.
-- Define UI standards for agents and humans:
-  - UI copy and wording guidelines (voice, tone, labels, error and empty states), based on the `ux-writing` skill.
-  - Interface standards (layout, tokens, states, component use), based on the `interface-design` skill and shadcn-svelte defaults.
 - Pin tool versions in `mise.toml`.
 
 ## Capabilities
@@ -39,7 +36,7 @@ None.
 
 ## Impact
 
-- New files: `.gitignore`, `CLAUDE.md` and/or `AGENTS.md`, UI copy and interface standards docs, installed project skills.
+- New files: `.gitignore`, `CLAUDE.md` and/or `AGENTS.md`, installed project skills.
 - Modified files: `openspec/config.yaml`, `mise.toml`, `.claude/`.
 - New tool dependency: the `npx skills` CLI (vercel-labs/skills), used at setup time only.
 - New GitHub repository created via `gh`.

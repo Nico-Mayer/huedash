@@ -13,7 +13,7 @@ All work goes through OpenSpec changes:
 
 Planned changes, in order:
 
-1. `agent-setup` - this guide, OpenSpec config, skills, UI standards
+1. `agent-setup` - this guide, OpenSpec config, skills
 2. `project-setup` - SvelteKit, shadcn-svelte, bits-ui, lint, format
 3. `testing-setup` - Vitest, Playwright, mock Hue bridge
 4. `ci-docker` - Dockerfile, compose example, GitHub Actions, GHCR
@@ -46,11 +46,6 @@ Notes:
 - `github-actions-templates` pins older action versions. Check the latest major version of each action before use.
 - No Tailwind skill is installed. `wshobson/agents@tailwind-design-system` targets Tailwind v4 but builds its own token system, which conflicts with shadcn-svelte theming. Use semantic tokens from shadcn-svelte.
 - Project skills are tracked in `skills-lock.json`. Manage them with `npx skills` (`list`, `check`, `update`, `add -a claude-code`). Read a skill's `SKILL.md` before installing it.
-
-## UI standards
-
-- UI copy: [docs/ui-copy.md](docs/ui-copy.md)
-- Interface: [docs/ui-standards.md](docs/ui-standards.md)
 
 ## Git
 

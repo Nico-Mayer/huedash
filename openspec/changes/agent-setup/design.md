@@ -23,12 +23,12 @@ Findings about the skills CLI (`skills` on npm, `vercel-labs/skills`): v1.7.4, a
 **Goals:**
 - One source of agent guidelines that works for Claude Code and other agents.
 - Project skills that are reproducible on another machine.
-- UI copy and interface standards that later feature changes can point to.
 
 **Non-Goals:**
 - No SvelteKit scaffold, package manager choice, or app dependencies (project-setup).
 - No CI workflows or Dockerfile (ci-docker).
 - No custom skills written by us.
+- No UI copy or interface standards docs. UI work uses the `ux-writing`, `interface-design`, and `shadcn-svelte` skills directly.
 
 ## Decisions
 
@@ -59,13 +59,6 @@ Stack and architecture go into `context`. Per-artifact `rules`:
 - tasks: prefer adding a maintained dependency over custom code; custom UI components build on bits-ui primitives.
 
 Feature work then has to follow the rule as part of the OpenSpec flow, not only when someone remembers it.
-
-### UI standards as two docs under `docs/`
-- `docs/ui-copy.md`: voice, tone, terms (light, room, zone, scene, bridge), button and label style, error, empty, and loading states. Drafted with the `ux-writing` skill.
-- `docs/ui-standards.md`: layout, spacing and color tokens, component states, touch targets, use of shadcn-svelte vs. custom bits-ui components. Drafted with the `interface-design` skill.
-
-`AGENTS.md` links to both.
-- Alternative: put everything in `AGENTS.md`. Rejected: makes the always-loaded context too large.
 
 ### Node pinned in `mise.toml`
 Pin Node.js 24 LTS in `mise.toml`. It meets the skills CLI minimum (22.20) and is the base for project-setup.
