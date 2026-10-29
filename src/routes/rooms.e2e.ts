@@ -46,8 +46,8 @@ test('sets room brightness', async ({ page }) => {
 });
 
 test('switches a single light in a room', async ({ page }) => {
-	await page.goto('/rooms/room-living');
-	await page.getByRole('link', { name: /^Kitchen/ }).click();
+	await page.goto('/');
+	await page.getByRole('link', { name: 'Kitchen' }).click();
 
 	await expect(page.getByRole('heading', { name: 'Kitchen' })).toBeVisible();
 	const sent = page.waitForResponse((r) => r.url().endsWith('/api/lights/ceiling'));

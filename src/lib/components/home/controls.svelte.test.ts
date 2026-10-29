@@ -4,8 +4,9 @@ import { render } from 'vitest-browser-svelte';
 import type { HomeGroup, HomeLight } from '#lib/server/hue/home.ts';
 import ColorControl from './ColorControl.svelte';
 import ColorTemperatureControl from './ColorTemperatureControl.svelte';
-import GroupCard from './GroupCard.svelte';
-import LightRow from './LightRow.svelte';
+import GroupControls from './GroupControls.svelte';
+import GroupInspector from './GroupInspector.svelte';
+import LightCard from './LightCard.svelte';
 import { live } from '#lib/live.svelte.ts';
 
 vi.mock('$app/navigation', () => ({ refreshAll: vi.fn() }));
@@ -25,7 +26,11 @@ beforeEach(() => {
 	toast.error.mockClear();
 });
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+	vi.unstubAllGlobals();
+	live.groups.clear();
+	live.lights.clear();
+});
 
 const light: HomeLight = {
 	id: 'ceiling',
@@ -55,9 +60,9 @@ function sentBody() {
 	return { url, body: JSON.parse(String(init.body)) };
 }
 
-describe('GroupCard', () => {
+describe('GroupControls', () => {
 	it('turns the group off with one command', async () => {
-		render(GroupCard, { group: kitchen });
+		render(GroupControls, { group: kitchen });
 
 		await page.getByRole('switch', { name: 'Kitchen' }).click();
 
@@ -67,7 +72,7 @@ describe('GroupCard', () => {
 
 	it('restores the switch and tells the user when the bridge refuses', async () => {
 		fetchMock.mockResolvedValue(new Response(null, { status: 502 }));
-		render(GroupCard, { group: kitchen });
+		render(GroupControls, { group: kitchen });
 
 		await page.getByRole('switch', { name: 'Kitchen' }).click();
 
@@ -76,7 +81,7 @@ describe('GroupCard', () => {
 	});
 
 	it('sends brightness only when the slider is released', async () => {
-		render(GroupCard, { group: kitchen });
+		render(GroupControls, { group: kitchen });
 		const slider = page.getByRole('slider', { name: 'Kitchen brightness' });
 
 		(slider.element() as HTMLElement).focus();
@@ -86,19 +91,11 @@ describe('GroupCard', () => {
 		await expect.poll(() => fetchMock.mock.calls.length).toBe(1);
 		expect(sentBody().body).toEqual({ on: true, brightness: 61 });
 	});
-
-	it('links to the room page', async () => {
-		render(GroupCard, { group: kitchen });
-
-		await expect
-			.element(page.getByRole('link', { name: 'Kitchen' }))
-			.toHaveAttribute('href', '/rooms/room-kitchen');
-	});
 });
 
-describe('LightRow', () => {
+describe('LightCard', () => {
 	it('switches one light', async () => {
-		render(LightRow, { light });
+		render(LightCard, { light });
 
 		await page.getByRole('switch', { name: 'Ceiling' }).click();
 
@@ -106,16 +103,43 @@ describe('LightRow', () => {
 	});
 
 	it('shows an unreachable light with disabled controls', async () => {
-		render(LightRow, { light: { ...light, reachable: false } });
+		render(LightCard, { light: { ...light, reachable: false } });
 
 		await expect.element(page.getByText('Unreachable')).toBeInTheDocument();
 		await expect.element(page.getByRole('switch', { name: 'Ceiling' })).toBeDisabled();
 	});
 
 	it('shows only a switch for a light without dimming', async () => {
-		render(LightRow, { light: { ...light, brightness: null } });
+		render(LightCard, { light: { ...light, brightness: null } });
 
 		await expect.element(page.getByRole('slider')).not.toBeInTheDocument();
+	});
+});
+
+describe('GroupInspector', () => {
+	it('shows white and color as tabs', async () => {
+		render(GroupInspector, { group: kitchen });
+
+		await expect
+			.element(page.getByRole('tab', { name: 'White' }))
+			.toHaveAttribute('aria-selected', 'true');
+		await page.getByRole('tab', { name: 'Color' }).click();
+
+		await expect
+			.element(page.getByRole('slider', { name: 'Kitchen saturation' }))
+			.toBeInTheDocument();
+		await expect
+			.element(page.getByRole('slider', { name: 'Kitchen color temperature' }))
+			.not.toBeInTheDocument();
+	});
+
+	it('shows only the white control without color', async () => {
+		render(GroupInspector, { group: { ...kitchen, color: false } });
+
+		await expect.element(page.getByRole('tab')).not.toBeInTheDocument();
+		await expect
+			.element(page.getByRole('slider', { name: 'Kitchen color temperature' }))
+			.toBeInTheDocument();
 	});
 });
 
@@ -149,7 +173,7 @@ describe('live updates', () => {
 	});
 
 	it('shows a group change from the bridge without reloading', async () => {
-		render(GroupCard, { group: kitchen });
+		render(GroupControls, { group: kitchen });
 
 		live.apply({ kind: 'group', id: 'grouped-kitchen', on: false });
 
@@ -158,7 +182,7 @@ describe('live updates', () => {
 	});
 
 	it('shows a light change from the bridge', async () => {
-		render(LightRow, { light });
+		render(LightCard, { light });
 
 		live.apply({ kind: 'light', id: 'ceiling', brightness: 20 });
 

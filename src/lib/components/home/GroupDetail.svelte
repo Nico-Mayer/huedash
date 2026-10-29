@@ -1,15 +1,12 @@
 <script lang="ts">
 	import { refreshAll } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import BridgeStatusView from '#lib/components/bridge/BridgeStatusView.svelte';
-	import { Button, buttonVariants } from '#lib/components/ui/button/index.js';
-	import * as Card from '#lib/components/ui/card/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Empty from '#lib/components/ui/empty/index.js';
+	import { lightCounts } from '#lib/group-state.svelte.ts';
 	import type { GroupPageData } from '#lib/server/group-page.ts';
-	import ColorControl from './ColorControl.svelte';
-	import ColorTemperatureControl from './ColorTemperatureControl.svelte';
-	import GroupCard from './GroupCard.svelte';
-	import LightRow from './LightRow.svelte';
+	import GroupInspector from './GroupInspector.svelte';
+	import LightCard from './LightCard.svelte';
 	import SceneList from './SceneList.svelte';
 
 	let { data }: { data: GroupPageData } = $props();
@@ -17,9 +14,7 @@
 	const noun = $derived(data.kind === 'room' ? 'room' : 'zone');
 </script>
 
-<div class="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6">
-	<a href={resolve('/(app)')} class="text-sm text-muted-foreground hover:underline">← All rooms</a>
-
+<div class="flex flex-col gap-6 p-6">
 	{#if data.status !== 'ok'}
 		<BridgeStatusView name={data.bridgeName} status={data.status} />
 		<Button class="self-start" onclick={() => refreshAll()}>Try again</Button>
@@ -31,49 +26,38 @@
 					This {noun} no longer exists on your bridge. It may have been removed in the Hue app.
 				</Empty.Description>
 			</Empty.Header>
-			<Empty.Content>
-				<a href={resolve('/(app)')} class={buttonVariants({ variant: 'outline' })}
-					>Go to all rooms</a
-				>
-			</Empty.Content>
 		</Empty.Root>
 	{:else}
 		{@const group = data.group}
-		<GroupCard {group} link={false} />
+		{@const counts = lightCounts(group)}
+		<header class="flex flex-col gap-1">
+			<h1 class="text-2xl font-semibold">{group.name}</h1>
+			<p class="text-sm text-muted-foreground tabular-nums">
+				{counts.on} of {counts.total} lights on{#if counts.unreachable > 0}
+					· {counts.unreachable} unreachable{/if}
+			</p>
+		</header>
 
-		<Card.Root>
-			<Card.Header>
-				<Card.Title>Scenes</Card.Title>
-			</Card.Header>
-			<Card.Content>
-				<SceneList {group} />
-			</Card.Content>
-		</Card.Root>
+		<div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+			<aside class="xl:sticky xl:top-6 xl:col-start-2 xl:row-start-1" aria-label="Controls">
+				<GroupInspector {group} />
+			</aside>
 
-		{#if group.colorTemperature || group.color}
-			<Card.Root>
-				<Card.Content class="flex flex-col gap-6">
-					{#if group.colorTemperature}
-						<ColorTemperatureControl {group} range={group.colorTemperature} />
-					{/if}
-					{#if group.color}
-						<ColorControl {group} />
-					{/if}
-				</Card.Content>
-			</Card.Root>
-		{/if}
+			<div class="flex min-w-0 flex-col gap-8">
+				<section class="flex flex-col gap-3" aria-labelledby="scenes-heading">
+					<h2 id="scenes-heading" class="text-sm font-medium text-muted-foreground">Scenes</h2>
+					<SceneList {group} />
+				</section>
 
-		<Card.Root>
-			<Card.Header>
-				<Card.Title>Lights</Card.Title>
-			</Card.Header>
-			<Card.Content>
-				<ul class="flex flex-col divide-y">
-					{#each group.lights as light (light.id)}
-						<LightRow {light} />
-					{/each}
-				</ul>
-			</Card.Content>
-		</Card.Root>
+				<section class="flex flex-col gap-3" aria-labelledby="lights-heading">
+					<h2 id="lights-heading" class="text-sm font-medium text-muted-foreground">Lights</h2>
+					<ul class="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3" aria-label="Lights">
+						{#each group.lights as light (light.id)}
+							<LightCard {light} />
+						{/each}
+					</ul>
+				</section>
+			</div>
+		</div>
 	{/if}
 </div>

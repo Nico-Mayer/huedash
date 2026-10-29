@@ -1,34 +1,24 @@
 <script lang="ts">
-	import { applyChange } from '#lib/commands.ts';
-	import { live } from '#lib/live.svelte.ts';
 	import { Slider } from '#lib/components/ui/slider/index.js';
 	import { Switch } from '#lib/components/ui/switch/index.js';
+	import { changeLight, lightBrightness, lightOn } from '#lib/group-state.svelte.ts';
 	import type { HomeLight } from '#lib/server/hue/home.ts';
 
 	let { light }: { light: HomeLight } = $props();
 
-	let on = $derived(live.lights.get(light.id)?.on ?? light.on);
-	let brightness = $derived(live.lights.get(light.id)?.brightness ?? light.brightness ?? 100);
-
-	const target = $derived({ kind: 'lights' as const, id: light.id, name: light.name });
-
-	function setOn(next: boolean) {
-		const previous = on;
-		on = next;
-		applyChange(target, { on: next }, () => (on = previous));
-	}
-
-	function commitBrightness(value: number) {
-		const previous = { on, brightness };
-		on = true;
-		applyChange(target, { on: true, brightness: value }, () => ({ on, brightness } = previous));
-	}
+	const on = $derived(lightOn(light));
+	let brightness = $derived(lightBrightness(light));
 </script>
 
-<li class="flex flex-col gap-3 py-3">
+<li
+	class={[
+		'flex flex-col gap-4 rounded-xl border bg-card p-4 text-card-foreground',
+		!light.reachable && 'opacity-60'
+	]}
+>
 	<div class="flex items-center justify-between gap-3">
-		<div class="flex flex-col">
-			<span class="font-medium">{light.name}</span>
+		<div class="flex min-w-0 flex-col">
+			<span class="truncate font-medium">{light.name}</span>
 			<span class="text-sm text-muted-foreground tabular-nums">
 				{#if !light.reachable}
 					Unreachable
@@ -43,7 +33,7 @@
 		</div>
 		<Switch
 			checked={on}
-			onCheckedChange={setOn}
+			onCheckedChange={(next) => changeLight(light, { on: next })}
 			disabled={!light.reachable}
 			aria-label={light.name}
 		/>
@@ -54,7 +44,7 @@
 			bind:value={brightness}
 			min={1}
 			max={100}
-			onValueCommit={commitBrightness}
+			onValueCommit={(value) => changeLight(light, { on: true, brightness: value })}
 			disabled={!light.reachable}
 			thumbLabel="{light.name} brightness"
 		/>
