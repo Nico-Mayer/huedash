@@ -13,7 +13,7 @@
 
 ## 3. Browser
 
-- [ ] 3.1 Implement `src/lib/live.svelte.ts` (connect once, override maps, `connected`, throttled reload, reload after reconnect, clear overrides after navigation) with component-level tests using a fake `EventSource`
+- [x] 3.1 Implement `src/lib/live.svelte.ts` (connect once, override maps, `connected`, throttled reload, reload after reconnect, clear overrides after navigation) with component-level tests using a fake `EventSource`
 - [ ] 3.2 Use the overrides in `GroupCard` and `LightRow`, remove `refreshAll()` from `src/lib/commands.ts`, connect from `+layout.svelte`, and add the reconnecting notice; verify with the Svelte autofixer and component tests (update applied in place, notice shown and hidden)
 
 ## 4. End to end, docs, verification
