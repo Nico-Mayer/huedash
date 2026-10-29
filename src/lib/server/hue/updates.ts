@@ -6,7 +6,8 @@ const resourceSchema = z.looseObject({
 	type: z.string(),
 	on: z.object({ on: z.boolean() }).optional(),
 	dimming: z.object({ brightness: z.number() }).optional(),
-	metadata: z.unknown().optional()
+	metadata: z.unknown().optional(),
+	status: z.unknown().optional()
 });
 
 const messageSchema = z.array(
@@ -15,13 +16,17 @@ const messageSchema = z.array(
 
 type Resource = z.infer<typeof resourceSchema>;
 
+// Other resources, like zigbee_connectivity, use a plain string status.
+const sceneStatusSchema = z.object({ active: z.enum(['inactive', 'static', 'dynamic_palette']) });
+
 const SHOWN_TYPES = new Set([
 	'light',
 	'grouped_light',
 	'room',
 	'zone',
 	'device',
-	'zigbee_connectivity'
+	'zigbee_connectivity',
+	'scene'
 ]);
 
 function stateOf(resource: Resource): StateUpdate | null {
@@ -43,6 +48,14 @@ export function toUpdates(message: unknown): LiveUpdate[] {
 		if (event.type === 'error') continue;
 		for (const resource of event.data) {
 			if (!SHOWN_TYPES.has(resource.type)) continue;
+
+			if (resource.type === 'scene' && event.type === 'update' && !resource.metadata) {
+				const status = sceneStatusSchema.safeParse(resource.status);
+				if (status.success) {
+					updates.push({ kind: 'scene', id: resource.id, active: status.data.active });
+					continue;
+				}
+			}
 
 			const inPlace =
 				event.type === 'update' &&

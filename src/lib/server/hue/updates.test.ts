@@ -73,3 +73,22 @@ describe('toUpdates', () => {
 		expect(toUpdates(message)).toEqual([{ kind: 'light', id: 'ceiling', on: true }]);
 	});
 });
+
+describe('toUpdates for scenes', () => {
+	it('turns a scene status into a scene update', () => {
+		const message = [
+			event('update', [{ id: 'scene-relax', type: 'scene', status: { active: 'static' } }])
+		];
+
+		expect(toUpdates(message)).toEqual([{ kind: 'scene', id: 'scene-relax', active: 'static' }]);
+	});
+
+	it.each([
+		['a new scene', event('add', [{ id: 's', type: 'scene' }])],
+		['a removed scene', event('delete', [{ id: 's', type: 'scene' }])],
+		['a renamed scene', event('update', [{ id: 's', type: 'scene', metadata: { name: 'New' } }])],
+		['changed scene actions', event('update', [{ id: 's', type: 'scene', actions: [] }])]
+	])('asks for a reload on %s', (_name, message) => {
+		expect(toUpdates([message])).toEqual([{ kind: 'reload' }]);
+	});
+});
