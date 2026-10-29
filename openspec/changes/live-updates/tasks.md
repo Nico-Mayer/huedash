@@ -8,7 +8,7 @@
 ## 2. Server
 
 - [x] 2.1 Add `eventsource`; implement `toUpdates` (bridge message to browser updates: light, group, reload, dropped types, rounded brightness) with unit tests for each case, including that no key or raw resource fields pass through
-- [ ] 2.2 Implement the event hub (lazy start, shared subscribers, status `open`/`reconnecting`, close 30 s after the last subscriber, pinned fetch with app key) with unit tests using the MSW stream and fake timers for the idle close
+- [x] 2.2 Implement the event hub (lazy start, shared subscribers, status `open`/`reconnecting`, close 30 s after the last subscriber, pinned fetch with app key) with unit tests using the MSW stream and fake timers for the idle close
 - [ ] 2.3 Implement `GET /api/events` (SSE response, heartbeat every 25 s, unsubscribe on abort, `409` without a bridge) with unit tests reading the stream
 
 ## 3. Browser

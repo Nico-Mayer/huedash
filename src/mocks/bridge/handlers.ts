@@ -87,10 +87,7 @@ const eventStream = http.get('*/eventstream/clip/v2', ({ request }) => {
 				const id = `${Math.floor(Date.now() / 1000)}:${eventCount++}`;
 				controller.enqueue(encoder.encode(`id: ${id}\ndata: ${JSON.stringify(events)}\n\n`));
 			});
-			request.signal.addEventListener('abort', () => {
-				stop();
-				controller.close();
-			});
+			request.signal.addEventListener('abort', () => stop());
 		},
 		cancel: () => stop()
 	});
