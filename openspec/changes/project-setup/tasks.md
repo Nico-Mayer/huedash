@@ -2,7 +2,7 @@
 
 ## 1. Tooling
 
-- [ ] 1.1 Add `pnpm = "12"` to `mise.toml` and verify `mise install` succeeds and `pnpm --version` reports 12.x
+- [x] 1.1 Add `pnpm = "12"` to `mise.toml` and verify `mise install` succeeds and `pnpm --version` reports 12.x
 
 ## 2. SvelteKit scaffold
 
