@@ -58,7 +58,7 @@ Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder:
 - Only server code talks to the bridge. Never send the app key or client key to the browser.
 - `src/lib/server/hue/schema.d.ts` is generated from the vendored `openhue.yaml` with `pnpm gen:hue`. Do not edit it by hand.
 - Pages use the home model from `src/lib/server/hue/home.ts`. They never read CLIP resources directly.
-- Send bridge commands through `src/lib/server/hue/commands.ts`. It validates, clamps, and throttles per id (1 s for groups, as Hue recommends; 100 ms for lights).
+- Send bridge commands through `src/lib/server/hue/commands.ts`. It validates, clamps, and throttles per id, as the specs require. Do not send commands to the bridge another way.
 - In the browser, send commands through `src/lib/commands.ts` (optimistic, toast on failure) and read live state from `src/lib/live.svelte.ts`. Do not reload after a command; the live update confirms it.
 - `culori` and `chroma-js` run on the server only. Kelvin and mirek helpers in `src/lib/color-temperature.ts` are shared with the browser.
 - Theme: use the `mode-watcher` API (`mode`, `setMode`, `userPrefersMode`), mounted in the root layout. Do not write your own dark mode state.
