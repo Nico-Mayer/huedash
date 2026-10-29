@@ -23,7 +23,7 @@
      draws one ring: the selection, or the keyboard focus when not selected. -->
 <li
 	class={[
-		'relative flex flex-col gap-4 rounded-xl border bg-card p-4 text-card-foreground',
+		'relative flex min-w-0 flex-col gap-4 rounded-xl border bg-card p-4 text-card-foreground',
 		!light.reachable && 'opacity-60',
 		selected
 			? 'ring-2 ring-primary'

@@ -10,7 +10,7 @@
 	class={[
 		'flex size-9 shrink-0 items-center justify-center rounded-full',
 		lit
-			? 'bg-(--swatch)/20 text-(--swatch) shadow-[0_0_12px_color-mix(in_oklab,var(--swatch)_50%,transparent)]'
+			? 'bg-(--swatch)/25 text-[color-mix(in_oklab,var(--swatch)_75%,var(--foreground))] shadow-[0_0_12px_color-mix(in_oklab,var(--swatch)_50%,transparent)]'
 			: 'bg-muted',
 		!lit && (on ? 'text-foreground' : 'text-muted-foreground')
 	]}
