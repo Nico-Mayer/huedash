@@ -2,13 +2,14 @@
 	import { untrack } from 'svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
-	import { Slider } from '#lib/components/ui/slider/index.js';
 	import { Switch } from '#lib/components/ui/switch/index.js';
 	import * as Tabs from '#lib/components/ui/tabs/index.js';
 	import type { ControlTarget } from '#lib/control-target.svelte.ts';
+	import { SmoothValue } from '#lib/smooth-value.svelte.ts';
 	import BrightnessPresets from './BrightnessPresets.svelte';
 	import ColorControl from './ColorControl.svelte';
 	import ColorTemperatureControl from './ColorTemperatureControl.svelte';
+	import LevelSlider from './LevelSlider.svelte';
 	import WhitePresets from './WhitePresets.svelte';
 
 	let {
@@ -18,7 +19,7 @@
 		class: className
 	}: { control: ControlTarget; scene?: string; onBack?: () => void; class?: string } = $props();
 
-	let brightness = $derived(control.brightness);
+	const brightness = new SmoothValue(() => control.brightness);
 	// Read once: the tab follows the light's mode when it is opened, not every live change.
 	const startTab = untrack(() => (control.hueSaturation ? 'color' : 'white'));
 </script>
@@ -40,9 +41,9 @@
 					{#if !control.on}
 						Off
 					{:else if scene}
-						{scene}, {brightness} %
+						{scene}, {brightness.current} %
 					{:else}
-						On, {brightness} %
+						On, {brightness.current} %
 					{/if}
 				</p>
 				<Switch
@@ -51,12 +52,16 @@
 					aria-label={control.name}
 				/>
 			</div>
-			<Slider
-				type="single"
-				bind:value={brightness}
+			<LevelSlider
+				value={brightness.current}
 				min={1}
 				max={100}
-				onValueCommit={(value) => control.apply({ on: true, brightness: value })}
+				format={(value) => `${value} %`}
+				onValueChange={(value) => brightness.input(value)}
+				onValueCommit={(value) => {
+					brightness.commit(value);
+					control.apply({ on: true, brightness: value });
+				}}
 				thumbLabel="{control.name} brightness"
 			/>
 			<BrightnessPresets {control} />
