@@ -1,6 +1,7 @@
 <script lang="ts">
 	import './layout.css';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import { ModeWatcher } from 'mode-watcher';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import favicon from '#lib/assets/favicon.svg';
@@ -26,6 +27,8 @@
 </script>
 
 <svelte:document onvisibilitychange={refreshWhenVisible} />
+
+<ModeWatcher />
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
