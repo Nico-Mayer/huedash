@@ -1,32 +1,31 @@
 schema: spec-driven
 
-# Project context (optional)
-# Add only constraints that should guide OpenSpec artifacts and workflows.
-# Include constraints an agent cannot infer by reading the code.
-# Keep general project documentation and discoverable codebase facts out.
-# Example:
-#   context: |
-#     Designs and tasks must cover Windows, macOS, and Linux
-#     Write all artifacts in Spanish
+context: |
+  huedash is a self-hosted web dashboard for Philips Hue, aiming for feature
+  parity with the official Hue mobile app.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always state what is out of scope
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  Deployment:
+  - Ships as a Docker image, run with docker compose on the user's LAN.
+  - CI on GitHub Actions; images published to GHCR.
 
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+  Stack:
+  - SvelteKit (Svelte 5) for UI and all server code.
+  - UI: shadcn-svelte. Custom components build on bits-ui primitives when one fits.
+
+  Architecture:
+  - Hue API v2 (CLIP v2) only. The SvelteKit server talks to the bridge; the
+    browser never calls the bridge directly (bridge TLS cert is not browser-trusted).
+  - Hue client is generated from the openhue-api OpenAPI spec, not handwritten.
+  - Config: env vars (bridge IP, app key) override; otherwise a setup wizard
+    pairs with the bridge and stores config in a `/data` volume.
+  - Per-device UI preferences live in browser localStorage.
+  - No authentication for now.
+
+rules:
+  design:
+    - Before choosing to handroll code, search for a well-maintained library.
+      Record the chosen library with maintenance evidence (latest release date,
+      repo activity) and the alternatives considered.
+  tasks:
+    - Prefer adding a maintained dependency over writing custom code.
+    - Custom UI components build on bits-ui primitives when one fits.

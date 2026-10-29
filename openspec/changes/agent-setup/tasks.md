@@ -7,8 +7,8 @@
 
 ## 2. OpenSpec config
 
-- [ ] 2.1 Fill `context` in `openspec/config.yaml` with stack, architecture (self-hosted Docker, Hue API v2 via SvelteKit server, generated client from openhue-api, env vars over `/data` config, localStorage for UI prefs, no auth), and CI target (GitHub Actions, GHCR); verify `openspec context --json` succeeds and `openspec instructions proposal --change agent-setup --json` shows the context
-- [ ] 2.2 Add `rules` for design (record library choice with maintenance evidence and alternatives) and tasks (prefer maintained dependency, custom UI on bits-ui primitives); verify `openspec instructions design --change agent-setup --json` and `openspec instructions tasks --change agent-setup --json` show the rules
+- [x] 2.1 Fill `context` in `openspec/config.yaml` with stack, architecture (self-hosted Docker, Hue API v2 via SvelteKit server, generated client from openhue-api, env vars over `/data` config, localStorage for UI prefs, no auth), and CI target (GitHub Actions, GHCR); verify `openspec context --json` succeeds and `openspec instructions proposal --change agent-setup --json` shows the context
+- [x] 2.2 Add `rules` for design (record library choice with maintenance evidence and alternatives) and tasks (prefer maintained dependency, custom UI on bits-ui primitives); verify `openspec instructions design --change agent-setup --json` and `openspec instructions tasks --change agent-setup --json` show the rules
 
 ## 3. Project skills
 
