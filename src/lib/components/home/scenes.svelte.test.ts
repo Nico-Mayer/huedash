@@ -37,11 +37,19 @@ const kitchen: HomeGroup = {
 	colorTemperature: null,
 	color: false,
 	scenes: [
-		{ id: 'scene-relax', name: 'Relax', colors: ['#ffaa55'], dynamic: false, active: 'inactive' },
+		{
+			id: 'scene-relax',
+			name: 'Relax',
+			colors: ['#ffaa55'],
+			brightness: 56,
+			dynamic: false,
+			active: 'inactive'
+		},
 		{
 			id: 'scene-tropical',
 			name: 'Tropical',
 			colors: ['#ff0000', '#00ff00'],
+			brightness: null,
 			dynamic: true,
 			active: 'inactive'
 		}

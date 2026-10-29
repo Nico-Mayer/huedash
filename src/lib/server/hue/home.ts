@@ -41,6 +41,7 @@ export type HomeScene = {
 	id: string;
 	name: string;
 	colors: string[];
+	brightness: number | null;
 	dynamic: boolean;
 	active: 'inactive' | 'static' | 'dynamic_palette';
 };
@@ -83,6 +84,7 @@ export function buildHome(resources: HomeResources): Home {
 				id: scene.id,
 				name: scene.metadata.name ?? 'Scene',
 				colors: sceneColors(scene.actions),
+				brightness: averageBrightness(scene.actions),
 				dynamic: (scene.palette?.color?.length ?? 0) > 0,
 				active: scene.status?.active ?? 'inactive'
 			} satisfies HomeScene
@@ -169,6 +171,13 @@ export function buildHome(resources: HomeResources): Home {
 		list.flatMap((g) => toGroup(kind, g) ?? []).sort(byName);
 
 	return { rooms: groups('room', resources.rooms), zones: groups('zone', resources.zones) };
+}
+
+function averageBrightness(actions: Scene['actions']): number | null {
+	const levels = actions.flatMap(({ action }) => action.dimming?.brightness ?? []);
+	return levels.length
+		? Math.round(levels.reduce((sum, level) => sum + level, 0) / levels.length)
+		: null;
 }
 
 export type HomeResult = { status: 'ok'; home: Home } | { status: BridgeFailure };
