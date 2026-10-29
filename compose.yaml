@@ -1,0 +1,11 @@
+services:
+  huedash:
+    image: ghcr.io/nico-mayer/huedash:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    # environment:
+    #   HUE_BRIDGE_IP: 192.168.1.20
+    #   HUE_APP_KEY: your-app-key

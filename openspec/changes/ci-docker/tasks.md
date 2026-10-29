@@ -8,9 +8,9 @@
 
 ## 2. Docker image
 
-- [ ] 2.1 Add `.dockerignore` (node_modules, build output, test output, `.git`, `.claude`, `openspec`, `data`, `.env*`) and verify every path it lists is a build-irrelevant path
-- [ ] 2.2 Add the multi-stage `Dockerfile` as in design.md (build on `$BUILDPLATFORM`, runtime `node:24-alpine`, `USER node`, `VOLUME /data`, `EXPOSE 3000`, `HEALTHCHECK` via `node -e fetch`); verify the `multi-stage-dockerfile` skill checklist (pinned base, non-root user, layer order, healthcheck) is met
-- [ ] 2.3 Add `compose.yaml` (GHCR image, `3000:3000`, `./data:/data`, `restart: unless-stopped`, commented `HUE_BRIDGE_IP` / `HUE_APP_KEY`); verify it parses with `yq '.services.huedash.image' compose.yaml`
+- [x] 2.1 Add `.dockerignore` (node_modules, build output, test output, `.git`, `.claude`, `openspec`, `data`, `.env*`) and verify every path it lists is a build-irrelevant path
+- [x] 2.2 Add the multi-stage `Dockerfile` as in design.md (build on `$BUILDPLATFORM`, runtime `node:24-alpine`, `USER node`, `VOLUME /data`, `EXPOSE 3000`, `HEALTHCHECK` via `node -e fetch`); verify the `multi-stage-dockerfile` skill checklist (pinned base, non-root user, layer order, healthcheck) is met
+- [x] 2.3 Add `compose.yaml` (GHCR image, `3000:3000`, `./data:/data`, `restart: unless-stopped`, commented `HUE_BRIDGE_IP` / `HUE_APP_KEY`); verify it parses with `yq '.services.huedash.image' compose.yaml`
 
 ## 3. GitHub Actions
 
