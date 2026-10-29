@@ -72,6 +72,12 @@ Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder:
 - Only server code talks to the bridge. Never send the app key or client key to the browser.
 - `server.js` is the production entry. It marks direct requests as `http` so SvelteKit's CSRF check accepts form posts on the LAN.
 
+## Theme
+
+- `<ModeWatcher />` from `mode-watcher` in the root layout sets the `.dark` class on `<html>`, as the shadcn-svelte dark mode guide says. Its head script applies the theme before the first paint.
+- `ThemePicker` (`src/lib/components/settings/`) on the settings page picks Light, Dark, or System. The choice lives in localStorage (`mode-watcher-mode`), per device.
+- Only a mounted `ModeWatcher` applies the class, so component tests render it next to the component. Vitest does not pre-bundle `mode-watcher`, for the same reason as `@lucide/svelte`.
+
 ## Library first
 
 Before writing code we would have to maintain, search for a maintained library: recent releases, active repo, real usage. Record the choice, the evidence, and the alternatives in the change's `design.md`. Custom UI components build on bits-ui primitives when one fits.
