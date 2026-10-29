@@ -26,25 +26,27 @@ Planned changes, in order:
 
 Tools (Node, pnpm) are pinned in `mise.toml`. Run `mise install` once.
 
-| Command                                    | Does                                        |
-| ------------------------------------------ | ------------------------------------------- |
-| `pnpm dev`                                 | Dev server                                  |
-| `pnpm build`                               | Production build to `build/` (adapter-node) |
-| `pnpm check`                               | Type check with svelte-check                |
-| `pnpm lint`                                | Prettier check and ESLint                   |
-| `pnpm format`                              | Format with Prettier                        |
-| `pnpm dlx shadcn-svelte@latest add <name>` | Add a shadcn-svelte component               |
-| `pnpm test`                                | Unit, component, and e2e tests              |
-| `pnpm test:unit`                           | Vitest in watch mode (`--run` for once)     |
-| `pnpm test:e2e`                            | Playwright against the production build     |
-| `pnpm exec playwright install chromium`    | Install the browser for tests (once)        |
+| Command                                    | Does                                         |
+| ------------------------------------------ | -------------------------------------------- |
+| `pnpm dev`                                 | Dev server                                   |
+| `pnpm build`                               | Production build to `build/` (adapter-node)  |
+| `pnpm check`                               | Type check with svelte-check                 |
+| `pnpm lint`                                | Prettier check and ESLint                    |
+| `pnpm format`                              | Format with Prettier                         |
+| `pnpm dlx shadcn-svelte@latest add <name>` | Add a shadcn-svelte component                |
+| `pnpm test`                                | Unit, component, and e2e tests               |
+| `pnpm test:unit`                           | Vitest in watch mode (`--run` for once)      |
+| `pnpm test:e2e`                            | Playwright against the production build      |
+| `pnpm exec playwright install chromium`    | Install the browser for tests (once)         |
+| `pnpm gen:hue`                             | Regenerate Hue API types from `openhue.yaml` |
 
 Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder: `#lib/components/ui/card/index.js`.
 
 ## Tests
 
 - Unit tests: `*.test.ts` (Node). Component tests: `*.svelte.test.ts` (browser). E2E tests: `*.e2e.ts`.
-- The mock Hue bridge lives in `src/mocks/bridge/` (MSW handlers and fixtures) and answers at `192.0.2.10`. Unit tests and the e2e server use it. Requests without a handler fail.
+- The mock Hue bridge lives in `src/mocks/bridge/` (MSW handlers and fixtures). Unit tests reach it at `192.0.2.10` through MSW; requests without a handler fail.
+- MSW hides real TLS certificates. Tests of certificate pinning stop the MSW server for their file. E2E runs a real HTTPS mock bridge at `127.0.0.1:8443` and a discovery mock at `127.0.0.1:8080` (`src/mocks/preload.ts`), with a fresh data directory per run.
 - Files in `src/mocks/` import each other with `.ts` extensions, because Node loads them directly in the e2e preload.
 
 ## CI and image
@@ -52,7 +54,14 @@ Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder:
 - `.github/workflows/ci.yml` runs lint, check, unit, and e2e tests on every PR and push to `main`. Tool versions come from `mise.toml`.
 - `.github/workflows/image.yml` builds the Docker image. PRs build `amd64` only, without pushing. `main` pushes `edge` and `sha-*`; `v*` tags push semver tags and `latest`, both for `amd64` and `arm64`.
 - The Docker image is only built in CI, not locally. Check results with `gh pr checks` or `gh run list`.
-- The runtime image contains only `build/` and `package.json`. Anything the server needs at runtime must be bundled by the build.
+- The runtime image contains only `build/`, `server.js`, and `package.json`. Anything the server needs at runtime must be bundled by the build.
+
+## Hue bridge code
+
+- `src/lib/server/hue/`: typed CLIP v2 client (`openapi-fetch`), certificate pinning (`tls.ts`), discovery, pairing calls. Types in `schema.d.ts` are generated from the vendored `openhue.yaml` with `pnpm gen:hue`; do not edit them by hand.
+- `src/lib/server/config/`: bridge config from env vars or `$HUE_DATA_DIR/config.json`.
+- Only server code talks to the bridge. Never send the app key or client key to the browser.
+- `server.js` is the production entry. It marks direct requests as `http` so SvelteKit's CSRF check accepts form posts on the LAN.
 
 ## Library first
 

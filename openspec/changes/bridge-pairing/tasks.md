@@ -34,7 +34,7 @@
 
 - [x] 6.0 Add `server.js` (wraps adapter-node `handler`, defaults `PROTOCOL_HEADER=x-forwarded-proto`, marks requests without the header as `http`, graceful shutdown) and use it in the Dockerfile `CMD` and the e2e web server; verify form actions no longer return 403 over plain http
 - [x] 6.1 Add e2e tests: unconfigured `/` redirects to `/setup`; "Find bridge" lists the mock bridge; pairing over real TLS reaches "Connected to"; forget returns to `/setup`; `/healthz` works without config. Verify `pnpm test:e2e` passes
-- [ ] 6.2 Update `compose.yaml` comments (`HUE_BRIDGE_IP`, `HUE_APP_KEY`, `HUE_BRIDGE_CERT_SHA256`), `README.md` (pairing, env vars, certificate-changed recovery, `/data` permissions), and `AGENTS.md` (Hue client layout, `pnpm gen:hue`, mock bridge on `127.0.0.1:8443`); verify `pnpm lint` passes
+- [x] 6.2 Update `compose.yaml` comments (`HUE_BRIDGE_IP`, `HUE_APP_KEY`, `HUE_BRIDGE_CERT_SHA256`), `README.md` (pairing, env vars, certificate-changed recovery, `/data` permissions), and `AGENTS.md` (Hue client layout, `pnpm gen:hue`, mock bridge on `127.0.0.1:8443`); verify `pnpm lint` passes
 - [ ] 6.3 Verify `pnpm test`, `pnpm check`, `pnpm lint`, and `pnpm build` all exit 0, then commit in atomic conventional commits with no co-author lines
 
 ## Workflow follow-up

@@ -6,6 +6,8 @@ services:
     volumes:
       - ./data:/data
     restart: unless-stopped
+    # Optional: configure the bridge here instead of pairing in the browser.
     # environment:
     #   HUE_BRIDGE_IP: 192.168.1.20
     #   HUE_APP_KEY: your-app-key
+    #   HUE_BRIDGE_CERT_SHA256: fingerprint-from-the-log

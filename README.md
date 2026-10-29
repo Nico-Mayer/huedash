@@ -19,9 +19,30 @@ Run huedash on a machine in the same network as your Hue Bridge.
    docker compose up -d
    ```
 
-4. Open `http://<host-ip>:3000`.
+4. Open `http://<host-ip>:3000` and follow the setup: find your bridge or enter its IP address, then press the link button on the bridge.
 
 The container checks its own health at `/healthz`.
+
+### Bridge settings
+
+After pairing, huedash stores the bridge address, app key, and certificate fingerprint in `/data/config.json`. To pair a different bridge, select **Forget bridge** on the home page. The app key stays on the bridge until you remove it in the Hue app.
+
+You can also configure the bridge with env vars instead. They take precedence over `/data/config.json`, and the setup page is then disabled.
+
+| Variable                 | Meaning                                                                                                          |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `HUE_BRIDGE_IP`          | Bridge address, optionally with `:port`                                                                          |
+| `HUE_APP_KEY`            | App key from pairing                                                                                             |
+| `HUE_BRIDGE_CERT_SHA256` | Optional. Pins the bridge certificate. Without it, huedash trusts the first certificate and logs its fingerprint |
+| `HUE_DATA_DIR`           | Data directory, default `/data`                                                                                  |
+
+### Bridge certificate changed
+
+huedash pins the bridge's TLS certificate when it pairs. If the home page says the certificate changed, the device at that address no longer shows the certificate huedash paired with. This happens when the bridge is replaced or reset, and may happen after a firmware update. If you trust the device, select **Forget bridge** and pair again.
+
+### Behind a reverse proxy
+
+huedash works over plain http on your network. If you put a TLS reverse proxy in front, make sure it sends `X-Forwarded-Proto: https`.
 
 ### Image tags
 
