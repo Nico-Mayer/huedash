@@ -11,16 +11,7 @@ All work goes through OpenSpec changes:
 3. `/opsx:apply` - implement the tasks, check them off as you go.
 4. `/opsx:archive` - archive after review.
 
-Planned changes, in order:
-
-1. `agent-setup` - this guide, OpenSpec config, skills
-2. `project-setup` - SvelteKit, shadcn-svelte, bits-ui, lint, format
-3. `testing-setup` - Vitest, Playwright, mock Hue bridge
-4. `ci-docker` - Dockerfile, compose example, GitHub Actions, GHCR
-5. `bridge-pairing` - setup wizard, `/data` config, env override
-6. `room-control` - rooms and zones: on/off, brightness, color temp, color
-7. `scenes` - list and activate scenes
-8. `live-updates` - bridge event stream to the browser via SSE
+The specs in `openspec/specs/` are the source of truth for features and behavior. Design reasons live in the archived changes. Keep this file to rules, commands, and constraints the code does not show; do not describe features or map files here.
 
 ## Commands
 
@@ -53,6 +44,7 @@ Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder:
 - E2E runs in two Playwright projects: `setup` pairs the bridge, then `app` runs the other tests against the paired bridge. Playwright runs with one worker, because all tests share the mock bridge state. Wait for a command response before reloading, because group commands may be held by the throttle, and wait for `data-live="open"` before testing live updates.
 - MSW hides real TLS certificates. Tests of certificate pinning stop the MSW server for their file. E2E runs a real HTTPS mock bridge at `127.0.0.1:8443` and a discovery mock at `127.0.0.1:8080` (`src/mocks/preload.ts`), with a fresh data directory per run.
 - Files in `src/mocks/` import each other with `.ts` extensions, because Node loads them directly in the e2e preload.
+- Only a mounted `ModeWatcher` sets the `.dark` class. Component tests that check the theme render it next to the component.
 
 ## CI and image
 
@@ -61,22 +53,16 @@ Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder:
 - CI builds and publishes the image. For local testing, `pnpm docker:up` builds the same Dockerfile from your working tree. Check CI results with `gh pr checks` or `gh run list`.
 - The runtime image contains only `build/`, `server.js`, and `package.json`. Anything the server needs at runtime must be bundled by the build.
 
-## Hue bridge code
+## Architecture rules
 
-- `src/lib/server/hue/`: typed CLIP v2 client (`openapi-fetch`), certificate pinning (`tls.ts`), discovery, pairing calls. Types in `schema.d.ts` are generated from the vendored `openhue.yaml` with `pnpm gen:hue`; do not edit them by hand.
-- `src/lib/server/hue/home.ts`: loads rooms, zones, devices, lights, grouped lights, connectivity, and scenes in parallel and builds the home model (`HomeGroup`, `HomeLight`, `HomeScene`). Scene color strips come from `scene-colors.ts` (`culori` for xy, `chroma-js` for color temperature, server only). Pages use this model; they never read CLIP resources directly.
-- `src/lib/server/hue/commands.ts` and `PUT /api/groups/[id]`, `PUT /api/lights/[id]`, `PUT /api/scenes/[id]` (`mode: active | dynamic`): validated, clamped commands, throttled per id (1 s for groups, as Hue recommends; 100 ms for lights). The browser calls them through `src/lib/commands.ts`, which updates the UI optimistically and reverts with a toast on failure. It does not reload after a command; the live update confirms it.
-- Live updates: `src/lib/server/hue/events.ts` holds one bridge event stream per bridge config (`eventsource` with the pinned fetch), shared by all tabs and closed 30 s after the last one. `updates.ts` maps bridge events to small `LiveUpdate`s (`src/lib/live-updates.ts`); `GET /api/events` streams them. In the browser, `src/lib/live.svelte.ts` holds overrides that `GroupCard` and `LightRow` read over the loaded data, reloads on structural changes, and drives the header notice.
-- Color conversion to CIE xy uses `culori` on the server only. Kelvin and mirek helpers in `src/lib/color-temperature.ts` are shared with the browser.
-- `src/lib/server/config/`: bridge config from env vars or `$HUE_DATA_DIR/config.json`.
 - Only server code talks to the bridge. Never send the app key or client key to the browser.
+- `src/lib/server/hue/schema.d.ts` is generated from the vendored `openhue.yaml` with `pnpm gen:hue`. Do not edit it by hand.
+- Pages use the home model from `src/lib/server/hue/home.ts`. They never read CLIP resources directly.
+- Send bridge commands through `src/lib/server/hue/commands.ts`. It validates, clamps, and throttles per id (1 s for groups, as Hue recommends; 100 ms for lights).
+- In the browser, send commands through `src/lib/commands.ts` (optimistic, toast on failure) and read live state from `src/lib/live.svelte.ts`. Do not reload after a command; the live update confirms it.
+- `culori` and `chroma-js` run on the server only. Kelvin and mirek helpers in `src/lib/color-temperature.ts` are shared with the browser.
+- Theme: use the `mode-watcher` API (`mode`, `setMode`, `userPrefersMode`), mounted in the root layout. Do not write your own dark mode state.
 - `server.js` is the production entry. It marks direct requests as `http` so SvelteKit's CSRF check accepts form posts on the LAN.
-
-## Theme
-
-- `<ModeWatcher />` from `mode-watcher` in the root layout sets the `.dark` class on `<html>`, as the shadcn-svelte dark mode guide says. Its head script applies the theme before the first paint.
-- `ThemePicker` (`src/lib/components/settings/`) on the settings page picks Light, Dark, or System. The choice lives in localStorage (`mode-watcher-mode`), per device.
-- Only a mounted `ModeWatcher` applies the class, so component tests render it next to the component. Vitest does not pre-bundle `mode-watcher`, for the same reason as `@lucide/svelte`.
 
 ## Library first
 
