@@ -19,7 +19,7 @@
 	}
 </script>
 
-<main class="flex flex-1 flex-col items-center gap-6 p-6">
+<div class="flex flex-1 flex-col items-center gap-6 p-6">
 	<Card.Root class="w-full max-w-md">
 		<Card.Header>
 			<Card.Title>{data.name}</Card.Title>
@@ -64,4 +64,4 @@
 			<ThemePicker />
 		</Card.Content>
 	</Card.Root>
-</main>
+</div>

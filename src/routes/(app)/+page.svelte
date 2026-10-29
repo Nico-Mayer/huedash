@@ -10,7 +10,7 @@
 	let { data }: PageProps = $props();
 </script>
 
-<main class="mx-auto flex w-full max-w-5xl flex-col gap-8 p-6">
+<div class="mx-auto flex w-full max-w-5xl flex-col gap-8 p-6">
 	{#if data.result.status !== 'ok'}
 		<div class="flex flex-col gap-4">
 			<BridgeStatusView name={data.bridgeName} status={data.result.status} />
@@ -44,4 +44,4 @@
 			{/if}
 		{/each}
 	{/if}
-</main>
+</div>

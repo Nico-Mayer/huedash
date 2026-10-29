@@ -5,7 +5,7 @@ test.describe.configure({ mode: 'serial' });
 
 function livingRoom(page: Page) {
 	return page
-		.locator('[data-slot="card"]')
+		.locator('[data-sidebar="menu-item"]')
 		.filter({ has: page.getByRole('switch', { name: 'Living room' }) });
 }
 
@@ -30,7 +30,7 @@ test('a change in one page shows in another page without reload', async ({ conte
 	await openLive(first);
 	await openLive(second);
 	await setLivingRoom(first, true);
-	await expect(livingRoom(second).getByText(/^On, /)).toBeVisible();
+	await expect(livingRoom(second).getByText(/^\d+ of \d+ on$/)).toBeVisible();
 
 	let reloaded = false;
 	second.on('request', (request) => {
@@ -39,7 +39,7 @@ test('a change in one page shows in another page without reload', async ({ conte
 
 	await setLivingRoom(first, false);
 
-	await expect(livingRoom(second).getByText('Off')).toBeVisible();
+	await expect(livingRoom(second).getByText('All off')).toBeVisible();
 	expect(reloaded).toBe(false);
 });
 
@@ -52,7 +52,7 @@ test('a group command does not reload page data', async ({ page }) => {
 
 	await setLivingRoom(page, true);
 
-	await expect(livingRoom(page).getByText(/^On, /)).toBeVisible();
+	await expect(livingRoom(page).getByText(/^\d+ of \d+ on$/)).toBeVisible();
 	await page.waitForTimeout(1500);
 	expect(reloaded).toBe(false);
 });

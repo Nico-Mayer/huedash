@@ -26,3 +26,10 @@ export function lightCounts(group: HomeGroup): { on: number; total: number; unre
 	const on = group.lights.filter((light) => light.reachable && lightOn(light)).length;
 	return { on, total: group.lights.length, unreachable };
 }
+
+export function groupSummary(group: HomeGroup): string {
+	const scene = activeScene(group);
+	if (scene) return scene.name;
+	const { on, total } = lightCounts(group);
+	return on === 0 ? 'All off' : `${on} of ${total} on`;
+}

@@ -1,12 +1,16 @@
 <script lang="ts">
-	import SettingsIcon from '@lucide/svelte/icons/settings';
-	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import LiveStatus from '#lib/components/live/LiveStatus.svelte';
-	import { buttonVariants } from '#lib/components/ui/button/index.js';
+	import AppSidebar from '#lib/components/shell/AppSidebar.svelte';
+	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
 	import { live } from '#lib/live.svelte.ts';
 	import type { LayoutProps } from './$types';
 
-	let { children }: LayoutProps = $props();
+	let { data, children }: LayoutProps = $props();
+
+	const title = $derived(
+		page.data.group?.name ?? (page.route.id === '/(app)/settings' ? 'Settings' : 'huedash')
+	);
 
 	$effect(() => {
 		live.connect();
@@ -20,17 +24,14 @@
 
 <svelte:document onvisibilitychange={refreshWhenVisible} />
 
-<div class="flex min-h-svh flex-col" data-live={live.open ? 'open' : 'closed'}>
-	<header class="flex items-center justify-between border-b px-6 py-3">
-		<a href={resolve('/(app)')} class="font-semibold">huedash</a>
-		<a
-			href={resolve('/(app)/settings')}
-			class={buttonVariants({ variant: 'ghost', size: 'icon' })}
-			aria-label="Settings"
-		>
-			<SettingsIcon />
-		</a>
-	</header>
-	<LiveStatus connected={live.connected} />
-	{@render children()}
-</div>
+<Sidebar.Provider>
+	<AppSidebar bridgeName={data.bridgeName} result={data.result} />
+	<Sidebar.Inset data-live={live.open ? 'open' : 'closed'}>
+		<header class="flex items-center gap-2 border-b px-4 py-2 md:hidden">
+			<Sidebar.Trigger aria-label="Open menu" />
+			<span class="truncate font-semibold">{title}</span>
+		</header>
+		<LiveStatus connected={live.connected} />
+		{@render children()}
+	</Sidebar.Inset>
+</Sidebar.Provider>

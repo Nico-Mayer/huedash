@@ -17,7 +17,7 @@
 	const noun = $derived(data.kind === 'room' ? 'room' : 'zone');
 </script>
 
-<main class="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6">
+<div class="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6">
 	<a href={resolve('/(app)')} class="text-sm text-muted-foreground hover:underline">← All rooms</a>
 
 	{#if data.status !== 'ok'}
@@ -76,4 +76,4 @@
 			</Card.Content>
 		</Card.Root>
 	{/if}
-</main>
+</div>

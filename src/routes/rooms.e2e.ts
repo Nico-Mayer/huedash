@@ -10,11 +10,11 @@ function card(page: Page, name: string) {
 test('lists rooms and zones', async ({ page }) => {
 	await page.goto('/');
 
-	const rooms = page.getByRole('region', { name: 'Rooms' });
-	const zones = page.getByRole('region', { name: 'Zones' });
-	await expect(rooms.getByRole('link', { name: 'Kitchen' })).toBeVisible();
-	await expect(rooms.getByRole('link', { name: 'Living room' })).toBeVisible();
-	await expect(zones.getByRole('link', { name: 'Downstairs' })).toBeVisible();
+	const rooms = page.getByRole('group', { name: 'Rooms' });
+	const zones = page.getByRole('group', { name: 'Zones' });
+	await expect(rooms.getByRole('link', { name: /Kitchen/ })).toBeVisible();
+	await expect(rooms.getByRole('link', { name: /Living room/ })).toBeVisible();
+	await expect(zones.getByRole('link', { name: /Downstairs/ })).toBeVisible();
 });
 
 test('turns a room off and on', async ({ page }) => {
@@ -46,8 +46,8 @@ test('sets room brightness', async ({ page }) => {
 });
 
 test('switches a single light in a room', async ({ page }) => {
-	await page.goto('/');
-	await page.getByRole('link', { name: 'Kitchen' }).click();
+	await page.goto('/rooms/room-living');
+	await page.getByRole('link', { name: /^Kitchen/ }).click();
 
 	await expect(page.getByRole('heading', { name: 'Kitchen' })).toBeVisible();
 	const sent = page.waitForResponse((r) => r.url().endsWith('/api/lights/ceiling'));

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { activeScene, groupOn, lightCounts } from './group-state.svelte.ts';
+import { activeScene, groupOn, groupSummary, lightCounts } from './group-state.svelte.ts';
 import { live } from './live.svelte.ts';
 import type { HomeGroup, HomeLight, HomeScene } from './server/hue/home.ts';
 
@@ -79,5 +79,21 @@ describe('activeScene', () => {
 		live.apply({ kind: 'scene', id: 'relax', active: 'inactive' });
 
 		expect(activeScene(home)).toBeUndefined();
+	});
+});
+
+describe('groupSummary', () => {
+	it('names the active scene', () => {
+		expect(groupSummary(group([light('a', true)], [scene('Relax', 'static')]))).toBe('Relax');
+	});
+
+	it('counts lights that are on', () => {
+		const lights = [light('a', true), light('b', true), light('c', false)];
+
+		expect(groupSummary(group(lights))).toBe('2 of 3 on');
+	});
+
+	it('says when all lights are off', () => {
+		expect(groupSummary(group([light('a', false), light('b', false)]))).toBe('All off');
 	});
 });
