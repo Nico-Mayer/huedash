@@ -82,7 +82,7 @@ After the user is asked to press the link button, the system SHALL request an ap
 - **THEN** the page shows the remaining time
 
 ### Requirement: Show connected bridge
-When a bridge is configured, the settings page at `/settings` SHALL show the bridge name and whether the bridge is reachable right now. The home page SHALL link to the settings page.
+When a bridge is configured, the settings page at `/settings` SHALL show the bridge name and whether the bridge is reachable right now. The sidebar SHALL link to the settings page.
 
 #### Scenario: Bridge reachable
 - **WHEN** a bridge is configured and answers an authenticated request
@@ -91,6 +91,10 @@ When a bridge is configured, the settings page at `/settings` SHALL show the bri
 #### Scenario: Bridge unreachable
 - **WHEN** a bridge is configured but does not answer
 - **THEN** the settings page shows the bridge name, says the bridge is not reachable, and offers a retry
+
+#### Scenario: Open settings
+- **WHEN** the user selects Settings in the sidebar
+- **THEN** the settings page opens
 
 ### Requirement: Forget bridge
 The system SHALL offer a "Forget bridge" action that, after confirmation, deletes the stored configuration and opens `/setup`. The system SHALL tell the user that the app key stays on the bridge until removed in the Hue app.

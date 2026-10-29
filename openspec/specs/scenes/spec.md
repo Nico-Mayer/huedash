@@ -41,16 +41,16 @@ For scenes with a color palette, the system SHALL offer a play control that reca
 - **THEN** it has no play control
 
 ### Requirement: Show the active scene
-The room or zone page SHALL mark the active scene and whether it plays dynamically. The home page card of the room or zone SHALL show the active scene's name.
+The room or zone page SHALL mark the active scene and whether it plays dynamically. The sidebar entry of the room or zone SHALL show the active scene's name.
 
 #### Scenario: Relax active
 - **WHEN** the bridge reports "Relax" as active in the Kitchen
 - **THEN** the Kitchen page marks "Relax" as active
-- **AND** the Kitchen card on the home page shows "Relax"
+- **AND** the Kitchen entry in the sidebar shows "Relax"
 
 #### Scenario: No active scene
 - **WHEN** no scene of a room is active, for example after the user changes a light
-- **THEN** no scene is marked and the card shows only on/off and brightness
+- **THEN** no scene is marked and the sidebar entry shows how many lights are on
 
 ### Requirement: Limit scene recall rate
 The system SHALL send at most one recall per second for the same scene. When the user recalls a scene again within the second, the system SHALL send only the latest recall once the second has passed.
