@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { refreshAll } from '$app/navigation';
+	import { afterNavigate, refreshAll } from '$app/navigation';
 	import BridgeStatusView from '#lib/components/bridge/BridgeStatusView.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Empty from '#lib/components/ui/empty/index.js';
 	import { lightsSummary } from '#lib/group-state.svelte.ts';
+	import { selection } from '#lib/selection.svelte.ts';
 	import type { GroupPageData } from '#lib/server/group-page.ts';
 	import GroupInspector from './GroupInspector.svelte';
 	import LightCard from './LightCard.svelte';
@@ -12,6 +13,8 @@
 	let { data }: { data: GroupPageData } = $props();
 
 	const noun = $derived(data.kind === 'room' ? 'room' : 'zone');
+
+	afterNavigate(() => selection.forGroup(data.group?.id ?? ''));
 </script>
 
 <div class="flex flex-col gap-6 p-6">
@@ -48,7 +51,14 @@
 				</section>
 
 				<section class="flex flex-col gap-3" aria-labelledby="lights-heading">
-					<h2 id="lights-heading" class="text-sm font-medium text-muted-foreground">Lights</h2>
+					<div class="flex items-center justify-between gap-2">
+						<h2 id="lights-heading" class="text-sm font-medium text-muted-foreground">Lights</h2>
+						{#if selection.selecting}
+							<Button variant="ghost" size="sm" onclick={() => selection.done()}>Done</Button>
+						{:else}
+							<Button variant="ghost" size="sm" onclick={() => selection.start()}>Select</Button>
+						{/if}
+					</div>
 					<ul class="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3" aria-label="Lights">
 						{#each group.lights as light (light.id)}
 							<LightCard {light} />
