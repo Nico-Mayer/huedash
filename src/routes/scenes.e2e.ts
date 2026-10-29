@@ -62,11 +62,11 @@ test('a scene started in one page shows in another without reload', async ({ con
 	expect(reloaded).toBe(false);
 });
 
-test('a scene moves the inspector brightness without reload', async ({ page }) => {
+test('a scene moves the header brightness without reload', async ({ page }) => {
 	await openKitchen(page);
 	await recall(page, 'Bright', 'scene-bright');
 	const brightness = page
-		.getByRole('complementary', { name: 'Controls' })
+		.getByRole('region', { name: 'Kitchen controls' })
 		.getByRole('slider', { name: 'Kitchen brightness' });
 	await expect(brightness).toHaveAttribute('aria-valuenow', '100');
 

@@ -34,26 +34,33 @@ test('marks no room on the settings page', async ({ page }) => {
 });
 
 test.describe('tablet', () => {
-	test.use({ viewport: { width: 1024, height: 900 } });
+	test.use({ viewport: { width: 1024, height: 400 } });
 
-	test('puts the inspector above the scenes', async ({ page }) => {
+	test('puts the header above the scenes and keeps it on screen', async ({ page }) => {
 		await page.goto('/rooms/room-kitchen');
+		const header = page.getByRole('region', { name: 'Kitchen controls' });
 
-		const inspector = await page.getByRole('complementary', { name: 'Controls' }).boundingBox();
+		const box = await header.boundingBox();
 		const scenes = await page.getByRole('heading', { name: 'Scenes' }).boundingBox();
-		expect(inspector!.y + inspector!.height).toBeLessThan(scenes!.y);
+		expect(box!.y + box!.height).toBeLessThan(scenes!.y);
 		await expect(page.getByRole('group', { name: 'Rooms' })).toBeVisible();
+
+		await page.mouse.move(600, 300);
+		await page.mouse.wheel(0, 2000);
+		await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+		await expect(header.getByRole('slider', { name: 'Kitchen brightness' })).toBeInViewport();
+		expect((await header.boundingBox())!.y).toBeCloseTo(0, 0);
 	});
 });
 
-test('puts the inspector beside the scenes on wide screens', async ({ page }) => {
+test('gives scenes and lights the full width on wide screens', async ({ page }) => {
 	await page.setViewportSize({ width: 1440, height: 900 });
 	await page.goto('/rooms/room-kitchen');
 
-	const inspector = await page.getByRole('complementary', { name: 'Controls' }).boundingBox();
-	const scenes = await page.getByRole('heading', { name: 'Scenes' }).boundingBox();
-	expect(inspector!.x).toBeGreaterThan(scenes!.x);
-	expect(inspector!.y).toBeLessThan(scenes!.y + scenes!.height);
+	const header = await page.getByRole('region', { name: 'Kitchen controls' }).boundingBox();
+	const lights = await page.getByRole('list', { name: 'Lights' }).boundingBox();
+	expect(header!.y + header!.height).toBeLessThanOrEqual(lights!.y);
+	expect(lights!.width).toBeGreaterThan(header!.width - 100);
 });
 
 test.describe('phone', () => {
@@ -85,5 +92,20 @@ test.describe('phone', () => {
 
 		await expect(page.getByText(/Live updates paused/)).toBeVisible();
 		await expect(page.getByRole('group', { name: 'Rooms' })).toBeHidden();
+	});
+});
+
+test.describe('short phone', () => {
+	test.use({ viewport: { width: 390, height: 500 } });
+
+	test('scrolls the header with the page', async ({ page }) => {
+		await page.goto('/rooms/room-kitchen');
+
+		await page.mouse.move(200, 300);
+		await page.mouse.wheel(0, 2000);
+
+		await expect(
+			page.getByRole('region', { name: 'Kitchen controls' }).getByRole('slider')
+		).not.toBeInViewport();
 	});
 });

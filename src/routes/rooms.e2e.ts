@@ -3,8 +3,8 @@ import { expect, test, type Page } from '@playwright/test';
 // The setup project pairs the bridge first; these steps change the mock's light state in order.
 test.describe.configure({ mode: 'serial' });
 
-function inspector(page: Page) {
-	return page.getByRole('complementary', { name: 'Controls' });
+function header(page: Page) {
+	return page.getByRole('region', { name: 'Kitchen controls' });
 }
 
 test('lists rooms and zones', async ({ page }) => {
@@ -19,30 +19,31 @@ test('lists rooms and zones', async ({ page }) => {
 
 test('turns a room off and on', async ({ page }) => {
 	await page.goto('/');
-	const kitchen = inspector(page);
+	const kitchen = () => header(page).getByRole('switch', { name: 'Kitchen' });
 
 	const sent = page.waitForResponse((r) => r.url().endsWith('/api/groups/grouped-kitchen'));
-	await kitchen.getByRole('switch', { name: 'Kitchen' }).click();
-	await expect(kitchen.getByText('Off')).toBeVisible();
+	await kitchen().click();
+	await expect(kitchen()).not.toBeChecked();
 	expect((await sent).status()).toBe(204);
 
 	await page.reload();
-	await expect(inspector(page).getByText('Off')).toBeVisible();
+	await expect(kitchen()).not.toBeChecked();
+	await expect(header(page).getByText('0 of 2 lights on')).toBeVisible();
 
-	await inspector(page).getByRole('switch', { name: 'Kitchen' }).click();
-	await expect(inspector(page).getByText(/^On, /)).toBeVisible();
+	await kitchen().click();
+	await expect(kitchen()).toBeChecked();
 });
 
 test('sets room brightness', async ({ page }) => {
 	await page.goto('/');
 
-	await inspector(page).getByRole('slider', { name: 'Kitchen brightness' }).focus();
+	await header(page).getByRole('slider', { name: 'Kitchen brightness' }).focus();
 	// The group throttle may hold this command for up to a second; the response comes once it is sent.
 	const sent = page.waitForResponse((r) => r.url().endsWith('/api/groups/grouped-kitchen'));
 	await page.keyboard.press('End');
 	expect((await sent).status()).toBe(204);
 
-	await expect(inspector(page).getByText('On, 100 %')).toBeVisible();
+	await expect(header(page).getByText('100 %', { exact: true }).last()).toBeVisible();
 });
 
 test('switches a single light in a room', async ({ page }) => {
