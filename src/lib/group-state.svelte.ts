@@ -35,6 +35,12 @@ export function groupSummary(group: HomeGroup): string {
 	return on === 0 ? 'All off' : `${on} of ${total} on`;
 }
 
+export function lightsSummary(group: HomeGroup): string {
+	const { on, total, unreachable } = lightCounts(group);
+	const summary = `${on} of ${total} lights on`;
+	return unreachable > 0 ? `${summary} · ${unreachable} unreachable` : summary;
+}
+
 // Optimistic: every view of the group shows the change at once, and a failure restores it.
 export function changeGroup(group: HomeGroup, change: { on?: boolean; brightness?: number }) {
 	const id = group.groupedLightId;

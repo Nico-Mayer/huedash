@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { activeScene, groupOn, groupSummary, lightCounts } from './group-state.svelte.ts';
+import {
+	activeScene,
+	groupOn,
+	groupSummary,
+	lightCounts,
+	lightsSummary
+} from './group-state.svelte.ts';
 import { live } from './live.svelte.ts';
 import type { HomeGroup, HomeLight, HomeScene } from './server/hue/home.ts';
 
@@ -95,5 +101,17 @@ describe('groupSummary', () => {
 
 	it('says when all lights are off', () => {
 		expect(groupSummary(group([light('a', false), light('b', false)]))).toBe('All off');
+	});
+});
+
+describe('lightsSummary', () => {
+	it('mentions unreachable lights', () => {
+		const lights = [light('a', true), light('b', true), light('c', false, false)];
+
+		expect(lightsSummary(group(lights))).toBe('2 of 3 lights on · 1 unreachable');
+	});
+
+	it('leaves out unreachable when all lights answer', () => {
+		expect(lightsSummary(group([light('a', true), light('b', false)]))).toBe('1 of 2 lights on');
 	});
 });

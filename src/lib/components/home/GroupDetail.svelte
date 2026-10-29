@@ -3,7 +3,7 @@
 	import BridgeStatusView from '#lib/components/bridge/BridgeStatusView.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Empty from '#lib/components/ui/empty/index.js';
-	import { lightCounts } from '#lib/group-state.svelte.ts';
+	import { lightsSummary } from '#lib/group-state.svelte.ts';
 	import type { GroupPageData } from '#lib/server/group-page.ts';
 	import GroupInspector from './GroupInspector.svelte';
 	import LightCard from './LightCard.svelte';
@@ -29,12 +29,10 @@
 		</Empty.Root>
 	{:else}
 		{@const group = data.group}
-		{@const counts = lightCounts(group)}
 		<header class="flex flex-col gap-1">
 			<h1 class="text-2xl font-semibold">{group.name}</h1>
 			<p class="text-sm text-muted-foreground tabular-nums">
-				{counts.on} of {counts.total} lights on{#if counts.unreachable > 0}
-					· {counts.unreachable} unreachable{/if}
+				{lightsSummary(group)}
 			</p>
 		</header>
 
