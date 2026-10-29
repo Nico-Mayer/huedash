@@ -18,7 +18,7 @@
 
 ## 4. End to end, docs, verification
 
-- [ ] 4.1 Add e2e tests: a change in one browser page shows in a second page without reload; a group command does not trigger a page data reload; verify `pnpm test:e2e` passes
+- [x] 4.1 Add e2e tests: a change in one browser page shows in a second page without reload; a group command does not trigger a page data reload; verify `pnpm test:e2e` passes
 - [ ] 4.2 Update `AGENTS.md` (event hub, browser state, mock stream) and `README.md` (live updates, reverse proxy must not buffer `/api/events`); verify `pnpm lint` passes
 - [ ] 4.3 Verify `pnpm test`, `pnpm check`, `pnpm lint`, `pnpm build` exit 0 and `server.js` runs without `node_modules`; commit in atomic conventional commits with no co-author lines
 
