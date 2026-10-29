@@ -119,3 +119,4 @@ Test certificates are generated once with `openssl` and committed; they protect 
   - Discovery reads its URL from `HUE_DISCOVERY_URL` (default `https://discovery.meethue.com/`), so e2e can point it at the local mock.
 - `tls.ts` exports `fetchWith(dispatcher)`, because the DOM `RequestInit` type does not declare Node's `dispatcher` option.
 - `pnpm gen:hue` uses `--empty-objects-unknown`. Without it, openapi-typescript turns empty `allOf` parts into `Record<string, never>`, which makes types like `BridgeGet` impossible to satisfy.
+- The setup redirect logic lives in `src/lib/server/setup-redirect.ts`; `hooks.server.ts` only wires it in, because SvelteKit 3 hook files should export hooks only. `Handle` is imported from `@sveltejs/kit/hooks` in SvelteKit 3, and `json()` from `@sveltejs/kit` is deprecated in favor of `Response.json`.

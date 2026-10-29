@@ -10,9 +10,9 @@
 
 ## 2. Configuration
 
-- [ ] 2.1 Implement `config/store.ts` (zod schema, read with cache, atomic write with mode 0600, delete) with unit tests: round trip, invalid JSON treated as unconfigured with a log, unwritable directory error names the path
-- [ ] 2.2 Implement `config/index.ts` (`HUE_BRIDGE_IP` + `HUE_APP_KEY` > `config.json` > null; warning when only one env var is set; `HUE_BRIDGE_CERT_SHA256` handling) with unit tests for each precedence case
-- [ ] 2.3 Add `src/hooks.server.ts` setup redirect with unit tests: unconfigured `/` redirects, `/healthz` and `/setup` pass, configured `/setup` redirects to `/`
+- [x] 2.1 Implement `config/store.ts` (zod schema, read with cache, atomic write with mode 0600, delete) with unit tests: round trip, invalid JSON treated as unconfigured with a log, unwritable directory error names the path
+- [x] 2.2 Implement `config/index.ts` (`HUE_BRIDGE_IP` + `HUE_APP_KEY` > `config.json` > null; warning when only one env var is set; `HUE_BRIDGE_CERT_SHA256` handling) with unit tests for each precedence case
+- [x] 2.3 Add `src/hooks.server.ts` setup redirect with unit tests: unconfigured `/` redirects, `/healthz` and `/setup` pass, configured `/setup` redirects to `/`
 
 ## 3. Mock bridge
 
