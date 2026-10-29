@@ -6,8 +6,8 @@
 
 ## 2. SvelteKit scaffold
 
-- [ ] 2.1 On a clean git tree, run `pnpm dlx sv@1.1.1 create . --template minimal --types ts --no-add-ons --install pnpm --no-dir-check` and verify `pnpm dev` serves the default page
-- [ ] 2.2 Review `git diff` for files `sv` overwrote (`.gitignore`, `README.md`) and merge back the previous entries; verify `git diff .gitignore` shows no removed project entries (`/data/`, `.env`, `.claude/settings.local.json`)
+- [x] 2.1 On a clean git tree, run `pnpm dlx sv@1.1.1 create . --template minimal --types ts --no-add-ons --install pnpm --no-dir-check` and verify `pnpm dev` serves the default page
+- [x] 2.2 Review `git diff` for files `sv` overwrote (`.gitignore`, `README.md`) and merge back the previous entries; verify `git diff .gitignore` shows no removed project entries (`/data/`, `.env`, `.claude/settings.local.json`)
 - [ ] 2.3 Run `pnpm dlx sv@1.1.1 add prettier eslint tailwindcss sveltekit-adapter="adapter:node"` and verify `svelte.config.js` imports `@sveltejs/adapter-node` and `pnpm build` writes `build/index.js`
 - [ ] 2.4 Approve only required install scripts with `pnpm approve-builds` and verify a fresh `pnpm install` prints no ignored-build warnings
 
