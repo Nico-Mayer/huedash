@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { LiveUpdate, StateUpdate } from '../../live-updates.ts';
 import { xyToHueSaturation } from './color.ts';
+import { swatchOf } from './scene-colors.ts';
 
 const resourceSchema = z.looseObject({
 	id: z.string(),
@@ -34,11 +35,12 @@ const SHOWN_TYPES = new Set([
 	'scene'
 ]);
 
-function colorOf(resource: Resource): Pick<StateUpdate, 'mirek' | 'hueSaturation'> {
+function colorOf(resource: Resource): Pick<StateUpdate, 'mirek' | 'hueSaturation' | 'swatch'> {
 	const white = resource.color_temperature;
+	const xy = resource.color?.xy;
 	if (white?.mirek_valid !== false && white?.mirek != null)
-		return { mirek: white.mirek, hueSaturation: null };
-	if (resource.color) return { mirek: null, hueSaturation: xyToHueSaturation(resource.color.xy) };
+		return { mirek: white.mirek, hueSaturation: null, swatch: swatchOf(white.mirek, undefined) };
+	if (xy) return { mirek: null, hueSaturation: xyToHueSaturation(xy), swatch: swatchOf(null, xy) };
 	return {};
 }
 

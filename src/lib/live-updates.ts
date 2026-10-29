@@ -7,6 +7,7 @@ export type StateUpdate = {
 	// Lights only. A light shows either a white or a color, so setting one clears the other.
 	mirek?: number | null;
 	hueSaturation?: HueSaturation | null;
+	swatch?: string | null;
 };
 
 export type SceneStatus = 'inactive' | 'static' | 'dynamic_palette';
