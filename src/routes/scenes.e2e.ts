@@ -27,14 +27,13 @@ test('lists the scenes of a room', async ({ page }) => {
 	await expect(names).toHaveText([/Bright/, /Relax/, /Tropical/]);
 });
 
-test('recalls a scene and shows it on the home card', async ({ page }) => {
+test('recalls a scene and shows it in the sidebar', async ({ page }) => {
 	await openKitchen(page);
 
 	await recall(page, 'Relax', 'scene-relax');
 	await expect(sceneRow(page, 'Relax').getByText('Active')).toBeVisible();
 
-	await page.goto('/');
-	await expect(page.getByText(/^Relax, \d+ %$/)).toBeVisible();
+	await expect(page.getByRole('link', { name: /^Kitchen/ })).toContainText('Relax');
 });
 
 test('plays a scene dynamically', async ({ page }) => {

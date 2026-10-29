@@ -3,8 +3,8 @@ import { expect, test, type Page } from '@playwright/test';
 // The setup project pairs the bridge first; these steps change the mock's light state in order.
 test.describe.configure({ mode: 'serial' });
 
-function card(page: Page, name: string) {
-	return page.locator('[data-slot="card"]').filter({ has: page.getByRole('switch', { name }) });
+function inspector(page: Page) {
+	return page.getByRole('complementary', { name: 'Controls' });
 }
 
 test('lists rooms and zones', async ({ page }) => {
@@ -19,7 +19,7 @@ test('lists rooms and zones', async ({ page }) => {
 
 test('turns a room off and on', async ({ page }) => {
 	await page.goto('/');
-	const kitchen = card(page, 'Kitchen');
+	const kitchen = inspector(page);
 
 	const sent = page.waitForResponse((r) => r.url().endsWith('/api/groups/grouped-kitchen'));
 	await kitchen.getByRole('switch', { name: 'Kitchen' }).click();
@@ -27,27 +27,27 @@ test('turns a room off and on', async ({ page }) => {
 	expect((await sent).status()).toBe(204);
 
 	await page.reload();
-	await expect(card(page, 'Kitchen').getByText('Off')).toBeVisible();
+	await expect(inspector(page).getByText('Off')).toBeVisible();
 
-	await card(page, 'Kitchen').getByRole('switch', { name: 'Kitchen' }).click();
-	await expect(card(page, 'Kitchen').getByText(/^On, /)).toBeVisible();
+	await inspector(page).getByRole('switch', { name: 'Kitchen' }).click();
+	await expect(inspector(page).getByText(/^On, /)).toBeVisible();
 });
 
 test('sets room brightness', async ({ page }) => {
 	await page.goto('/');
 
-	await card(page, 'Kitchen').getByRole('slider', { name: 'Kitchen brightness' }).focus();
+	await inspector(page).getByRole('slider', { name: 'Kitchen brightness' }).focus();
 	// The group throttle may hold this command for up to a second; the response comes once it is sent.
 	const sent = page.waitForResponse((r) => r.url().endsWith('/api/groups/grouped-kitchen'));
 	await page.keyboard.press('End');
 	expect((await sent).status()).toBe(204);
 
-	await expect(card(page, 'Kitchen').getByText('On, 100 %')).toBeVisible();
+	await expect(inspector(page).getByText('On, 100 %')).toBeVisible();
 });
 
 test('switches a single light in a room', async ({ page }) => {
-	await page.goto('/');
-	await page.getByRole('link', { name: 'Kitchen' }).click();
+	await page.goto('/rooms/room-living');
+	await page.getByRole('link', { name: /^Kitchen/ }).click();
 
 	await expect(page.getByRole('heading', { name: 'Kitchen' })).toBeVisible();
 	const sent = page.waitForResponse((r) => r.url().endsWith('/api/lights/ceiling'));
@@ -75,4 +75,5 @@ test('shows a not-found page for an unknown room', async ({ page }) => {
 	await page.goto('/rooms/unknown');
 
 	await expect(page.getByText('Room not found')).toBeVisible();
+	await expect(page.getByRole('link', { name: /^Kitchen/ })).toBeVisible();
 });

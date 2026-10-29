@@ -33,6 +33,29 @@ test('marks no room on the settings page', async ({ page }) => {
 	await expect(page.locator('[aria-current="page"]')).toHaveCount(0);
 });
 
+test.describe('tablet', () => {
+	test.use({ viewport: { width: 1024, height: 900 } });
+
+	test('puts the inspector above the scenes', async ({ page }) => {
+		await page.goto('/rooms/room-kitchen');
+
+		const inspector = await page.getByRole('complementary', { name: 'Controls' }).boundingBox();
+		const scenes = await page.getByRole('heading', { name: 'Scenes' }).boundingBox();
+		expect(inspector!.y + inspector!.height).toBeLessThan(scenes!.y);
+		await expect(page.getByRole('group', { name: 'Rooms' })).toBeVisible();
+	});
+});
+
+test('puts the inspector beside the scenes on wide screens', async ({ page }) => {
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto('/rooms/room-kitchen');
+
+	const inspector = await page.getByRole('complementary', { name: 'Controls' }).boundingBox();
+	const scenes = await page.getByRole('heading', { name: 'Scenes' }).boundingBox();
+	expect(inspector!.x).toBeGreaterThan(scenes!.x);
+	expect(inspector!.y).toBeLessThan(scenes!.y + scenes!.height);
+});
+
 test.describe('phone', () => {
 	test.use({ viewport: { width: 390, height: 844 } });
 
