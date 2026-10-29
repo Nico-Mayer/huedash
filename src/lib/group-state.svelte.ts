@@ -1,3 +1,4 @@
+import { applyChange } from './commands.ts';
 import { live } from './live.svelte.ts';
 import type { HomeGroup, HomeLight, HomeScene } from './server/hue/home.ts';
 
@@ -32,4 +33,24 @@ export function groupSummary(group: HomeGroup): string {
 	if (scene) return scene.name;
 	const { on, total } = lightCounts(group);
 	return on === 0 ? 'All off' : `${on} of ${total} on`;
+}
+
+// Optimistic: every view of the group shows the change at once, and a failure restores it.
+export function changeGroup(group: HomeGroup, change: { on?: boolean; brightness?: number }) {
+	const id = group.groupedLightId;
+	const previous = live.groups.get(id);
+	live.apply({ kind: 'group', id, ...change });
+	applyChange({ kind: 'groups', id, name: group.name }, change, () => {
+		if (previous) live.groups.set(id, previous);
+		else live.groups.delete(id);
+	});
+}
+
+export function changeLight(light: HomeLight, change: { on?: boolean; brightness?: number }) {
+	const previous = live.lights.get(light.id);
+	live.apply({ kind: 'light', id: light.id, ...change });
+	applyChange({ kind: 'lights', id: light.id, name: light.name }, change, () => {
+		if (previous) live.lights.set(light.id, previous);
+		else live.lights.delete(light.id);
+	});
 }
