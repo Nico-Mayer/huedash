@@ -18,8 +18,8 @@
 
 ## 4. Scripts and docs
 
-- [ ] 4.1 Make `pnpm test` run unit and e2e tests, and verify `pnpm test`, `pnpm check`, and `pnpm lint` all exit 0
-- [ ] 4.2 Add test commands, the mock bridge location, and the fake bridge host to the Commands section of `AGENTS.md`; verify each listed command runs
+- [x] 4.1 Make `pnpm test` run unit and e2e tests, and verify `pnpm test`, `pnpm check`, and `pnpm lint` all exit 0
+- [x] 4.2 Add test commands, the mock bridge location, and the fake bridge host to the Commands section of `AGENTS.md`; verify each listed command runs
 - [ ] 4.3 Commit in atomic conventional commits and verify `git log --oneline` shows them with no co-author lines
 
 ## Workflow follow-up

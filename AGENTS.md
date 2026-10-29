@@ -34,8 +34,18 @@ Tools (Node, pnpm) are pinned in `mise.toml`. Run `mise install` once.
 | `pnpm lint`                                | Prettier check and ESLint                   |
 | `pnpm format`                              | Format with Prettier                        |
 | `pnpm dlx shadcn-svelte@latest add <name>` | Add a shadcn-svelte component               |
+| `pnpm test`                                | Unit, component, and e2e tests              |
+| `pnpm test:unit`                           | Vitest in watch mode (`--run` for once)     |
+| `pnpm test:e2e`                            | Playwright against the production build     |
+| `pnpm exec playwright install chromium`    | Install the browser for tests (once)        |
 
 Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder: `#lib/components/ui/card/index.js`.
+
+## Tests
+
+- Unit tests: `*.test.ts` (Node). Component tests: `*.svelte.test.ts` (browser). E2E tests: `*.e2e.ts`.
+- The mock Hue bridge lives in `src/mocks/bridge/` (MSW handlers and fixtures) and answers at `192.0.2.10`. Unit tests and the e2e server use it. Requests without a handler fail.
+- Files in `src/mocks/` import each other with `.ts` extensions, because Node loads them directly in the e2e preload.
 
 ## Library first
 

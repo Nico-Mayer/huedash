@@ -59,6 +59,13 @@ Use the Playwright-managed Chromium (`pnpm exec playwright install chromium`). C
 - Component: render the placeholder `Card` content and assert the title.
 - E2E: the home page loads and shows the title. The preload logs that the mock bridge is active. An e2e test of a real mocked bridge call follows in bridge-pairing, when the app first calls the bridge.
 
+### Changes found during implementation
+- `sv add vitest` pinned Vitest 4.1. Upgraded to Vitest 5.0.5, `@vitest/browser-playwright` 5.0.5, and `vitest-browser-svelte` 3.1.0; all tests pass.
+- `sv add playwright` co-locates e2e tests as `*.e2e.ts` instead of an `e2e/` folder. Kept the `sv` convention. The preload lives at `src/mocks/preload.ts`.
+- `sv` set `test:e2e` to `playwright install && playwright test`, which downloads all browsers on every run. Changed to `playwright test`; Chromium is installed once.
+- MSW 3 moved `http` and `HttpResponse` to `msw/http` and renamed `onUnhandledRequest` to `onUnhandledFrame`.
+- Node strips types from the preload but does not map `.js` imports to `.ts` files. Files in `src/mocks/` import each other with `.ts` extensions. `pnpm check` accepts this.
+
 ## Risks / Trade-offs
 
 - [`sv` add-ons may not match SvelteKit 3 config exactly] → Review the diff after `sv add`. Fix by hand if needed and record it here.
