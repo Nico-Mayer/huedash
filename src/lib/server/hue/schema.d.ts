@@ -2040,7 +2040,7 @@ export interface components {
 		};
 		ApiResponse: {
 			errors: components['schemas']['Error'][];
-			data: Record<string, never>[];
+			data: Record<string, unknown>[];
 		};
 		/**
 		 * @description The default archetype given by manufacturer. Can be changed by user.
@@ -2139,7 +2139,7 @@ export interface components {
 				archetype: components['schemas']['ProductArchetype'];
 			};
 			/** @description Triggers a visual identification sequence on the device */
-			identify: Record<string, never>;
+			identify: Record<string, unknown>;
 			usertest?: {
 				/** @enum {string} */
 				status?: 'set' | 'changing';
@@ -2356,7 +2356,7 @@ export interface components {
 				fixed_mired?: number;
 			};
 			/** @description Triggers identification sequence on the light */
-			identify: Record<string, never>;
+			identify: Record<string, unknown>;
 			/** @description Service identification number. 0 indicates service of a single instance */
 			service_id: number;
 			on: components['schemas']['On'];
@@ -3564,11 +3564,11 @@ export interface components {
 			/** @description Description of the behavior script. */
 			description?: string;
 			/** @description JSON schema for configuration. */
-			configuration_schema?: Record<string, never>;
+			configuration_schema?: Record<string, unknown>;
 			/** @description JSON schema for trigger. */
-			trigger_schema?: Record<string, never>;
+			trigger_schema?: Record<string, unknown>;
 			/** @description JSON schema for state. */
-			state_schema?: Record<string, never>;
+			state_schema?: Record<string, unknown>;
 			/** @description Version of the behavior script. */
 			version?: string;
 			metadata?: {
@@ -3586,9 +3586,9 @@ export interface components {
 			/** @description True if the behavior instance is enabled. */
 			enabled?: boolean;
 			/** @description Current state of the behavior instance. */
-			state?: Record<string, never>;
+			state?: Record<string, unknown>;
 			/** @description Configuration for this behavior instance. */
-			configuration?: Record<string, never>;
+			configuration?: Record<string, unknown>;
 			dependees?: components['schemas']['ResourceIdentifier'][];
 			/** @enum {string} */
 			status?: 'initializing' | 'running' | 'disabled' | 'errored';
@@ -3604,7 +3604,7 @@ export interface components {
 			/** @description True to enable the behavior instance. */
 			enabled?: boolean;
 			/** @description Configuration for this behavior instance. */
-			configuration?: Record<string, never>;
+			configuration?: Record<string, unknown>;
 			metadata?: {
 				name?: string;
 			};

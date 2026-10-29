@@ -15,7 +15,7 @@
 		"test:unit": "vitest",
 		"test": "pnpm test:unit --run && pnpm test:e2e",
 		"test:e2e": "playwright test",
-		"gen:hue": "openapi-typescript src/lib/server/hue/openhue.yaml -o src/lib/server/hue/schema.d.ts && prettier --write src/lib/server/hue/schema.d.ts"
+		"gen:hue": "openapi-typescript src/lib/server/hue/openhue.yaml --empty-objects-unknown -o src/lib/server/hue/schema.d.ts && prettier --write src/lib/server/hue/schema.d.ts"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
