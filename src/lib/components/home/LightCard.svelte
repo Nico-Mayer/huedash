@@ -1,43 +1,32 @@
 <script lang="ts">
 	import { Switch } from '#lib/components/ui/switch/index.js';
 	import { changeLight, lightBrightness, lightOn, lightSwatch } from '#lib/group-state.svelte.ts';
-	import { selection } from '#lib/selection.svelte.ts';
 	import type { HomeLight } from '#lib/server/hue/home.ts';
 	import { SmoothValue } from '#lib/smooth-value.svelte.ts';
 	import LevelSlider from './LevelSlider.svelte';
 	import LightIndicator from './LightIndicator.svelte';
 
-	let { light }: { light: HomeLight } = $props();
+	let { light, onOpen }: { light: HomeLight; onOpen: () => void } = $props();
 
 	const on = $derived(lightOn(light));
 	const brightness = new SmoothValue(() => lightBrightness(light));
-	const selected = $derived(selection.has(light.id));
-
-	function select(event: MouseEvent) {
-		if (selection.selecting || event.shiftKey || event.metaKey || event.ctrlKey)
-			selection.toggle(light.id);
-		else selection.only(light.id);
-	}
 </script>
 
-<!-- The select button stretches over the whole card; the switch and slider sit above it. The card
-     draws one ring: the selection, or the keyboard focus when not selected. -->
+<!-- The open button stretches over the whole card; the switch and slider sit above it. -->
 <li
 	class={[
 		'relative flex min-w-0 flex-col gap-4 rounded-xl border bg-card p-4 text-card-foreground',
 		!light.reachable && 'opacity-60',
-		selected
-			? 'ring-2 ring-primary'
-			: 'has-[button:focus-visible]:ring-[3px] has-[button:focus-visible]:ring-ring/50'
+		'has-[button:focus-visible]:ring-[3px] has-[button:focus-visible]:ring-ring/50'
 	]}
 >
 	<div class="flex items-center justify-between gap-3">
 		<button
 			type="button"
 			class="flex min-w-0 flex-1 items-center gap-3 text-left outline-none after:absolute after:inset-0 after:rounded-xl enabled:cursor-pointer"
-			aria-pressed={selected}
+			aria-haspopup="dialog"
 			disabled={!light.reachable}
-			onclick={select}
+			onclick={onOpen}
 		>
 			<LightIndicator swatch={lightSwatch(light)} on={light.reachable && on} />
 			<span class="flex min-w-0 flex-col">

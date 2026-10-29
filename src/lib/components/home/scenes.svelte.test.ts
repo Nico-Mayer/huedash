@@ -3,8 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { live } from '#lib/live.svelte.ts';
 import type { HomeGroup } from '#lib/server/hue/home.ts';
-import Controls from './Controls.svelte';
-import { groupTarget } from '#lib/control-target.svelte.ts';
 import SceneList from './SceneList.svelte';
 
 vi.mock('$app/navigation', () => ({ refreshAll: vi.fn() }));
@@ -119,13 +117,5 @@ describe('SceneList brightness', () => {
 		await expect.element(page.getByText('56 %')).toBeInTheDocument();
 		const tropical = page.getByRole('listitem').filter({ hasText: 'Tropical' }).element();
 		expect(tropical.textContent).not.toContain('%');
-	});
-});
-
-describe('Controls with a scene', () => {
-	it('shows the active scene name', async () => {
-		render(Controls, { control: groupTarget(kitchen), scene: 'Relax' });
-
-		await expect.element(page.getByText('Relax, 60 %')).toBeInTheDocument();
 	});
 });

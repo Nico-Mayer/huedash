@@ -1,7 +1,7 @@
 import { page } from 'vitest/browser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
-import { groupTarget, lightsTarget } from '#lib/control-target.svelte.ts';
+import { groupTarget, lightTarget } from '#lib/control-target.svelte.ts';
 import { live } from '#lib/live.svelte.ts';
 import type { HomeGroup, HomeLight } from '#lib/server/hue/home.ts';
 import Controls from './Controls.svelte';
@@ -74,20 +74,17 @@ describe('presets for a group', () => {
 	});
 });
 
-describe('presets for selected lights', () => {
-	it('sends a brightness preset to each light', async () => {
-		render(Controls, { control: lightsTarget([ceiling, counter]) });
+describe('presets for a light', () => {
+	it('sends a brightness preset to the light', async () => {
+		render(Controls, { control: lightTarget(ceiling) });
 
 		await page.getByRole('button', { name: '25 %' }).click();
 
-		await expect.poll(sent).toEqual([
-			['/api/lights/ceiling', { on: true, brightness: 25 }],
-			['/api/lights/counter', { on: true, brightness: 25 }]
-		]);
+		await expect.poll(sent).toEqual([['/api/lights/ceiling', { on: true, brightness: 25 }]]);
 	});
 
 	it('clamps Warm to the warmest white a light supports', async () => {
-		render(Controls, { control: lightsTarget([counter]) });
+		render(Controls, { control: lightTarget(counter) });
 
 		await page.getByRole('button', { name: 'Warm' }).click();
 

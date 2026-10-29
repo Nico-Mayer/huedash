@@ -16,6 +16,7 @@ export type ControlTarget = {
 	readonly name: string;
 	readonly on: boolean;
 	readonly brightness: number;
+	readonly dimmable: boolean;
 	readonly mirekRange: MirekRange | null;
 	readonly color: boolean;
 	readonly mirek: number | null;
@@ -36,6 +37,7 @@ export function groupTarget(group: HomeGroup): ControlTarget {
 		get brightness() {
 			return groupBrightness(group);
 		},
+		dimmable: true,
 		mirekRange: group.colorTemperature,
 		color: group.color,
 		// The bridge does not report a group's white or color.
@@ -45,36 +47,24 @@ export function groupTarget(group: HomeGroup): ControlTarget {
 	};
 }
 
-function sharedRange(lights: HomeLight[]): MirekRange | null {
-	if (lights.some((light) => !light.mirekRange)) return null;
-	const ranges = lights.map((light) => light.mirekRange!);
-	const range = {
-		minMirek: Math.max(...ranges.map((r) => r.minMirek)),
-		maxMirek: Math.min(...ranges.map((r) => r.maxMirek))
-	};
-	return range.minMirek <= range.maxMirek ? range : null;
-}
-
-// Current values come from the first light by name; commands go to every light.
-export function lightsTarget(selected: HomeLight[]): ControlTarget {
-	const lights = [...selected].sort((a, b) => a.name.localeCompare(b.name));
-	const [first] = lights;
+export function lightTarget(light: HomeLight): ControlTarget {
 	return {
-		name: lights.length === 1 ? first.name : `${lights.length} lights`,
+		name: light.name,
 		get on() {
-			return lightOn(first);
+			return lightOn(light);
 		},
 		get brightness() {
-			return lightBrightness(first);
+			return lightBrightness(light);
 		},
-		mirekRange: sharedRange(lights),
-		color: lights.every((light) => light.color),
+		dimmable: light.brightness !== null,
+		mirekRange: light.mirekRange,
+		color: light.color,
 		get mirek() {
-			return lightMirek(first);
+			return lightMirek(light);
 		},
 		get hueSaturation() {
-			return lightHueSaturation(first);
+			return lightHueSaturation(light);
 		},
-		apply: (change) => lights.forEach((light) => changeLight(light, change))
+		apply: (change) => changeLight(light, change)
 	};
 }

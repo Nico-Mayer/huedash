@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { clampMirek, groupTarget, lightsTarget } from './control-target.svelte.ts';
+import { clampMirek, groupTarget, lightTarget } from './control-target.svelte.ts';
 import { live } from './live.svelte.ts';
 import type { HomeGroup, HomeLight } from './server/hue/home.ts';
 
@@ -34,57 +34,50 @@ const light = (id: string, name: string, extra: Partial<HomeLight> = {}): HomeLi
 const sent = () =>
 	fetchMock.mock.calls.map(([url, init]) => [url, JSON.parse(String((init as RequestInit).body))]);
 
-describe('lightsTarget', () => {
-	it('names one light or counts several', () => {
-		expect(lightsTarget([light('ceiling', 'Ceiling')]).name).toBe('Ceiling');
-		expect(lightsTarget([light('ceiling', 'Ceiling'), light('counter', 'Counter')]).name).toBe(
-			'2 lights'
-		);
-	});
+describe('lightTarget', () => {
+	it('offers white and color for a color light', () => {
+		const target = lightTarget(light('ceiling', 'Ceiling', { brightness: 70, mirek: 400 }));
 
-	it('starts at the first light by name', () => {
-		const target = lightsTarget([
-			light('counter', 'Counter', { brightness: 20, mirek: 250 }),
-			light('ceiling', 'Ceiling', { brightness: 70, mirek: 400 })
-		]);
-
+		expect(target.name).toBe('Ceiling');
 		expect(target.brightness).toBe(70);
 		expect(target.mirek).toBe(400);
+		expect(target.mirekRange).toEqual({ minMirek: 153, maxMirek: 500 });
+		expect(target.color).toBe(true);
 	});
 
-	it('limits white to the range every light supports', () => {
-		const target = lightsTarget([
-			light('ceiling', 'Ceiling'),
+	it('offers only white for a white-only light', () => {
+		const target = lightTarget(light('counter', 'Counter', { color: false }));
+
+		expect(target.mirekRange).not.toBeNull();
+		expect(target.color).toBe(false);
+	});
+
+	it('keeps the range of the light', () => {
+		const target = lightTarget(
 			light('counter', 'Counter', { mirekRange: { minMirek: 153, maxMirek: 454 } })
-		]);
+		);
 
 		expect(target.mirekRange).toEqual({ minMirek: 153, maxMirek: 454 });
 	});
 
-	it('offers white and color only when every light supports them', () => {
-		const target = lightsTarget([
-			light('ceiling', 'Ceiling'),
-			light('plug', 'Plug', { mirekRange: null, color: false })
-		]);
+	it('offers neither for a plug', () => {
+		const target = lightTarget(
+			light('plug', 'Plug', { brightness: null, mirekRange: null, color: false })
+		);
 
+		expect(target.dimmable).toBe(false);
 		expect(target.mirekRange).toBeNull();
 		expect(target.color).toBe(false);
 	});
 
-	it('sends one command per light', async () => {
-		lightsTarget([light('ceiling', 'Ceiling'), light('counter', 'Counter')]).apply({
-			brightness: 40
-		});
+	it('sends a command to the light', async () => {
+		lightTarget(light('ceiling', 'Ceiling')).apply({ brightness: 40 });
 
-		await expect.poll(() => sent().length).toBe(2);
-		expect(sent()).toEqual([
-			['/api/lights/ceiling', { brightness: 40 }],
-			['/api/lights/counter', { brightness: 40 }]
-		]);
+		await expect.poll(() => sent()).toEqual([['/api/lights/ceiling', { brightness: 40 }]]);
 	});
 
 	it('shows a new color at once', () => {
-		const target = lightsTarget([light('ceiling', 'Ceiling')]);
+		const target = lightTarget(light('ceiling', 'Ceiling'));
 
 		target.apply({ color: { hue: 0, saturation: 100 } });
 

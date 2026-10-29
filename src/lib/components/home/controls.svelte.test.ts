@@ -6,7 +6,7 @@ import ColorControl from './ColorControl.svelte';
 import ColorTemperatureControl from './ColorTemperatureControl.svelte';
 import Controls from './Controls.svelte';
 import LightCard from './LightCard.svelte';
-import { groupTarget, lightsTarget } from '#lib/control-target.svelte.ts';
+import { groupTarget, lightTarget } from '#lib/control-target.svelte.ts';
 import { live } from '#lib/live.svelte.ts';
 
 vi.mock('$app/navigation', () => ({ refreshAll: vi.fn() }));
@@ -109,7 +109,7 @@ describe('Controls for a group', () => {
 
 describe('LightCard', () => {
 	it('switches one light', async () => {
-		render(LightCard, { light });
+		render(LightCard, { light, onOpen: () => {} });
 
 		await page.getByRole('switch', { name: 'Ceiling' }).click();
 
@@ -117,14 +117,14 @@ describe('LightCard', () => {
 	});
 
 	it('shows an unreachable light with disabled controls', async () => {
-		render(LightCard, { light: { ...light, reachable: false } });
+		render(LightCard, { light: { ...light, reachable: false }, onOpen: () => {} });
 
 		await expect.element(page.getByText('Unreachable')).toBeInTheDocument();
 		await expect.element(page.getByRole('switch', { name: 'Ceiling' })).toBeDisabled();
 	});
 
 	it('shows only a switch for a light without dimming', async () => {
-		render(LightCard, { light: { ...light, brightness: null } });
+		render(LightCard, { light: { ...light, brightness: null }, onOpen: () => {} });
 
 		await expect.element(page.getByRole('slider')).not.toBeInTheDocument();
 	});
@@ -157,10 +157,10 @@ describe('Controls tabs', () => {
 	});
 });
 
-describe('Controls for selected lights', () => {
+describe('Controls for a light', () => {
 	it('starts on the Color tab for a light that shows a color', async () => {
 		render(Controls, {
-			control: lightsTarget([{ ...light, mirek: null, hueSaturation: { hue: 0, saturation: 100 } }])
+			control: lightTarget({ ...light, mirek: null, hueSaturation: { hue: 0, saturation: 100 } })
 		});
 
 		await expect
@@ -172,24 +172,15 @@ describe('Controls for selected lights', () => {
 	});
 
 	it('starts at the light white', async () => {
-		render(Controls, { control: lightsTarget([{ ...light, mirek: 370 }]) });
+		render(Controls, { control: lightTarget({ ...light, mirek: 370 }) });
 
 		await expect
 			.element(page.getByRole('slider', { name: 'Ceiling color temperature' }))
 			.toHaveAttribute('aria-valuenow', '2700');
 	});
 
-	it('goes back to the room', async () => {
-		const onBack = vi.fn();
-		render(Controls, { control: lightsTarget([light]), onBack });
-
-		await page.getByRole('button', { name: 'Back to room' }).click();
-
-		expect(onBack).toHaveBeenCalled();
-	});
-
 	it('sends a light command, not a group command', async () => {
-		render(Controls, { control: lightsTarget([light]) });
+		render(Controls, { control: lightTarget(light) });
 
 		await page.getByRole('switch', { name: 'Ceiling' }).click();
 
@@ -239,7 +230,7 @@ describe('live updates', () => {
 	});
 
 	it('shows a light change from the bridge', async () => {
-		render(LightCard, { light });
+		render(LightCard, { light, onOpen: () => {} });
 
 		live.apply({ kind: 'light', id: 'ceiling', brightness: 20 });
 
