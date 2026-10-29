@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw/http';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MOCK_APP_KEY } from '../../../mocks/bridge/fixtures.ts';
 import { MOCK_BRIDGE_IP } from '../../../mocks/bridge/handlers.ts';
 import { home } from '../../../mocks/bridge/home.ts';
@@ -94,5 +94,72 @@ describe('createCommandSender', () => {
 			ok: false,
 			reason: 'unreachable'
 		});
+	});
+});
+
+describe('command rate limits', () => {
+	// The mock logs a command only after a real network round trip, so count calls to fetch
+	// to see when a command leaves.
+	const fetchSpy = vi.fn(target.fetch);
+	const spiedTarget = { ...target, fetch: fetchSpy as typeof fetch };
+	const sent = () => home.commands.map((c) => [c.id, c.body]);
+
+	beforeEach(() => {
+		fetchSpy.mockClear();
+		vi.useFakeTimers({ toFake: ['setTimeout', 'Date'] });
+	});
+
+	afterEach(() => vi.useRealTimers());
+
+	it('sends the first and last light change within 100 ms', async () => {
+		const { setLight } = createCommandSender();
+
+		const changes = [10, 20, 30].map((brightness) =>
+			setLight(spiedTarget, 'ceiling', { brightness })
+		);
+		await vi.advanceTimersByTimeAsync(99);
+		expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+		await vi.advanceTimersByTimeAsync(1);
+		expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+		await Promise.all(changes);
+		expect(sent()).toEqual([
+			['ceiling', { dimming: { brightness: 10 } }],
+			['ceiling', { dimming: { brightness: 30 } }]
+		]);
+	});
+
+	it('limits each light on its own', async () => {
+		const { setLight } = createCommandSender();
+
+		const changes = [
+			setLight(spiedTarget, 'ceiling', { on: false }),
+			setLight(spiedTarget, 'counter', { on: false })
+		];
+		await vi.advanceTimersByTimeAsync(0);
+		expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+		await Promise.all(changes);
+	});
+
+	it('sends a second scene recall after 1 s', async () => {
+		const { setScene } = createCommandSender();
+
+		const recalls = [
+			setScene(spiedTarget, 'scene-tropical', { mode: 'active' }),
+			setScene(spiedTarget, 'scene-tropical', { mode: 'dynamic' })
+		];
+		await vi.advanceTimersByTimeAsync(999);
+		expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+		await vi.advanceTimersByTimeAsync(1);
+		expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+		await Promise.all(recalls);
+		expect(sent()).toEqual([
+			['scene-tropical', { recall: { action: 'active' } }],
+			['scene-tropical', { recall: { action: 'dynamic_palette' } }]
+		]);
 	});
 });
