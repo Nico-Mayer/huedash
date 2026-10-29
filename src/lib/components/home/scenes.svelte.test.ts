@@ -112,6 +112,16 @@ describe('SceneList', () => {
 	});
 });
 
+describe('SceneList brightness', () => {
+	it('shows the scene brightness when it has one', async () => {
+		render(SceneList, { group: kitchen });
+
+		await expect.element(page.getByText('56 %')).toBeInTheDocument();
+		const tropical = page.getByRole('listitem').filter({ hasText: 'Tropical' }).element();
+		expect(tropical.textContent).not.toContain('%');
+	});
+});
+
 describe('Controls with a scene', () => {
 	it('shows the active scene name', async () => {
 		render(Controls, { control: groupTarget(kitchen), scene: 'Relax' });
