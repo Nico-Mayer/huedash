@@ -48,32 +48,38 @@
 		</Empty.Header>
 	</Empty.Root>
 {:else}
-	<ul class="flex flex-col gap-2" aria-label="Scenes">
+	<ul class="grid grid-cols-2 gap-3 lg:grid-cols-3 2xl:grid-cols-4" aria-label="Scenes">
 		{#each group.scenes as scene (scene.id)}
 			{@const status = statusOf(scene)}
-			<li class="flex items-center gap-2">
+			<li class="relative">
 				<button
 					type="button"
-					class="flex flex-1 items-center gap-3 rounded-lg border p-2 text-left hover:bg-muted"
+					class={[
+						'flex w-full flex-col gap-3 rounded-xl border bg-card p-3 text-left hover:bg-muted',
+						status !== 'inactive' && 'border-primary'
+					]}
 					aria-pressed={status !== 'inactive'}
 					onclick={() => recall(scene, 'active')}
 				>
 					<span
-						class="h-8 w-12 shrink-0 rounded-md border"
+						class="h-10 w-full rounded-md border"
 						style:background={strip(scene.colors)}
 						aria-hidden="true"
 					></span>
-					<span class="flex-1 font-medium">{scene.name}</span>
-					{#if status === 'static'}
-						<Badge>Active</Badge>
-					{:else if status === 'dynamic_palette'}
-						<Badge>Playing</Badge>
-					{/if}
+					<span class="flex items-center justify-between gap-2">
+						<span class="truncate font-medium">{scene.name}</span>
+						{#if status === 'static'}
+							<Badge>Active</Badge>
+						{:else if status === 'dynamic_palette'}
+							<Badge>Playing</Badge>
+						{/if}
+					</span>
 				</button>
 				{#if scene.dynamic}
 					<Button
-						variant="outline"
-						size="icon"
+						variant="secondary"
+						size="icon-sm"
+						class="absolute top-4 right-4"
 						aria-label="Play {scene.name}"
 						onclick={() => recall(scene, 'dynamic')}
 					>

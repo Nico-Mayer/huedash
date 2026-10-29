@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { live } from '#lib/live.svelte.ts';
 import type { HomeGroup } from '#lib/server/hue/home.ts';
-import GroupCard from './GroupCard.svelte';
+import GroupControls from './GroupControls.svelte';
 import SceneList from './SceneList.svelte';
 
 vi.mock('$app/navigation', () => ({ refreshAll: vi.fn() }));
@@ -103,9 +103,9 @@ describe('SceneList', () => {
 	});
 });
 
-describe('GroupCard with scenes', () => {
+describe('GroupControls with scenes', () => {
 	it('shows the active scene name', async () => {
-		render(GroupCard, { group: kitchen });
+		render(GroupControls, { group: kitchen });
 
 		live.apply({ kind: 'scene', id: 'scene-relax', active: 'static' });
 

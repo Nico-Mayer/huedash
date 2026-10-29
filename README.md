@@ -5,9 +5,9 @@ Self-hosted web dashboard for Philips Hue.
 ## Features
 
 - Pair with your Hue bridge from the browser.
-- See all rooms and zones. Turn them on and off and set their brightness.
-- Open a room or zone to set its white color temperature and color, and to control single lights.
-- Recall the scenes you made in the Hue app, including dynamic scenes. The active scene shows on the room card.
+- All rooms and zones in a sidebar: switch them on and off and move between them in one click. On phones the sidebar opens from a menu.
+- Each room or zone shows its scenes and lights. Set brightness, white color temperature, and color for the whole group, and control single lights.
+- Recall the scenes you made in the Hue app, including dynamic scenes. The active scene shows in the sidebar.
 - Live updates: changes from the Hue app, a wall switch, or another huedash tab show up right away.
 - Dark mode. Follows your system theme, or pick Light or Dark per device in settings.
 

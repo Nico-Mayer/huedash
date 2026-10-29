@@ -78,7 +78,7 @@
 
 				if (result.type === 'redirect') {
 					stopPairing?.();
-					await goto(resolve('/'), { invalidateAll: true });
+					await goto(resolve('/(app)'), { invalidateAll: true });
 					return;
 				}
 				if (result.type === 'failure')
