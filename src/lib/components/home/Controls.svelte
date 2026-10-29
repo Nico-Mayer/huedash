@@ -6,8 +6,10 @@
 	import { Switch } from '#lib/components/ui/switch/index.js';
 	import * as Tabs from '#lib/components/ui/tabs/index.js';
 	import type { ControlTarget } from '#lib/control-target.svelte.ts';
+	import BrightnessPresets from './BrightnessPresets.svelte';
 	import ColorControl from './ColorControl.svelte';
 	import ColorTemperatureControl from './ColorTemperatureControl.svelte';
+	import WhitePresets from './WhitePresets.svelte';
 
 	let { control, scene, onBack }: { control: ControlTarget; scene?: string; onBack?: () => void } =
 		$props();
@@ -53,6 +55,7 @@
 				onValueCommit={(value) => control.apply({ on: true, brightness: value })}
 				thumbLabel="{control.name} brightness"
 			/>
+			<BrightnessPresets {control} />
 		</div>
 
 		{#if control.mirekRange && control.color}
@@ -61,15 +64,19 @@
 					<Tabs.Trigger value="white">White</Tabs.Trigger>
 					<Tabs.Trigger value="color">Color</Tabs.Trigger>
 				</Tabs.List>
-				<Tabs.Content value="white" class="pt-4">
+				<Tabs.Content value="white" class="flex flex-col gap-4 pt-4">
 					<ColorTemperatureControl {control} range={control.mirekRange} />
+					<WhitePresets {control} range={control.mirekRange} />
 				</Tabs.Content>
 				<Tabs.Content value="color" class="pt-4">
 					<ColorControl {control} />
 				</Tabs.Content>
 			</Tabs.Root>
 		{:else if control.mirekRange}
-			<ColorTemperatureControl {control} range={control.mirekRange} />
+			<div class="flex flex-col gap-4">
+				<ColorTemperatureControl {control} range={control.mirekRange} />
+				<WhitePresets {control} range={control.mirekRange} />
+			</div>
 		{:else if control.color}
 			<ColorControl {control} />
 		{/if}
