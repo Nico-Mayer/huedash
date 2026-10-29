@@ -112,3 +112,9 @@ Test certificates are generated once with `openssl` and committed; they protect 
 
 - Runtime libraries (`openapi-fetch`, `undici`, `zod`) are devDependencies, like everything else. SvelteKit externalizes `dependencies` from the server bundle, and the runtime image has no `node_modules`. Task 6.3 re-checks that `node build` runs without `node_modules`.
 - `openapi-typescript` 7.13 declares a peer of TypeScript 5; the project uses TypeScript 6. Generation is checked in task 1.2.
+- Test certificates are generated in memory with `selfsigned` 5.5.0 (published 2026-01-12, repo active 2026-03) instead of committed openssl files, so no private keys land in the repo (GitGuardian runs on this repo).
+- MSW 3 intercepts at the socket level. Even requests it lets through run on a mock socket that reports no peer certificate, so pinning cannot work under MSW. Consequences:
+  - The TLS unit test stops the MSW server for its file and restarts it afterwards.
+  - The e2e preload starts no MSW interception. It runs real servers that answer with the MSW handlers through `getResponse`: the HTTPS mock bridge on `127.0.0.1:8443` and an HTTP discovery mock on `127.0.0.1:8080`.
+  - Discovery reads its URL from `HUE_DISCOVERY_URL` (default `https://discovery.meethue.com/`), so e2e can point it at the local mock.
+- `tls.ts` exports `fetchWith(dispatcher)`, because the DOM `RequestInit` type does not declare Node's `dispatcher` option.

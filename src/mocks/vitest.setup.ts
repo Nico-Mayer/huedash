@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { server } from './server.js';
+import { server } from './server.ts';
 
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 afterEach(() => server.resetHandlers());
