@@ -58,8 +58,14 @@ The later Docker image runs `node build`. Picked now, so `pnpm build` produces t
 - Alternative: `adapter-auto`. Rejected: no target detection in self-hosted Docker.
 
 ### shadcn-svelte via its CLI
-`pnpm dlx shadcn-svelte@latest init --base-color neutral` with default aliases (`$lib/components/ui`, `$lib/utils`). Then `add button card` as the first components. More components come with the features that need them.
+`pnpm dlx shadcn-svelte@1.7.1 init --preset b3e3SmJxh2` (chosen by the user: style `maia`, base color `mauve`, Geist font, lucide icons). shadcn-svelte 1.7 requires a preset, so the planned `--base-color neutral` was dropped. Then `add button card` as the first components. More components come with the features that need them.
 - Alternative: use bits-ui directly. Rejected: shadcn-svelte gives styled, accessible components on top of bits-ui. bits-ui stays available for custom components.
+
+SvelteKit 3 uses Node subpath imports (`#lib`) instead of `$lib`. Aliases are `#lib`, `#lib/components`, `#lib/components/ui`, `#lib/utils`, `#lib/hooks`. Subpath imports do not resolve folders, so imports name the file: `#lib/components/ui/card/index.js`.
+
+shadcn-svelte 1.7 replaces `clsx` + `tailwind-merge` with `cn` (shadcn-ui/cn, 0.5.0, published 2026-10-16).
+
+Generated components are formatted with the project Prettier config. ESLint's `svelte/no-navigation-without-resolve` is off for `src/lib/components/ui/**`, because `Button` passes `href` through and callers resolve it.
 
 ### Lint and format from `sv` add-ons
 Use the ESLint flat config and Prettier config from `sv`. Add `prettier-plugin-tailwindcss` for class sorting. No extra lint rules for now.

@@ -18,10 +18,10 @@
 
 ## 4. shadcn-svelte
 
-- [ ] 4.1 Run `pnpm dlx shadcn-svelte@latest init --base-color neutral` with default aliases and verify `components.json` exists and `src/lib/utils.ts` exports `cn`
-- [ ] 4.2 Run `pnpm dlx shadcn-svelte@latest add button card -y` and verify both folders exist under `src/lib/components/ui/`
-- [ ] 4.3 Replace `src/routes/+page.svelte` with a placeholder `Card` (app name, short note that setup comes next) using `Card` and `Button`; verify it renders styled in `pnpm dev` and passes the Svelte autofixer
-- [ ] 4.4 Verify `pnpm check`, `pnpm lint`, and `pnpm build` all pass after adding shadcn-svelte
+- [x] 4.1 Run `pnpm dlx shadcn-svelte@latest init --base-color neutral` with default aliases and verify `components.json` exists and `src/lib/utils.ts` exports `cn`
+- [x] 4.2 Run `pnpm dlx shadcn-svelte@latest add button card -y` and verify both folders exist under `src/lib/components/ui/`
+- [x] 4.3 Replace `src/routes/+page.svelte` with a placeholder `Card` (app name, short note that setup comes next) using `Card` and `Button`; verify it renders styled in `pnpm dev` and passes the Svelte autofixer
+- [x] 4.4 Verify `pnpm check`, `pnpm lint`, and `pnpm build` all pass after adding shadcn-svelte
 
 ## 5. Docs and commit
 

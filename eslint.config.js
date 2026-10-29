@@ -34,6 +34,11 @@ export default defineConfig(
 		}
 	},
 	{
+		// shadcn-svelte components pass href through; callers resolve it.
+		files: ['src/lib/components/ui/**'],
+		rules: { 'svelte/no-navigation-without-resolve': 'off' }
+	},
+	{
 		// Override or add rule settings here, such as:
 		// 'svelte/button-has-type': 'error'
 		rules: {}
