@@ -3,6 +3,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Spinner } from '#lib/components/ui/spinner/index.js';
+	import ThemePicker from '#lib/components/settings/ThemePicker.svelte';
 	import BridgeStatusView from '#lib/components/bridge/BridgeStatusView.svelte';
 	import ForgetBridge from './ForgetBridge.svelte';
 	import type { PageProps } from './$types';
@@ -18,7 +19,7 @@
 	}
 </script>
 
-<main class="flex flex-1 justify-center p-6">
+<main class="flex flex-1 flex-col items-center gap-6 p-6">
 	<Card.Root class="w-full max-w-md">
 		<Card.Header>
 			<Card.Title>{data.name}</Card.Title>
@@ -51,5 +52,16 @@
 				{/if}
 			{/await}
 		</Card.Footer>
+	</Card.Root>
+
+	<Card.Root class="w-full max-w-md">
+		<Card.Header>
+			<Card.Title>Appearance</Card.Title>
+			<Card.Description>Theme for this device</Card.Description>
+		</Card.Header>
+
+		<Card.Content>
+			<ThemePicker />
+		</Card.Content>
 	</Card.Root>
 </main>
