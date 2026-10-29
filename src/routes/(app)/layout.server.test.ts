@@ -3,8 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MOCK_APP_KEY } from '../../mocks/bridge/fixtures.ts';
 import { MOCK_BRIDGE_IP } from '../../mocks/bridge/handlers.ts';
 import { server } from '../../mocks/server.ts';
-import type { PageServerLoadEvent } from './$types';
-import { load } from './+page.server.ts';
+import type { LayoutServerLoadEvent } from './$types';
+import { load } from './+layout.server.ts';
 
 beforeEach(() => {
 	vi.stubEnv('HUE_BRIDGE_IP', MOCK_BRIDGE_IP);
@@ -13,9 +13,9 @@ beforeEach(() => {
 
 afterEach(() => vi.unstubAllEnvs());
 
-const run = () => load({} as PageServerLoadEvent) as Promise<Record<string, unknown>>;
+const run = () => load({} as LayoutServerLoadEvent) as Promise<Record<string, unknown>>;
 
-describe('home load', () => {
+describe('app layout load', () => {
 	it('loads rooms and zones without sending any keys to the browser', async () => {
 		const data = await run();
 

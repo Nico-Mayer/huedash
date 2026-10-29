@@ -1,4 +1,5 @@
-import { loadGroupPage } from '#lib/server/group-page.ts';
+import { findGroup } from '#lib/server/group-page.ts';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = ({ params }) => loadGroupPage('zone', params.id);
+export const load: PageServerLoad = async ({ params, parent }) =>
+	findGroup(await parent(), 'zone', params.id);
