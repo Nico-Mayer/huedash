@@ -13,8 +13,8 @@
 
 ## 3. UI components
 
-- [ ] 3.1 Add shadcn-svelte `slider`, `switch`, `sonner`, `empty` and `@lucide/svelte` icons as needed (keep existing `button`); verify `pnpm check` passes
-- [ ] 3.2 Build `GroupCard`, `LightRow`, `ColorTemperatureControl`, `ColorControl` with optimistic state, send-on-release, revert plus toast on failure; copy per the `ux-writing` skill; verify with the Svelte autofixer and component tests for on/off, release-to-send, revert on failure, hidden controls for unsupported features, unreachable light
+- [x] 3.1 Add shadcn-svelte `slider`, `switch`, `sonner`, `empty` and `@lucide/svelte` icons as needed (keep existing `button`); verify `pnpm check` passes
+- [x] 3.2 Build `GroupCard`, `LightRow`, `ColorTemperatureControl`, `ColorControl` with optimistic state, send-on-release, revert plus toast on failure; copy per the `ux-writing` skill; verify with the Svelte autofixer and component tests for on/off, release-to-send, revert on failure, hidden controls for unsupported features, unreachable light
 
 ## 4. Pages
 

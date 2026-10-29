@@ -79,3 +79,11 @@ Fixtures gain a small home: rooms "Kitchen" (color light "Ceiling", ambiance lig
 - [Color conversion ignores per-light gamut] → The bridge clamps to each light's gamut; colors outside it appear as the nearest supported color, as in the Hue app.
 - [Zones can contain lights from several rooms] → Model handles lights in multiple groups; a light appears in each group's detail page.
 - [`refreshAll` after every command reloads the whole model] → Acceptable until live updates; commands already show their result optimistically.
+
+## Changes found during implementation
+
+- shadcn's `sonner` component pulls in `svelte-sonner` 1.2.2 (published 2026-10-27) and `mode-watcher` 1.1.0 (last published 2025-06) for its theme. Kept as the shadcn default; `mode-watcher` only reads the color mode.
+- The shadcn `Slider` put `aria-label` on its root, so the focusable thumb (`role="slider"`) had no accessible name. The generated `slider.svelte` gained a `thumbLabel` prop that labels the thumb.
+- Brightness and color changes also send `on: true`, as in the Hue app: dimming or coloring a room that is off turns it on.
+- Kelvin and mirek conversion lives in `src/lib/color-temperature.ts`, so client components can use it; `culori` stays in server code.
+- `/api/*` requests are excluded from the setup redirect. Without a bridge they answer `409` themselves instead of redirecting a `fetch` to the setup HTML.

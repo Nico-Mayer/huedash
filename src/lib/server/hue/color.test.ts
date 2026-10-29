@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { hueSaturationToXy, kelvinToMirek, mirekToKelvin } from './color.ts';
+import { kelvinToMirek, mirekToKelvin } from '../../color-temperature.ts';
+import { hueSaturationToXy } from './color.ts';
 
 describe('hueSaturationToXy', () => {
 	it.each([

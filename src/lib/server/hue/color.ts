@@ -10,6 +10,3 @@ export function hueSaturationToXy(hue: number, saturationPercent: number): Xy {
 	const sum = x + y + z;
 	return { x: round(x / sum), y: round(y / sum) };
 }
-
-export const mirekToKelvin = (mirek: number) => Math.round(1_000_000 / mirek);
-export const kelvinToMirek = (kelvin: number) => Math.round(1_000_000 / kelvin);
