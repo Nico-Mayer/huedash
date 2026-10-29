@@ -71,6 +71,20 @@ describe('loadHome', () => {
 		});
 	});
 
+	it('gives each light a swatch for its white or color, and its product', async () => {
+		const [kitchen, living] = (await home()).rooms;
+		const [ceiling] = kitchen.lights;
+		const [lamp, plug] = living.lights;
+
+		expect(ceiling).toMatchObject({
+			product: 'Hue White and Color Ambiance',
+			swatch: expect.stringMatching(/^#[0-9a-f]{6}$/)
+		});
+		expect(lamp.swatch).toMatch(/^#[0-9a-f]{6}$/);
+		expect(lamp.swatch).not.toBe(ceiling.swatch);
+		expect(plug).toMatchObject({ product: 'Hue Smart Plug', swatch: null });
+	});
+
 	it('marks a light with a connectivity issue as unreachable', async () => {
 		const living = (await home()).rooms[1];
 

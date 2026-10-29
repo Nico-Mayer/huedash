@@ -19,6 +19,12 @@ export function xyToHex({ x, y }: Xy): string {
 
 export const mirekToHex = (mirek: number) => chroma.temperature(mirekToKelvin(mirek)).hex();
 
+// A light shows either a white (valid mirek) or a color (xy); lights with neither have no swatch.
+export function swatchOf(mirek: number | null, xy: Xy | undefined): string | null {
+	if (mirek !== null) return mirekToHex(mirek);
+	return xy ? xyToHex(xy) : null;
+}
+
 export function sceneColors(actions: SceneAction[]): string[] {
 	const colors = actions.flatMap(({ action }) => {
 		if (action.color?.xy) return [xyToHex(action.color.xy)];

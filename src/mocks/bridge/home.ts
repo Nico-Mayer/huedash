@@ -94,10 +94,18 @@ function initialHome() {
 		light('plug', 'Plug', { on: false })
 	];
 
+	const products: Record<string, string> = {
+		ceiling: 'Hue White and Color Ambiance',
+		counter: 'Hue White Ambiance',
+		lamp: 'Hue Go',
+		plug: 'Hue Smart Plug'
+	};
+
 	const devices = lights.map((l) => ({
 		id: `device-${l.id}`,
 		type: 'device' as const,
 		metadata: { name: l.metadata.name, archetype: 'classic_bulb' },
+		product_data: { product_name: products[l.id] },
 		services: [ref(l.id, 'light'), ref(`zigbee-${l.id}`, 'zigbee_connectivity')]
 	}));
 

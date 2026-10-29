@@ -26,6 +26,8 @@ const light = (id: string, name: string, extra: Partial<HomeLight> = {}): HomeLi
 	color: true,
 	mirek: 366,
 	hueSaturation: null,
+	product: null,
+	swatch: null,
 	...extra
 });
 

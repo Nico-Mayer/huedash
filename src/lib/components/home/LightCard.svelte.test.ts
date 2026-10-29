@@ -26,7 +26,9 @@ const light = (id: string, name: string, reachable = true): HomeLight => ({
 	mirekRange: null,
 	color: false,
 	mirek: null,
-	hueSaturation: null
+	hueSaturation: null,
+	product: null,
+	swatch: null
 });
 
 const card = (name: string) => page.getByRole('button', { name: new RegExp(`^${name}`) });

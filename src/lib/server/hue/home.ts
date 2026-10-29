@@ -3,7 +3,7 @@ import type { HueSaturation } from '../../live-updates.ts';
 import { createHueClient } from './client.ts';
 import { xyToHueSaturation } from './color.ts';
 import type { Connection } from './connection.ts';
-import { sceneColors } from './scene-colors.ts';
+import { sceneColors, swatchOf } from './scene-colors.ts';
 import type { paths } from './schema.d.ts';
 
 type ResourceData<P extends keyof paths> = paths[P] extends {
@@ -28,11 +28,13 @@ export type HomeLight = {
 	on: boolean;
 	brightness: number | null;
 	reachable: boolean;
+	product: string | null;
 	mirekRange: MirekRange | null;
 	color: boolean;
 	// Only one of these is set: the bridge reports either a white or a color for the light.
 	mirek: number | null;
 	hueSaturation: HueSaturation | null;
+	swatch: string | null;
 };
 
 export type HomeScene = {
@@ -104,6 +106,7 @@ export function buildHome(resources: HomeResources): Home {
 					: null;
 			const white = light.color_temperature?.mirek_valid ? light.color_temperature.mirek : null;
 			const xy = light.color?.xy;
+			const mirek = white ?? null;
 			return [
 				light.id,
 				{
@@ -112,10 +115,12 @@ export function buildHome(resources: HomeResources): Home {
 					on: light.on.on ?? false,
 					brightness: light.dimming ? Math.round(light.dimming.brightness ?? 0) : null,
 					reachable: reachable(light),
+					product: devices.get(light.owner.rid)?.product_data.product_name ?? null,
 					mirekRange,
 					color: light.color !== undefined,
-					mirek: white ?? null,
-					hueSaturation: white == null && xy ? xyToHueSaturation(xy) : null
+					mirek,
+					hueSaturation: mirek === null && xy ? xyToHueSaturation(xy) : null,
+					swatch: swatchOf(mirek, xy)
 				}
 			];
 		})
