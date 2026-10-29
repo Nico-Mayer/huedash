@@ -19,7 +19,8 @@
 		"dev:lan": "vite dev --host",
 		"docker:up": "docker compose -f compose.dev.yaml up -d --build",
 		"docker:down": "docker compose -f compose.dev.yaml down",
-		"docker:logs": "docker compose -f compose.dev.yaml logs -f"
+		"docker:logs": "docker compose -f compose.dev.yaml logs -f",
+		"check:standalone": "node scripts/check-standalone.js"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",

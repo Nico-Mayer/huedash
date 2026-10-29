@@ -26,22 +26,23 @@ Planned changes, in order:
 
 Tools (Node, pnpm) are pinned in `mise.toml`. Run `mise install` once.
 
-| Command                                    | Does                                                                                   |
-| ------------------------------------------ | -------------------------------------------------------------------------------------- |
-| `pnpm dev`                                 | Dev server                                                                             |
-| `pnpm build`                               | Production build to `build/` (adapter-node)                                            |
-| `pnpm check`                               | Type check with svelte-check                                                           |
-| `pnpm lint`                                | Prettier check and ESLint                                                              |
-| `pnpm format`                              | Format with Prettier                                                                   |
-| `pnpm dlx shadcn-svelte@latest add <name>` | Add a shadcn-svelte component                                                          |
-| `pnpm test`                                | Unit, component, and e2e tests                                                         |
-| `pnpm test:unit`                           | Vitest in watch mode (`--run` for once)                                                |
-| `pnpm test:e2e`                            | Playwright against the production build                                                |
-| `pnpm exec playwright install chromium`    | Install the browser for tests (once)                                                   |
-| `pnpm gen:hue`                             | Regenerate Hue API types from `openhue.yaml`                                           |
-| `pnpm dev:lan`                             | Dev server reachable from other devices on the LAN                                     |
-| `pnpm docker:up`                           | Build the image from local source and run it (`compose.dev.yaml`, port 3000, `./data`) |
-| `pnpm docker:down` / `pnpm docker:logs`    | Stop the local container / follow its logs                                             |
+| Command                                    | Does                                                                                    |
+| ------------------------------------------ | --------------------------------------------------------------------------------------- |
+| `pnpm dev`                                 | Dev server                                                                              |
+| `pnpm build`                               | Production build to `build/` (adapter-node)                                             |
+| `pnpm check`                               | Type check with svelte-check                                                            |
+| `pnpm lint`                                | Prettier check and ESLint                                                               |
+| `pnpm format`                              | Format with Prettier                                                                    |
+| `pnpm dlx shadcn-svelte@latest add <name>` | Add a shadcn-svelte component                                                           |
+| `pnpm test`                                | Unit, component, and e2e tests                                                          |
+| `pnpm test:unit`                           | Vitest in watch mode (`--run` for once)                                                 |
+| `pnpm test:e2e`                            | Playwright against the production build                                                 |
+| `pnpm exec playwright install chromium`    | Install the browser for tests (once)                                                    |
+| `pnpm gen:hue`                             | Regenerate Hue API types from `openhue.yaml`                                            |
+| `pnpm check:standalone`                    | Run the built server like the Docker image, without `node_modules` (needs `pnpm build`) |
+| `pnpm dev:lan`                             | Dev server reachable from other devices on the LAN                                      |
+| `pnpm docker:up`                           | Build the image from local source and run it (`compose.dev.yaml`, port 3000, `./data`)  |
+| `pnpm docker:down` / `pnpm docker:logs`    | Stop the local container / follow its logs                                              |
 
 Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder: `#lib/components/ui/card/index.js`.
 
