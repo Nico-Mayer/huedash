@@ -6,7 +6,7 @@
 	import { Switch } from '#lib/components/ui/switch/index.js';
 	import type { HomeGroup } from '#lib/server/hue/home.ts';
 
-	let { group }: { group: HomeGroup } = $props();
+	let { group, link = true }: { group: HomeGroup; link?: boolean } = $props();
 
 	let on = $derived(group.on);
 	let brightness = $derived(group.brightness);
@@ -34,7 +34,11 @@
 <Card.Root>
 	<Card.Header>
 		<Card.Title>
-			<a {href} class="hover:underline">{group.name}</a>
+			{#if link}
+				<a {href} class="hover:underline">{group.name}</a>
+			{:else}
+				<h1>{group.name}</h1>
+			{/if}
 		</Card.Title>
 		<Card.Description class="tabular-nums">
 			{on ? `On, ${brightness} %` : 'Off'}
