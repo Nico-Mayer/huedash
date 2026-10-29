@@ -3,7 +3,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Spinner } from '#lib/components/ui/spinner/index.js';
-	import BridgeStatusView from './BridgeStatusView.svelte';
+	import BridgeStatusView from '#lib/components/bridge/BridgeStatusView.svelte';
 	import ForgetBridge from './ForgetBridge.svelte';
 	import type { PageProps } from './$types';
 
@@ -18,7 +18,7 @@
 	}
 </script>
 
-<main class="flex min-h-svh items-center justify-center p-6">
+<main class="flex flex-1 justify-center p-6">
 	<Card.Root class="w-full max-w-md">
 		<Card.Header>
 			<Card.Title>{data.name}</Card.Title>

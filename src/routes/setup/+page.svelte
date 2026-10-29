@@ -105,7 +105,7 @@
 	}
 </script>
 
-<main class="flex min-h-svh items-center justify-center p-6">
+<main class="flex flex-1 justify-center p-6">
 	<Card.Root class="w-full max-w-md">
 		{#if !bridge}
 			<Card.Header>
