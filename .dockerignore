@@ -20,4 +20,5 @@ data
 Dockerfile
 .dockerignore
 compose.yaml
+compose.dev.yaml
 *.log

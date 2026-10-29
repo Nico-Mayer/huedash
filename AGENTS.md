@@ -26,19 +26,22 @@ Planned changes, in order:
 
 Tools (Node, pnpm) are pinned in `mise.toml`. Run `mise install` once.
 
-| Command                                    | Does                                         |
-| ------------------------------------------ | -------------------------------------------- |
-| `pnpm dev`                                 | Dev server                                   |
-| `pnpm build`                               | Production build to `build/` (adapter-node)  |
-| `pnpm check`                               | Type check with svelte-check                 |
-| `pnpm lint`                                | Prettier check and ESLint                    |
-| `pnpm format`                              | Format with Prettier                         |
-| `pnpm dlx shadcn-svelte@latest add <name>` | Add a shadcn-svelte component                |
-| `pnpm test`                                | Unit, component, and e2e tests               |
-| `pnpm test:unit`                           | Vitest in watch mode (`--run` for once)      |
-| `pnpm test:e2e`                            | Playwright against the production build      |
-| `pnpm exec playwright install chromium`    | Install the browser for tests (once)         |
-| `pnpm gen:hue`                             | Regenerate Hue API types from `openhue.yaml` |
+| Command                                    | Does                                                                                   |
+| ------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `pnpm dev`                                 | Dev server                                                                             |
+| `pnpm build`                               | Production build to `build/` (adapter-node)                                            |
+| `pnpm check`                               | Type check with svelte-check                                                           |
+| `pnpm lint`                                | Prettier check and ESLint                                                              |
+| `pnpm format`                              | Format with Prettier                                                                   |
+| `pnpm dlx shadcn-svelte@latest add <name>` | Add a shadcn-svelte component                                                          |
+| `pnpm test`                                | Unit, component, and e2e tests                                                         |
+| `pnpm test:unit`                           | Vitest in watch mode (`--run` for once)                                                |
+| `pnpm test:e2e`                            | Playwright against the production build                                                |
+| `pnpm exec playwright install chromium`    | Install the browser for tests (once)                                                   |
+| `pnpm gen:hue`                             | Regenerate Hue API types from `openhue.yaml`                                           |
+| `pnpm dev:lan`                             | Dev server reachable from other devices on the LAN                                     |
+| `pnpm docker:up`                           | Build the image from local source and run it (`compose.dev.yaml`, port 3000, `./data`) |
+| `pnpm docker:down` / `pnpm docker:logs`    | Stop the local container / follow its logs                                             |
 
 Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder: `#lib/components/ui/card/index.js`.
 
@@ -54,7 +57,7 @@ Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder:
 
 - `.github/workflows/ci.yml` runs lint, check, unit, and e2e tests on every PR and push to `main`. Tool versions come from `mise.toml`.
 - `.github/workflows/image.yml` builds the Docker image. PRs build `amd64` only, without pushing. `main` pushes `edge` and `sha-*`; `v*` tags push semver tags and `latest`, both for `amd64` and `arm64`.
-- The Docker image is only built in CI, not locally. Check results with `gh pr checks` or `gh run list`.
+- CI builds and publishes the image. For local testing, `pnpm docker:up` builds the same Dockerfile from your working tree. Check CI results with `gh pr checks` or `gh run list`.
 - The runtime image contains only `build/`, `server.js`, and `package.json`. Anything the server needs at runtime must be bundled by the build.
 
 ## Hue bridge code

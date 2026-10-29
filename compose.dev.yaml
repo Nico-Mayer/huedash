@@ -1,0 +1,8 @@
+services:
+  huedash:
+    build: .
+    image: huedash:dev
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./data:/data

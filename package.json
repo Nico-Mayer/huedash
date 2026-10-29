@@ -15,7 +15,11 @@
 		"test:unit": "vitest",
 		"test": "pnpm test:unit --run && pnpm test:e2e",
 		"test:e2e": "playwright test",
-		"gen:hue": "openapi-typescript src/lib/server/hue/openhue.yaml --empty-objects-unknown -o src/lib/server/hue/schema.d.ts && prettier --write src/lib/server/hue/schema.d.ts"
+		"gen:hue": "openapi-typescript src/lib/server/hue/openhue.yaml --empty-objects-unknown -o src/lib/server/hue/schema.d.ts && prettier --write src/lib/server/hue/schema.d.ts",
+		"dev:lan": "vite dev --host",
+		"docker:up": "docker compose -f compose.dev.yaml up -d --build",
+		"docker:down": "docker compose -f compose.dev.yaml down",
+		"docker:logs": "docker compose -f compose.dev.yaml logs -f"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
