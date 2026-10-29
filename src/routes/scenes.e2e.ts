@@ -61,3 +61,21 @@ test('a scene started in one page shows in another without reload', async ({ con
 	await expect(sceneRow(second, 'Bright').getByText('Active')).toBeVisible();
 	expect(reloaded).toBe(false);
 });
+
+test('a scene moves the inspector brightness without reload', async ({ page }) => {
+	await openKitchen(page);
+	await recall(page, 'Bright', 'scene-bright');
+	const brightness = page
+		.getByRole('complementary', { name: 'Controls' })
+		.getByRole('slider', { name: 'Kitchen brightness' });
+	await expect(brightness).toHaveAttribute('aria-valuenow', '100');
+
+	let reloaded = false;
+	page.on('request', (request) => {
+		if (request.url().includes('__data.json')) reloaded = true;
+	});
+	await recall(page, 'Relax', 'scene-relax');
+
+	await expect(brightness).toHaveAttribute('aria-valuenow', '56');
+	expect(reloaded).toBe(false);
+});

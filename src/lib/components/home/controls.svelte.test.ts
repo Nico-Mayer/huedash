@@ -95,6 +95,16 @@ describe('Controls for a group', () => {
 		await expect.poll(() => fetchMock.mock.calls.length).toBe(1);
 		expect(sentBody().body).toEqual({ on: true, brightness: 61 });
 	});
+
+	it('moves the brightness to a live change', async () => {
+		render(Controls, { control: groupTarget(kitchen) });
+		const slider = page.getByRole('slider', { name: 'Kitchen brightness' });
+
+		live.apply({ kind: 'group', id: 'grouped-kitchen', brightness: 30 });
+
+		await expect.element(slider).toHaveAttribute('aria-valuenow', '30');
+		await expect.element(page.getByText('On, 30 %')).toBeInTheDocument();
+	});
 });
 
 describe('LightCard', () => {

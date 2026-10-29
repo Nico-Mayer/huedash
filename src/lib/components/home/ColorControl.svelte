@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { Slider } from '#lib/components/ui/slider/index.js';
 	import type { ControlTarget } from '#lib/control-target.svelte.ts';
+	import { SmoothValue } from '#lib/smooth-value.svelte.ts';
 
 	let { control }: { control: ControlTarget } = $props();
 
 	// Without a reported color, for example for a group, the picker starts neutral.
-	let hue = $derived(control.hueSaturation?.hue ?? 30);
-	let saturation = $derived(control.hueSaturation?.saturation ?? 0);
+	const hue = new SmoothValue(() => control.hueSaturation?.hue ?? 30);
+	const saturation = new SmoothValue(() => control.hueSaturation?.saturation ?? 0);
 
-	function commit() {
-		control.apply({ on: true, color: { hue, saturation } });
+	function commit(smooth: SmoothValue, value: number) {
+		smooth.commit(value);
+		control.apply({ on: true, color: { hue: hue.current, saturation: saturation.current } });
 	}
 </script>
 
@@ -18,24 +20,26 @@
 		<span class="font-medium">Color</span>
 		<span
 			class="size-6 rounded-full border"
-			style:background-color={`hsl(${hue} ${saturation}% 50%)`}
+			style:background-color={`hsl(${hue.current} ${saturation.current}% 50%)`}
 			aria-hidden="true"
 		></span>
 	</div>
 	<Slider
 		type="single"
-		bind:value={hue}
+		value={hue.current}
 		min={0}
 		max={360}
-		onValueCommit={commit}
+		onValueChange={(value) => hue.input(value)}
+		onValueCommit={(value) => commit(hue, value)}
 		thumbLabel="{control.name} hue"
 	/>
 	<Slider
 		type="single"
-		bind:value={saturation}
+		value={saturation.current}
 		min={0}
 		max={100}
-		onValueCommit={commit}
+		onValueChange={(value) => saturation.input(value)}
+		onValueCommit={(value) => commit(saturation, value)}
 		thumbLabel="{control.name} saturation"
 	/>
 </div>

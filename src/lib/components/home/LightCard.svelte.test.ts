@@ -4,6 +4,7 @@ import { render } from 'vitest-browser-svelte';
 import { live } from '#lib/live.svelte.ts';
 import { selection } from '#lib/selection.svelte.ts';
 import type { HomeLight } from '#lib/server/hue/home.ts';
+import '../../../routes/layout.css';
 import LightCard from './LightCard.svelte';
 
 const fetchMock = vi.fn();
@@ -94,6 +95,15 @@ describe('LightCard selection', () => {
 		renderCards(light('ceiling', 'Ceiling'));
 
 		await page.getByRole('switch', { name: 'Ceiling' }).click();
+
+		expect(selection.ids.size).toBe(0);
+		await expect.poll(() => fetchMock.mock.calls.length).toBe(1);
+	});
+
+	it('does not select when the slider is used', async () => {
+		renderCards(light('ceiling', 'Ceiling'));
+
+		await page.getByRole('slider', { name: 'Ceiling brightness' }).click();
 
 		expect(selection.ids.size).toBe(0);
 		await expect.poll(() => fetchMock.mock.calls.length).toBe(1);
