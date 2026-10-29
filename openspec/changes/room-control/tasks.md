@@ -18,8 +18,8 @@
 
 ## 4. Pages
 
-- [ ] 4.1 Move bridge status and Forget bridge to `/settings`; add the layout header with a labelled settings link and the `visibilitychange` refresh; verify existing settings behavior with the moved component tests
-- [ ] 4.2 Replace the home page with Rooms and Zones lists, the empty state, and the unreachable notice with retry and settings link; verify load tests (model, unreachable, no keys in data)
+- [x] 4.1 Move bridge status and Forget bridge to `/settings`; add the layout header with a labelled settings link and the `visibilitychange` refresh; verify existing settings behavior with the moved component tests
+- [x] 4.2 Replace the home page with Rooms and Zones lists, the empty state, and the unreachable notice with retry and settings link; verify load tests (model, unreachable, no keys in data)
 - [ ] 4.3 Add `/rooms/[id]` and `/zones/[id]` with `GroupDetail` and the not-found state; verify load tests for found and unknown ids
 
 ## 5. End to end, docs, verification
