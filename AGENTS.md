@@ -22,6 +22,21 @@ Planned changes, in order:
 7. `scenes` - list and activate scenes
 8. `live-updates` - bridge event stream to the browser via SSE
 
+## Commands
+
+Tools (Node, pnpm) are pinned in `mise.toml`. Run `mise install` once.
+
+| Command                                    | Does                                        |
+| ------------------------------------------ | ------------------------------------------- |
+| `pnpm dev`                                 | Dev server                                  |
+| `pnpm build`                               | Production build to `build/` (adapter-node) |
+| `pnpm check`                               | Type check with svelte-check                |
+| `pnpm lint`                                | Prettier check and ESLint                   |
+| `pnpm format`                              | Format with Prettier                        |
+| `pnpm dlx shadcn-svelte@latest add <name>` | Add a shadcn-svelte component               |
+
+Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder: `#lib/components/ui/card/index.js`.
+
 ## Library first
 
 Before writing code we would have to maintain, search for a maintained library: recent releases, active repo, real usage. Record the choice, the evidence, and the alternatives in the change's `design.md`. Custom UI components build on bits-ui primitives when one fits.
