@@ -18,11 +18,17 @@ async function setLivingRoom(page: Page, on: boolean) {
 	expect((await sent).status()).toBe(204);
 }
 
+// Updates sent before a page's live connection opens never reach it.
+async function openLive(page: Page) {
+	await page.goto('/');
+	await expect(page.locator('[data-live]')).toHaveAttribute('data-live', 'open');
+}
+
 test('a change in one page shows in another page without reload', async ({ context }) => {
 	const first = await context.newPage();
 	const second = await context.newPage();
-	await first.goto('/');
-	await second.goto('/');
+	await openLive(first);
+	await openLive(second);
 	await setLivingRoom(first, true);
 	await expect(livingRoom(second).getByText(/^On, /)).toBeVisible();
 
@@ -38,7 +44,7 @@ test('a change in one page shows in another page without reload', async ({ conte
 });
 
 test('a group command does not reload page data', async ({ page }) => {
-	await page.goto('/');
+	await openLive(page);
 	let reloaded = false;
 	page.on('request', (request) => {
 		if (request.url().includes('__data.json')) reloaded = true;

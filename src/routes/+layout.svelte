@@ -31,7 +31,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="flex min-h-svh flex-col">
+<div class="flex min-h-svh flex-col" data-live={live.open ? 'open' : 'closed'}>
 	<header class="flex items-center justify-between border-b px-6 py-3">
 		<a href={resolve('/')} class="font-semibold">huedash</a>
 		{#if !inSetup}

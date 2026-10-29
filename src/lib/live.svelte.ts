@@ -26,7 +26,11 @@ export class Live {
 
 	// Before the first full connection there is nothing to have lost yet.
 	get connected(): boolean {
-		return !this.#wasOpen || (this.#browserOpen && this.#bridgeOpen);
+		return !this.#wasOpen || this.open;
+	}
+
+	get open(): boolean {
+		return this.#browserOpen && this.#bridgeOpen;
 	}
 
 	connect() {
@@ -87,7 +91,7 @@ export class Live {
 	}
 
 	#settle() {
-		const open = this.#browserOpen && this.#bridgeOpen;
+		const open = this.open;
 		if (open && this.#lost) {
 			this.#lost = false;
 			this.reload();

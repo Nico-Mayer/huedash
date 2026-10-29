@@ -85,3 +85,4 @@ The mock home gets an emitter: `updateLight` and `updateGroupedLight` publish CL
 - The bridge reports `reconnecting` until its stream first opens, so the browser only treats the connection as lost after it has been fully open once. This avoids a notice and a reload on every page load.
 - A reload requested during the one-second gap runs once afterwards instead of being dropped.
 - The idle-close test uses short real timeouts instead of fake timers, because fake timers would also stop `eventsource`'s internal timers.
+- Changes between a page load and its live connection opening (usually well under a second) are missed until the next reload or tab switch. The e2e tests wait for `data-live="open"` on the layout before sending commands; CI hit this race on a slower runner.
