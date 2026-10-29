@@ -1,0 +1,5 @@
+import { commandEndpoint } from '#lib/server/api/command-endpoint.ts';
+import { commands, lightCommandSchema } from '#lib/server/hue/commands.ts';
+import type { RequestHandler } from './$types';
+
+export const PUT: RequestHandler = commandEndpoint(lightCommandSchema, commands.setLight);

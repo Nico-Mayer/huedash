@@ -9,7 +9,7 @@
 - [x] 2.1 Implement `home.ts` (`buildHome` pure function and `loadHome` with parallel reads and status mapping) with unit tests: room lights via devices, zone lights directly, sorted groups and lights, union mirek range, color support, unreachable light, failed read returns a status
 - [x] 2.2 Add `culori` and `@types/culori`; implement `color.ts` (hue and saturation to CIE xy, kelvin and mirek conversion) with unit tests: red, green, blue match sRGB primaries' xy within 0.01; 2700 K and 6500 K round-trip
 - [x] 2.3 Implement `throttle.ts` (per-key leading and trailing, latest value wins, every caller gets the result for its value) with fake-timer unit tests for the spec scenario "Quick changes"
-- [ ] 2.4 Implement `commands.ts` (`setGroup`, `setLight`: zod-validated input, clamping, mapping to CLIP bodies, throttled per id) and the `PUT /api/groups/[id]` and `PUT /api/lights/[id]` endpoints with unit tests: 204 on success, 400 on invalid input, 502 on bridge error, command log shows the mapped body
+- [x] 2.4 Implement `commands.ts` (`setGroup`, `setLight`: zod-validated input, clamping, mapping to CLIP bodies, throttled per id) and the `PUT /api/groups/[id]` and `PUT /api/lights/[id]` endpoints with unit tests: 204 on success, 400 on invalid input, 502 on bridge error, command log shows the mapped body
 
 ## 3. UI components
 
