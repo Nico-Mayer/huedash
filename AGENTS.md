@@ -47,6 +47,13 @@ Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder:
 - The mock Hue bridge lives in `src/mocks/bridge/` (MSW handlers and fixtures) and answers at `192.0.2.10`. Unit tests and the e2e server use it. Requests without a handler fail.
 - Files in `src/mocks/` import each other with `.ts` extensions, because Node loads them directly in the e2e preload.
 
+## CI and image
+
+- `.github/workflows/ci.yml` runs lint, check, unit, and e2e tests on every PR and push to `main`. Tool versions come from `mise.toml`.
+- `.github/workflows/image.yml` builds the Docker image. PRs build `amd64` only, without pushing. `main` pushes `edge` and `sha-*`; `v*` tags push semver tags and `latest`, both for `amd64` and `arm64`.
+- The Docker image is only built in CI, not locally. Check results with `gh pr checks` or `gh run list`.
+- The runtime image contains only `build/` and `package.json`. Anything the server needs at runtime must be bundled by the build.
+
 ## Library first
 
 Before writing code we would have to maintain, search for a maintained library: recent releases, active repo, real usage. Record the choice, the evidence, and the alternatives in the change's `design.md`. Custom UI components build on bits-ui primitives when one fits.
