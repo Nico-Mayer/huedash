@@ -27,8 +27,8 @@
 
 ## 5. Home page
 
-- [ ] 5.1 Implement `+page.server.ts` load (name, source, streamed status) and `forget` action (deletes config, redirects to `/setup`, unavailable in env mode) with unit tests; verify no load data contains the app or client key
-- [ ] 5.2 Replace the placeholder `+page.svelte` with the connected view (name, live status, retry, certificate-changed message, Forget bridge with `AlertDialog`, env mode note); verify with the Svelte autofixer and a component test for each status
+- [x] 5.1 Implement `+page.server.ts` load (name, source, streamed status) and `forget` action (deletes config, redirects to `/setup`, unavailable in env mode) with unit tests; verify no load data contains the app or client key
+- [x] 5.2 Replace the placeholder `+page.svelte` with the connected view (name, live status, retry, certificate-changed message, Forget bridge with `AlertDialog`, env mode note); verify with the Svelte autofixer and a component test for each status
 
 ## 6. End to end and docs
 
