@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Defines how the brightness, white, hue, and saturation sliders look and move, so values are easy to set and changes from outside are easy to follow.
+Defines how the brightness and white sliders and the color pad look and move, so values are easy to set and changes from outside are easy to follow.
 
 ## Requirements
 
