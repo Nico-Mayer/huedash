@@ -3,6 +3,7 @@ import { playwright } from '@vitest/browser-playwright';
 import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
+import pkg from './package.json' with { type: 'json' };
 
 export default defineConfig({
 	plugins: [
@@ -13,7 +14,8 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter()
+			adapter: adapter(),
+			version: { name: pkg.version }
 		})
 	],
 	test: {
