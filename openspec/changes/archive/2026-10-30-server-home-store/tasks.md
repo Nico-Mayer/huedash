@@ -44,7 +44,7 @@
 ## 8. Verification
 
 - [x] 8.1 Run `pnpm docker:up`, open two tabs, change lights, rename a room through the mock or a real bridge, and check `pnpm docker:logs` for skipped resource warnings; verify both tabs follow without reloads
-- [ ] 8.2 Verify `pnpm test`, `pnpm check`, `pnpm lint`, `pnpm build`, and `pnpm check:standalone` exit 0; commit on `main` in atomic conventional commits
+- [x] 8.2 Verify `pnpm test`, `pnpm check`, `pnpm lint`, `pnpm build`, and `pnpm check:standalone` exit 0; commit on `main` in atomic conventional commits
 
 ## Workflow follow-up
 
