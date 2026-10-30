@@ -1,5 +1,5 @@
-import type { BridgeFailure } from './hue/bridge.ts';
-import type { HomeGroup, HomeResult } from './hue/home.ts';
+import type { BridgeFailure } from './server/hue/bridge.ts';
+import type { HomeGroup, HomeResult } from './server/hue/home.ts';
 
 export type GroupPageData =
 	| { bridgeName: string; status: 'ok'; kind: HomeGroup['kind']; group: HomeGroup | null }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { PageServerLoadEvent } from './$types';
-import { load } from './+page.server.ts';
+import type { PageLoadEvent } from './$types';
+import { load } from './+page.ts';
 
 describe('room page load', () => {
 	it('uses the home from the layout without calling the bridge', async () => {
@@ -8,7 +8,7 @@ describe('room page load', () => {
 		const event = {
 			params: { id: 'room-kitchen' },
 			parent: async () => ({ bridgeName: 'Hue', result: { status: 'ok', home } })
-		} as unknown as PageServerLoadEvent;
+		} as unknown as PageLoadEvent;
 
 		expect(await load(event)).toMatchObject({ status: 'ok', group: { name: 'Kitchen' } });
 	});

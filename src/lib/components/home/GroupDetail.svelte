@@ -4,7 +4,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Empty from '#lib/components/ui/empty/index.js';
 	import { groupTarget, lightTarget } from '#lib/control-target.svelte.ts';
-	import type { GroupPageData } from '#lib/server/group-page.ts';
+	import type { GroupPageData } from '#lib/group-page.ts';
 	import type { HomeGroup } from '#lib/server/hue/home.ts';
 	import ControlDialog from './ControlDialog.svelte';
 	import LightCard from './LightCard.svelte';

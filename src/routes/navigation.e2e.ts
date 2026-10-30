@@ -24,6 +24,51 @@ test('moves between rooms from the sidebar', async ({ page }) => {
 	await expect(entry(page, 'Kitchen')).not.toHaveAttribute('aria-current');
 });
 
+function trackDataRequests(page: Page) {
+	const urls: string[] = [];
+	page.on('request', (request) => {
+		if (request.url().includes('__data.json')) urls.push(request.url());
+	});
+	return urls;
+}
+
+test('switches rooms without a data request', async ({ page }) => {
+	await page.goto('/rooms/room-kitchen');
+	await expect(page.getByRole('heading', { name: 'Kitchen' })).toBeVisible();
+	const requests = trackDataRequests(page);
+
+	await entry(page, 'Living room').hover();
+	await page.waitForTimeout(500);
+	expect(requests).toEqual([]);
+
+	await entry(page, 'Living room').click();
+	await expect(page.getByRole('heading', { name: 'Living room' })).toBeVisible();
+	await entry(page, 'Downstairs').click();
+	await expect(page.getByRole('heading', { name: 'Downstairs' })).toBeVisible();
+	expect(requests).toEqual([]);
+});
+
+test('keeps live state after a switch', async ({ page }) => {
+	await page.goto('/rooms/room-living');
+	await expect(page.locator('[data-live]')).toHaveAttribute('data-live', 'open');
+	const lamp = page.getByRole('switch', { name: 'Lamp' });
+	const wasOn = (await lamp.getAttribute('aria-checked')) === 'true';
+	const toggle = async () => {
+		const sent = page.waitForResponse((r) => r.url().endsWith('/api/lights/lamp'));
+		await lamp.click();
+		expect((await sent).status()).toBe(204);
+	};
+	const requests = trackDataRequests(page);
+
+	await toggle();
+	await entry(page, 'Downstairs').click();
+
+	await expect(page.getByRole('heading', { name: 'Downstairs' })).toBeVisible();
+	await expect(lamp).toHaveAttribute('aria-checked', String(!wasOn));
+	expect(requests).toEqual([]);
+	await toggle();
+});
+
 test('marks no room on the settings page', async ({ page }) => {
 	await page.goto('/rooms/room-kitchen');
 

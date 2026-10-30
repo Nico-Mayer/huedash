@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MOCK_APP_KEY } from '../../mocks/bridge/fixtures.ts';
-import { MOCK_BRIDGE_IP } from '../../mocks/bridge/handlers.ts';
-import { getBridgeConfig } from './config/index.ts';
+import { MOCK_APP_KEY } from '../mocks/bridge/fixtures.ts';
+import { MOCK_BRIDGE_IP } from '../mocks/bridge/handlers.ts';
+import { getBridgeConfig } from './server/config/index.ts';
 import { findGroup } from './group-page.ts';
-import { connectionFor } from './hue/connection.ts';
-import { loadHome } from './hue/home.ts';
+import { connectionFor } from './server/hue/connection.ts';
+import { loadHome } from './server/hue/home.ts';
 
 beforeEach(() => {
 	vi.stubEnv('HUE_BRIDGE_IP', MOCK_BRIDGE_IP);
