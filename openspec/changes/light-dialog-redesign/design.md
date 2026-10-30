@@ -54,7 +54,7 @@ Alternative: a disc (angle = hue, radius = saturation) like the screenshot. A re
 - `{ kind: 'light'; color: string | null }` for brightness: fill `var(--tone)`, track `color-mix(in oklab, var(--tone) 20%, transparent)`. A `null` color (off, or a light without swatch) uses `bg-muted-foreground/40` on `bg-muted`.
 - `{ kind: 'white'; stops: string[] }` for white: the track is a linear gradient of the stops, warm at the start; there is no separate fill, the thumb marks the value.
 
-The thumb is a white bar with a 1.5 px dark ring and a soft shadow, so it stays visible on a near-white fill and on a dark or saturated fill, in both themes. The track also gets a faint inset outline drawn above the fill, so a near-white light still shows its edges on a white page.
+The thumb is a bar with only a soft shadow, no border. Its color follows the color behind it with CSS relative color syntax, `oklch(from <color> clamp(0.3, (0.82 - l) * 1000, 1) 0 0)`: white on dark or saturated colors, dark gray on pale ones such as yellow or daylight. For the white slider, the color behind the thumb is the nearest gradient stop. A hard dark ring was tried first and looked heavy. The track also gets a faint inset outline drawn above the fill, so a near-white light still shows its edges on a white page.
 
 Callers pass the color through `ControlTarget.swatch`: a light uses `lightSwatch(light)`, a group `var(--light)`. A light that is on but has no swatch (a dim-only bulb) also uses `var(--light)`, so it does not look off. `RoomHeader` and `LightCard` pass `null` while off.
 
