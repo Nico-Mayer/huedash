@@ -112,6 +112,25 @@ async function formatFile(file) {
 	await writeFile(file, await prettier.format(text, { ...options, filepath: file }));
 }
 
+function releaseNotes() {
+	return run('git-cliff', ['--latest', '--strip', 'all']).replace(/^## .*\n+/, '');
+}
+
+function createGithubRelease(tag) {
+	try {
+		execFileSync(
+			'gh',
+			['release', 'create', tag, '--verify-tag', '--title', tag, '--notes-file', '-'],
+			{ input: releaseNotes(), stdio: ['pipe', 'inherit', 'inherit'] }
+		);
+	} catch {
+		fail(
+			`Could not create the GitHub Release. The tag is pushed. To create it, run:\n` +
+				`  git cliff --latest --strip all | gh release create ${tag} --verify-tag --title ${tag} --notes-file -`
+		);
+	}
+}
+
 async function setPackageVersion(version) {
 	const pkg = JSON.parse(await readFile('package.json', 'utf8'));
 	pkg.version = version;
@@ -161,4 +180,5 @@ try {
 	);
 }
 
+createGithubRelease(tag);
 console.log(`\nReleased ${tag}. The image workflow builds it now.`);

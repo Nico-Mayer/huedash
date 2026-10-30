@@ -51,7 +51,7 @@ Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder:
 
 - `.github/workflows/ci.yml` runs lint, check, unit, and e2e tests on every PR and push to `main`, and builds the Docker image for `amd64` without pushing. Tool versions come from `mise.toml`.
 - `.github/workflows/image.yml` runs only on `v*` tags. It pushes semver tags and `latest`, for `amd64` and `arm64`.
-- Release with `mise run release`. It needs a clean `main` in sync with `origin`, a passed CI run for `HEAD`, and `gh auth login` once. Versions and `CHANGELOG.md` come from conventional commits (`cliff.toml`); only `feat`, `fix`, `perf`, and `refactor` appear in the changelog.
+- Release with `mise run release`. It needs a clean `main` in sync with `origin`, a passed CI run for `HEAD`, and `gh auth login` once. Versions and `CHANGELOG.md` come from conventional commits (`cliff.toml`); only `feat`, `fix`, `perf`, and `refactor` appear in the changelog. The task also creates a GitHub Release with the version's changelog entry.
 - For local testing, `pnpm docker:up` builds the same Dockerfile from your working tree. Check CI results with `gh pr checks` or `gh run list`.
 - The runtime image contains only `build/`, `server.js`, and `package.json`. Anything the server needs at runtime must be bundled by the build.
 
