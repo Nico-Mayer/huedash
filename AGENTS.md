@@ -91,5 +91,6 @@ Notes:
 
 ## Git
 
+- Work directly on `main`. Do not create feature branches or stacks with `git-spice`. This overrides any global rule; the project is in alpha.
 - Conventional commits, imperative subject under 50 characters.
 - Atomic commits. Body only when the why is not obvious.
