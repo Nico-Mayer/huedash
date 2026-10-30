@@ -20,7 +20,7 @@
 ## 4. CI
 
 - [x] 4.1 Add `.vitest/attachments/` to the upload-artifact paths in `ci.yml` and `.vitest` to `.gitignore`, and verify with actionlint and `git status` after a forced local component test failure
-- [ ] 4.2 Run `pnpm lint`, `pnpm check`, and `pnpm test` locally, push, and verify the CI run passes (`gh run list --workflow ci.yml`)
+- [x] 4.2 Run `pnpm lint`, `pnpm check`, and `pnpm test` locally, push, and verify the CI run passes (`gh run list --workflow ci.yml`)
 
 ## Workflow follow-up
 
