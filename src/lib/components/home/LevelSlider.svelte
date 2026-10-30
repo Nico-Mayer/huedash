@@ -50,7 +50,7 @@
 	{orientation}
 	class={cn(
 		'group/slider relative flex cursor-pointer touch-none items-center select-none has-data-active:cursor-grabbing data-disabled:cursor-not-allowed data-disabled:opacity-50',
-		vertical ? 'h-72 w-24 flex-col' : 'w-full',
+		vertical ? 'h-[clamp(15rem,40svh,18rem)] w-24 flex-col' : 'w-full',
 		className
 	)}
 	style={lit && tone.kind === 'light' ? `--tone: ${tone.color}` : undefined}
