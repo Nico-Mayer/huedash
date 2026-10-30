@@ -47,16 +47,16 @@ Alternative: a disc (angle = hue, radius = saturation) like the screenshot. A re
 
 ### `LevelSlider` gets `orientation` and a `tone`
 
-`orientation: 'horizontal' | 'vertical'` passes through to the bits-ui `Slider`, which already supports vertical sliders and keeps the thumb inside the track. The fill uses `height` and `bottom: 0` instead of `width`, with the same `calc` that ends the fill at the thumb's edge. `size` gains `xl` for the dialog (at least 80 px wide, 240 px high, rounded like the screenshot). Vertical sliders do not render `ThumbLabel`.
+`orientation: 'horizontal' | 'vertical'` passes through to the bits-ui `Slider`, which already supports vertical sliders and keeps the thumb inside the track. The fill uses `height` and `bottom: 0` instead of `width`, with the same `calc` that ends the fill at the thumb's edge. A vertical slider has one size, 96 px wide and `clamp(15rem, 40svh, 18rem)` high, so it never drops below 240 px and still fits short phones; a separate `xl` size was not needed. Vertical sliders do not render `ThumbLabel`.
 
 `tone` decides the colors:
 
 - `{ kind: 'light'; color: string | null }` for brightness: fill `var(--tone)`, track `color-mix(in oklab, var(--tone) 20%, transparent)`. A `null` color (off, or a light without swatch) uses `bg-muted-foreground/40` on `bg-muted`.
 - `{ kind: 'white'; stops: string[] }` for white: the track is a linear gradient of the stops, warm at the start; there is no separate fill, the thumb marks the value.
 
-The thumb is a bar with a white center line and a dark shadow (`shadow` plus a 1 px dark ring at low alpha), so it stays visible on a near-white fill and on a dark or saturated fill, in both themes.
+The thumb is a white bar with a 1.5 px dark ring and a soft shadow, so it stays visible on a near-white fill and on a dark or saturated fill, in both themes. The track also gets a faint inset outline drawn above the fill, so a near-white light still shows its edges on a white page.
 
-Callers pass the color: `LightCard` and `Controls` for a light use `lightSwatch(light)` when on; `RoomHeader` and `Controls` for a group use `var(--light)`.
+Callers pass the color through `ControlTarget.swatch`: a light uses `lightSwatch(light)`, a group `var(--light)`. A light that is on but has no swatch (a dim-only bulb) also uses `var(--light)`, so it does not look off. `RoomHeader` and `LightCard` pass `null` while off.
 
 ### Generic light color as a theme token
 
@@ -86,15 +86,15 @@ State: `mode = $state<'brightness' | 'color' | 'white'>`, starting at `brightnes
 +---------------------------+
 ```
 
-The mode bar is a bits-ui `ToggleGroup` (single) for the modes, so arrow keys and `aria-pressed` come from the primitive, next to a power `Toggle` with `aria-pressed` for on/off. Each is a round icon button with an `aria-label` (`Brightness`, `Color`, `White`, `Power`). The color and white buttons show small gradients as icons, as in the screenshots. If shadcn-svelte's `toggle-group` fits the look, add it with the CLI instead of using the primitive directly.
+The mode bar is a bits-ui `ToggleGroup` (single) for the modes, next to a power `Toggle` with `aria-pressed` for on/off. In single mode the primitive renders the items as radios with `aria-checked` and arrow-key focus. A function binding ignores the empty value bits-ui sends when the selected item is clicked again, so one mode always stays selected. Each is a round icon button with an `aria-label` (`Brightness`, `Color`, `White`, `Power`). The color and white buttons show small gradients as icons, as in the screenshots. The primitives are used directly; shadcn-svelte's `toggle-group` would add two files for styling we override anyway.
 
-`ColorTemperatureControl` and `ColorControl` lose their labels and value rows, because the value moves to the top. `BrightnessPresets`, `WhitePresets`, and the `tabs` use go away. The `untrack` start tab goes away, too.
+`Controls` owns the brightness and kelvin `SmoothValue`s, because the value at the top needs both. The white slider therefore lives in `Controls`, and `ColorTemperatureControl` is deleted instead of trimmed. `ColorControl` is reduced to the pad. `BrightnessPresets`, `WhitePresets`, and the `tabs` use go away. The start mode is read once with `untrack`, like the start tab before.
 
 While the user drags the pad, nothing else in the dialog shows the color, so the light's swatch updating on the bridge's confirmation is enough. The pad marker itself follows the pointer.
 
 ### Dialog content size
 
-The `Dialog` keeps its default width. The value, the control, and the bar are centered. In the bottom `Sheet` the same layout is used; the vertical slider height uses `min(240px, 40svh)` so it fits on short phones.
+The `Dialog` keeps its default width. The value, the control, and the bar are centered. In the bottom `Sheet` the same layout is used; the slider and the pad share the `clamp(15rem, 40svh, 18rem)` height. The pad's marker moves inside a 14 px inset, the marker's radius, so it never sits half outside the pad; pointer positions map through the same inset.
 
 ## Risks / Trade-offs
 
