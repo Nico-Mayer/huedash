@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Switch } from '#lib/components/ui/switch/index.js';
 	import { changeLight, lightBrightness, lightOn, lightSwatch } from '#lib/group-state.svelte.ts';
+	import { lightTarget } from '#lib/control-target.svelte.ts';
 	import type { HomeLight } from '#lib/server/hue/home.ts';
 	import { SmoothValue } from '#lib/smooth-value.svelte.ts';
 	import LevelSlider from './LevelSlider.svelte';
@@ -10,6 +11,7 @@
 
 	const on = $derived(lightOn(light));
 	const brightness = new SmoothValue(() => lightBrightness(light));
+	const target = $derived(lightTarget(light));
 </script>
 
 <!-- The open button stretches over the whole card; the switch and slider sit above it. -->
@@ -61,6 +63,7 @@
 			value={brightness.current}
 			min={1}
 			max={100}
+			tone={{ kind: 'light', color: light.reachable && on ? target.swatch : null }}
 			format={(value) => `${value} %`}
 			onValueChange={(value) => brightness.input(value)}
 			onValueCommit={(value) => {

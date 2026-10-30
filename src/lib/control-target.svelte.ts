@@ -7,10 +7,13 @@ import {
 	lightHueSaturation,
 	lightMirek,
 	lightOn,
+	lightSwatch,
 	type Change
 } from './group-state.svelte.ts';
 import type { HueSaturation } from './live-updates.ts';
 import type { HomeGroup, HomeLight, MirekRange } from './server/hue/home.ts';
+
+export const GENERIC_LIGHT = 'var(--light)';
 
 export type ControlTarget = {
 	readonly name: string;
@@ -22,6 +25,7 @@ export type ControlTarget = {
 	readonly color: boolean;
 	readonly mirek: number | null;
 	readonly hueSaturation: HueSaturation | null;
+	readonly swatch: string;
 	apply(change: Change): void;
 };
 
@@ -45,6 +49,7 @@ export function groupTarget(group: HomeGroup): ControlTarget {
 		// The bridge does not report a group's white or color.
 		mirek: null,
 		hueSaturation: null,
+		swatch: GENERIC_LIGHT,
 		apply: (change) => changeGroup(group, change)
 	};
 }
@@ -67,6 +72,9 @@ export function lightTarget(light: HomeLight): ControlTarget {
 		},
 		get hueSaturation() {
 			return lightHueSaturation(light);
+		},
+		get swatch() {
+			return lightSwatch(light) ?? GENERIC_LIGHT;
 		},
 		apply: (change) => changeLight(light, change)
 	};

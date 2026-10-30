@@ -24,6 +24,7 @@
 		min={warmest}
 		max={coolest}
 		step={50}
+		tone={{ kind: 'white', stops: control.whiteStops ?? [] }}
 		format={(value) => `${value} K`}
 		onValueChange={(value) => kelvin.input(value)}
 		onValueCommit={(value) => {

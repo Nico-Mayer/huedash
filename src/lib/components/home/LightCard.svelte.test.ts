@@ -114,4 +114,25 @@ describe('LightCard details', () => {
 
 		await expect.poll(() => document.querySelectorAll('[data-lit="false"]').length).toBe(2);
 	});
+
+	it('fills the brightness slider with the light color while on', async () => {
+		const { container } = await render(LightCard, {
+			light: { ...light('ceiling', 'Ceiling'), swatch: '#ff0000' },
+			onOpen
+		});
+		const fill = () => getComputedStyle(container.querySelector('[data-slider-fill]')!);
+
+		expect(fill().backgroundColor).toBe('rgb(255, 0, 0)');
+	});
+
+	it('mutes the brightness slider of a light that is off', async () => {
+		const { container } = await render(LightCard, {
+			light: { ...light('ceiling', 'Ceiling'), on: false, swatch: '#ff0000' },
+			onOpen
+		});
+
+		expect(
+			getComputedStyle(container.querySelector('[data-slider-fill]')!).backgroundColor
+		).not.toBe('rgb(255, 0, 0)');
+	});
 });

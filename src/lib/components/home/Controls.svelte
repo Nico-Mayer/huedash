@@ -40,6 +40,7 @@
 				value={brightness.current}
 				min={1}
 				max={100}
+				tone={{ kind: 'light', color: control.on ? control.swatch : null }}
 				format={(value) => `${value} %`}
 				onValueChange={(value) => brightness.input(value)}
 				onValueCommit={(value) => {

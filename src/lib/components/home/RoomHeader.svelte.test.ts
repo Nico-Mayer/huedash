@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { live } from '#lib/live.svelte.ts';
 import type { HomeGroup, HomeLight } from '#lib/server/hue/home.ts';
+import '../../../routes/layout.css';
 import RoomHeader from './RoomHeader.svelte';
 
 vi.mock('$app/navigation', () => ({ refreshAll: vi.fn() }));
@@ -128,5 +129,25 @@ describe('RoomHeader', () => {
 		await expect
 			.element(page.getByRole('button', { name: /Color and white/ }))
 			.not.toBeInTheDocument();
+	});
+
+	it('fills the brightness slider with the generic light color, muted when off', async () => {
+		const light = getComputedStyle(document.documentElement).getPropertyValue('--light');
+		const probe = document.createElement('span');
+		probe.style.backgroundColor = light;
+		document.body.append(probe);
+		const amber = getComputedStyle(probe).backgroundColor;
+		probe.remove();
+
+		const on = await render(RoomHeader, { group: kitchen, onOpenColor: () => {} });
+		const off = await render(RoomHeader, {
+			group: { ...kitchen, id: 'room-off', groupedLightId: 'grouped-off', on: false },
+			onOpenColor: () => {}
+		});
+		const fill = (container: HTMLElement) =>
+			getComputedStyle(container.querySelector('[data-slider-fill]')!).backgroundColor;
+
+		expect(fill(on.container)).toBe(amber);
+		expect(fill(off.container)).not.toBe(amber);
 	});
 });

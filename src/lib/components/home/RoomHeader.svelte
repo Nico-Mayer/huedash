@@ -4,9 +4,11 @@
 		activeScene,
 		changeGroup,
 		groupBrightness,
+		groupOn,
 		lightsSummary,
 		onSwatches
 	} from '#lib/group-state.svelte.ts';
+	import { GENERIC_LIGHT } from '#lib/control-target.svelte.ts';
 	import type { HomeGroup } from '#lib/server/hue/home.ts';
 	import { SmoothValue } from '#lib/smooth-value.svelte.ts';
 	import GroupSwitch from './GroupSwitch.svelte';
@@ -57,6 +59,7 @@
 				value={brightness.current}
 				min={1}
 				max={100}
+				tone={{ kind: 'light', color: groupOn(group) ? GENERIC_LIGHT : null }}
 				format={(value) => `${value} %`}
 				onValueChange={(value) => brightness.input(value)}
 				onValueCommit={(value) => {
