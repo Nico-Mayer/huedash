@@ -2,11 +2,11 @@
 
 ## 1. Setup
 
-- [ ] 1.1 Create the branch `light-dialog-redesign` on top of `main` with `git-spice branch create light-dialog-redesign`; verify `git-spice log short` shows it
+- [x] 1.1 Create the branch `light-dialog-redesign` on top of `main` with `git-spice branch create light-dialog-redesign`; verify `git-spice log short` shows it
 
 ## 2. Home model and theme
 
-- [ ] 2.1 Add `whiteStops` (five hex colors over the mirek range, from `mirekToHex`) to lights and groups in `src/lib/server/hue/home.ts`, `null` without white support, and expose it on `ControlTarget` (design: White gradient from the server); verify `home.test.ts` checks Ceiling's stops run from warm (more red than blue) to cool (more blue than red), and the plug has `null`
+- [x] 2.1 Add `whiteStops` (five hex colors over the mirek range, from `mirekToHex`) to lights and groups in `src/lib/server/hue/home.ts`, `null` without white support, and expose it on `ControlTarget` (design: White gradient from the server); verify `home.test.ts` checks Ceiling's stops run from warm (more red than blue) to cool (more blue than red), and the plug has `null`
 - [ ] 2.2 Add the `--light` token to `:root` and `.dark` in `src/routes/layout.css` and map it in `@theme inline` (design: Generic light color); verify `pnpm check` passes and `bg-light` renders amber in both themes
 
 ## 3. LevelSlider

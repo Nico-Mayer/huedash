@@ -92,7 +92,7 @@ A white slider SHALL show a gradient from its warmest to its coolest supported w
 
 #### Scenario: Ceiling range
 - **WHEN** the dialog for "Ceiling" shows white
-- **THEN** the white slider runs from a warm orange at 2000 K to a cool bluish white at 6536 K
+- **THEN** the white slider runs from a warm orange at 2000 K to a cool white at 6536 K
 
 ### Requirement: Visible thumb
 The thumb of a brightness or white slider SHALL keep a contrast of at least 3:1 against the fill or gradient behind it, in light and dark mode, for any light color.

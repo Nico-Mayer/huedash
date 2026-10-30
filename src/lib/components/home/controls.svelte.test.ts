@@ -39,6 +39,7 @@ const light: HomeLight = {
 	brightness: 70,
 	reachable: true,
 	mirekRange: { minMirek: 153, maxMirek: 500 },
+	whiteStops: ['#ff8b14', '#ffd6aa', '#dce6ff'],
 	color: true,
 	mirek: 366,
 	hueSaturation: null,
@@ -55,6 +56,7 @@ const kitchen: HomeGroup = {
 	brightness: 60,
 	lights: [light],
 	colorTemperature: { minMirek: 153, maxMirek: 500 },
+	whiteStops: ['#ff8b14', '#ffd6aa', '#dce6ff'],
 	color: true,
 	scenes: []
 };

@@ -18,6 +18,7 @@ export type ControlTarget = {
 	readonly brightness: number;
 	readonly dimmable: boolean;
 	readonly mirekRange: MirekRange | null;
+	readonly whiteStops: string[] | null;
 	readonly color: boolean;
 	readonly mirek: number | null;
 	readonly hueSaturation: HueSaturation | null;
@@ -39,6 +40,7 @@ export function groupTarget(group: HomeGroup): ControlTarget {
 		},
 		dimmable: true,
 		mirekRange: group.colorTemperature,
+		whiteStops: group.whiteStops,
 		color: group.color,
 		// The bridge does not report a group's white or color.
 		mirek: null,
@@ -58,6 +60,7 @@ export function lightTarget(light: HomeLight): ControlTarget {
 		},
 		dimmable: light.brightness !== null,
 		mirekRange: light.mirekRange,
+		whiteStops: light.whiteStops,
 		color: light.color,
 		get mirek() {
 			return lightMirek(light);

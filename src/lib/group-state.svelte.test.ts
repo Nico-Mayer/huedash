@@ -18,6 +18,7 @@ const light = (id: string, on: boolean, reachable = true): HomeLight => ({
 	brightness: 50,
 	reachable,
 	mirekRange: null,
+	whiteStops: null,
 	color: false,
 	mirek: null,
 	hueSaturation: null,
@@ -43,6 +44,7 @@ const group = (lights: HomeLight[], scenes: HomeScene[] = []): HomeGroup => ({
 	brightness: 50,
 	lights,
 	colorTemperature: null,
+	whiteStops: null,
 	color: false,
 	scenes
 });

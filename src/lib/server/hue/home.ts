@@ -3,7 +3,7 @@ import type { HueSaturation } from '../../live-updates.ts';
 import { createHueClient } from './client.ts';
 import { xyToHueSaturation } from './color.ts';
 import type { Connection } from './connection.ts';
-import { sceneColors, swatchOf } from './scene-colors.ts';
+import { sceneColors, swatchOf, whiteStops } from './scene-colors.ts';
 import type { paths } from './schema.d.ts';
 
 type ResourceData<P extends keyof paths> = paths[P] extends {
@@ -30,6 +30,7 @@ export type HomeLight = {
 	reachable: boolean;
 	product: string | null;
 	mirekRange: MirekRange | null;
+	whiteStops: string[] | null;
 	color: boolean;
 	// Only one of these is set: the bridge reports either a white or a color for the light.
 	mirek: number | null;
@@ -55,6 +56,7 @@ export type HomeGroup = {
 	brightness: number;
 	lights: HomeLight[];
 	colorTemperature: MirekRange | null;
+	whiteStops: string[] | null;
 	color: boolean;
 	scenes: HomeScene[];
 };
@@ -119,6 +121,7 @@ export function buildHome(resources: HomeResources): Home {
 					reachable: reachable(light),
 					product: devices.get(light.owner.rid)?.product_data.product_name ?? null,
 					mirekRange,
+					whiteStops: mirekRange && whiteStops(mirekRange.minMirek, mirekRange.maxMirek),
 					color: light.color !== undefined,
 					mirek,
 					hueSaturation: mirek === null && xy ? xyToHueSaturation(xy) : null,
@@ -146,6 +149,12 @@ export function buildHome(resources: HomeResources): Home {
 			.filter((light) => light !== undefined)
 			.sort(byName);
 		const ranges = members.flatMap((light) => light.mirekRange ?? []);
+		const colorTemperature = ranges.length
+			? {
+					minMirek: Math.min(...ranges.map((r) => r.minMirek)),
+					maxMirek: Math.max(...ranges.map((r) => r.maxMirek))
+				}
+			: null;
 		const state = groupedLights.get(groupedLightId);
 
 		return {
@@ -156,12 +165,9 @@ export function buildHome(resources: HomeResources): Home {
 			on: state?.on?.on ?? false,
 			brightness: Math.round(state?.dimming?.brightness ?? 0),
 			lights: members,
-			colorTemperature: ranges.length
-				? {
-						minMirek: Math.min(...ranges.map((r) => r.minMirek)),
-						maxMirek: Math.max(...ranges.map((r) => r.maxMirek))
-					}
-				: null,
+			colorTemperature,
+			whiteStops:
+				colorTemperature && whiteStops(colorTemperature.minMirek, colorTemperature.maxMirek),
 			color: members.some((light) => light.color),
 			scenes: (scenesByGroup.get(group.id) ?? []).map((entry) => entry.scene).sort(byName)
 		};

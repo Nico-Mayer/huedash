@@ -29,6 +29,7 @@ const light = (id: string, name: string, extra: Partial<HomeLight> = {}): HomeLi
 	brightness: 60,
 	reachable: true,
 	mirekRange: { minMirek: 153, maxMirek: 500 },
+	whiteStops: ['#ff8b14', '#ffd6aa', '#dce6ff'],
 	color: true,
 	mirek: 366,
 	hueSaturation: null,
@@ -50,6 +51,7 @@ const kitchen: HomeGroup = {
 		light('plug', 'Plug', { reachable: false })
 	],
 	colorTemperature: { minMirek: 153, maxMirek: 500 },
+	whiteStops: ['#ff8b14', '#ffd6aa', '#dce6ff'],
 	color: true,
 	scenes: [
 		{

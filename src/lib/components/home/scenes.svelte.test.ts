@@ -33,6 +33,7 @@ const kitchen: HomeGroup = {
 	brightness: 60,
 	lights: [],
 	colorTemperature: null,
+	whiteStops: null,
 	color: false,
 	scenes: [
 		{

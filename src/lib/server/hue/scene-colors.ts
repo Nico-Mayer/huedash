@@ -19,6 +19,14 @@ export function xyToHex({ x, y }: Xy): string {
 
 export const mirekToHex = (mirek: number) => chroma.temperature(mirekToKelvin(mirek)).hex();
 
+const WHITE_STOPS = 5;
+
+export function whiteStops(minMirek: number, maxMirek: number): string[] {
+	return Array.from({ length: WHITE_STOPS }, (_, i) =>
+		mirekToHex(maxMirek - ((maxMirek - minMirek) * i) / (WHITE_STOPS - 1))
+	);
+}
+
 // A light shows either a white (valid mirek) or a color (xy); lights with neither have no swatch.
 export function swatchOf(mirek: number | null, xy: Xy | undefined): string | null {
 	if (mirek !== null) return mirekToHex(mirek);

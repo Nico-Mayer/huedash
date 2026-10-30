@@ -26,6 +26,7 @@ const ceiling: HomeLight = {
 	brightness: 70,
 	reachable: true,
 	mirekRange: { minMirek: 153, maxMirek: 500 },
+	whiteStops: ['#ff8b14', '#ffd6aa', '#dce6ff'],
 	color: true,
 	mirek: 366,
 	hueSaturation: null,
@@ -38,6 +39,7 @@ const counter: HomeLight = {
 	id: 'counter',
 	name: 'Counter',
 	mirekRange: { minMirek: 153, maxMirek: 454 },
+	whiteStops: ['#ff8b14', '#ffd6aa', '#dce6ff'],
 	color: false
 };
 
@@ -47,6 +49,7 @@ const kitchen = {
 	on: false,
 	brightness: 60,
 	colorTemperature: { minMirek: 153, maxMirek: 500 },
+	whiteStops: ['#ff8b14', '#ffd6aa', '#dce6ff'],
 	color: true,
 	scenes: []
 } as unknown as HomeGroup;

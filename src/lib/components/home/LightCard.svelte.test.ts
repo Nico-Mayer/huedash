@@ -25,6 +25,7 @@ const light = (id: string, name: string, reachable = true): HomeLight => ({
 	brightness: 50,
 	reachable,
 	mirekRange: null,
+	whiteStops: null,
 	color: false,
 	mirek: null,
 	hueSaturation: null,

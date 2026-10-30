@@ -85,6 +85,21 @@ describe('loadHome', () => {
 		expect(plug).toMatchObject({ product: 'Hue Smart Plug', swatch: null });
 	});
 
+	it('gives white stops from warm to cool over each white range', async () => {
+		const [kitchen, living] = (await home()).rooms;
+		const channels = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+		const stops = kitchen.lights[0].whiteStops!;
+		const [warmR, , warmB] = channels(stops[0]);
+		const [coolR, , coolB] = channels(stops.at(-1)!);
+
+		expect(stops).toHaveLength(5);
+		expect(warmR).toBeGreaterThan(warmB);
+		expect(coolB).toBeGreaterThanOrEqual(coolR);
+		expect(coolB).toBeGreaterThan(warmB);
+		expect(kitchen.whiteStops).toEqual(stops);
+		expect(living.lights.find((l) => l.name === 'Plug')?.whiteStops).toBeNull();
+	});
+
 	it('gives a scene no brightness when it sets none', async () => {
 		const reading = mockHome.scenes.find((scene) => scene.id === 'scene-reading')!;
 		for (const { action } of reading.actions) delete action.dimming;
