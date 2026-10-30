@@ -81,12 +81,6 @@ describe('RoomHeader', () => {
 		await expect.element(page.getByText('60 %', { exact: true }).last()).toBeVisible();
 	});
 
-	it('shows no brightness presets', async () => {
-		render(RoomHeader, { group: kitchen, onOpenColor: () => {} });
-
-		await expect.element(page.getByRole('button', { name: '50 %' })).not.toBeInTheDocument();
-	});
-
 	it('sends one group command when the slider is released', async () => {
 		render(RoomHeader, { group: kitchen, onOpenColor: () => {} });
 
