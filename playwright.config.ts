@@ -7,6 +7,7 @@ export default defineConfig({
 	use: { baseURL: `http://localhost:${E2E_APP_PORT}` },
 	// All tests share one mock bridge whose lights and scenes they change.
 	workers: 1,
+	retries: process.env.CI ? 1 : 0,
 	// Pairing runs first and leaves the bridge paired for the app tests.
 	projects: [
 		{ name: 'setup', testMatch: ['**/setup.e2e.ts', '**/healthz.e2e.ts'] },

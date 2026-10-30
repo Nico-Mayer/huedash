@@ -53,6 +53,7 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            .vitest/attachments/
           retention-days: 7
 
   docker:
