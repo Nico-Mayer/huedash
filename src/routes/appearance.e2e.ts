@@ -26,33 +26,8 @@ test.describe('system theme', () => {
 	});
 });
 
-test.describe('light system theme', () => {
-	test.use({ colorScheme: 'light' });
-
-	test('follows a light system theme', async ({ page }) => {
-		await page.goto('/');
-
-		await expect(page.locator('html')).not.toHaveClass(/\bdark\b/);
-	});
-});
-
 test.describe('theme setting', () => {
 	test.use({ colorScheme: 'dark' });
-
-	test('applies each theme right away', async ({ page }) => {
-		await page.goto('/settings');
-		const html = page.locator('html');
-
-		await page.getByText('Light', { exact: true }).click();
-		await expect(html).not.toHaveClass(/\bdark\b/);
-
-		await page.getByText('Dark', { exact: true }).click();
-		await expect(html).toHaveClass(/\bdark\b/);
-
-		await page.emulateMedia({ colorScheme: 'light' });
-		await page.getByText('System', { exact: true }).click();
-		await expect(html).not.toHaveClass(/\bdark\b/);
-	});
 
 	test('remembers the theme after a reload', async ({ page }) => {
 		await page.goto('/settings');

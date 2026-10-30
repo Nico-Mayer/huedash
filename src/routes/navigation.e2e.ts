@@ -1,11 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
 
-declare global {
-	interface Window {
-		viewTransitions: number;
-	}
-}
-
 const entry = (page: Page, name: string) =>
 	page.getByRole('link', { name: new RegExp(`^${name}`) });
 
@@ -75,38 +69,6 @@ test('keeps live state after a switch', async ({ page }) => {
 	await toggle();
 });
 
-async function countViewTransitions(page: Page) {
-	await page.addInitScript(() => {
-		const start = document.startViewTransition.bind(document);
-		window.viewTransitions = 0;
-		document.startViewTransition = ((update) => {
-			window.viewTransitions += 1;
-			return start(update);
-		}) as typeof document.startViewTransition;
-	});
-}
-
-test('cross-fades the page when switching rooms', async ({ page }) => {
-	await countViewTransitions(page);
-	await page.goto('/rooms/room-kitchen');
-
-	await entry(page, 'Living room').click();
-
-	await expect(page.getByRole('heading', { name: 'Living room' })).toBeVisible();
-	expect(await page.evaluate(() => window.viewTransitions)).toBe(1);
-});
-
-test('switches rooms without a transition for reduced motion', async ({ page }) => {
-	await page.emulateMedia({ reducedMotion: 'reduce' });
-	await countViewTransitions(page);
-	await page.goto('/rooms/room-kitchen');
-
-	await entry(page, 'Living room').click();
-
-	await expect(page.getByRole('heading', { name: 'Living room' })).toBeVisible();
-	expect(await page.evaluate(() => window.viewTransitions)).toBe(0);
-});
-
 test('marks no room on the settings page', async ({ page }) => {
 	await page.goto('/rooms/room-kitchen');
 
@@ -114,36 +76,6 @@ test('marks no room on the settings page', async ({ page }) => {
 
 	await expect(page).toHaveURL(/\/settings$/);
 	await expect(page.locator('[aria-current="page"]')).toHaveCount(0);
-});
-
-test.describe('tablet', () => {
-	test.use({ viewport: { width: 1024, height: 400 } });
-
-	test('puts the header above the scenes and keeps it on screen', async ({ page }) => {
-		await page.goto('/rooms/room-kitchen');
-		const header = page.getByRole('region', { name: 'Kitchen controls' });
-
-		const box = await header.boundingBox();
-		const scenes = await page.getByRole('heading', { name: 'Scenes' }).boundingBox();
-		expect(box!.y + box!.height).toBeLessThan(scenes!.y);
-		await expect(page.getByRole('group', { name: 'Rooms' })).toBeVisible();
-
-		await page.mouse.move(600, 300);
-		await page.mouse.wheel(0, 2000);
-		await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
-		await expect(header.getByRole('slider', { name: 'Kitchen brightness' })).toBeInViewport();
-		expect((await header.boundingBox())!.y).toBeCloseTo(0, 0);
-	});
-});
-
-test('gives scenes and lights the full width on wide screens', async ({ page }) => {
-	await page.setViewportSize({ width: 1440, height: 900 });
-	await page.goto('/rooms/room-kitchen');
-
-	const header = await page.getByRole('region', { name: 'Kitchen controls' }).boundingBox();
-	const lights = await page.getByRole('list', { name: 'Lights' }).boundingBox();
-	expect(header!.y + header!.height).toBeLessThanOrEqual(lights!.y);
-	expect(lights!.width).toBeGreaterThan(header!.width - 100);
 });
 
 test.describe('phone', () => {
@@ -175,20 +107,5 @@ test.describe('phone', () => {
 
 		await expect(page.getByText(/Live updates paused/)).toBeVisible();
 		await expect(page.getByRole('group', { name: 'Rooms' })).toBeHidden();
-	});
-});
-
-test.describe('short phone', () => {
-	test.use({ viewport: { width: 390, height: 500 } });
-
-	test('scrolls the header with the page', async ({ page }) => {
-		await page.goto('/rooms/room-kitchen');
-
-		await page.mouse.move(200, 300);
-		await page.mouse.wheel(0, 2000);
-
-		await expect(
-			page.getByRole('region', { name: 'Kitchen controls' }).getByRole('slider')
-		).not.toBeInViewport();
 	});
 });

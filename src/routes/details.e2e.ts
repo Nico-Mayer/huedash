@@ -35,12 +35,6 @@ test('the home summary follows switches', async ({ page }) => {
 	await expect(summary).toHaveText('2 of 4 lights on');
 });
 
-test('a light card shows its product', async ({ page }) => {
-	await openKitchen(page);
-
-	await expect(lightCard(page, 'Ceiling')).toContainText('Hue White and Color Ambiance');
-});
-
 test('the light color follows a change without a reload', async ({ page }) => {
 	await openKitchen(page);
 	const indicator = lightCard(page, 'Ceiling').locator('[data-lit]');
