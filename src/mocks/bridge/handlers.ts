@@ -4,11 +4,15 @@ import type { paths } from '../../lib/server/hue/schema.d.ts';
 import { bridge, MOCK_APP_KEY, MOCK_CLIENT_KEY, publicConfig } from './fixtures.ts';
 import {
 	groupedLights,
+	holdEvents,
 	home,
 	onBridgeEvents,
+	publishEvents,
 	recallScene,
+	updateEvent,
 	updateGroupedLight,
-	updateLight
+	updateLight,
+	type BridgeEvent
 } from './home.ts';
 
 // TEST-NET-1 address, never routable, so a missed mock cannot reach a real device.
@@ -27,8 +31,11 @@ export function pressLinkButtonAfter(attempts: number) {
 	linkButton.pressAfterAttempts = attempts;
 }
 
+let resourceReads = 0;
+
 export function resetBridge() {
 	Object.assign(linkButton, { pressed: false, pressAfterAttempts: Infinity, attempts: 0 });
+	resourceReads = 0;
 }
 
 export const handlers: HttpHandler[] = [
@@ -63,8 +70,26 @@ function unauthorized(request: Request) {
 
 const collection = (path: string, read: () => unknown[]) =>
 	http.get(`*/clip/v2/resource/${path}`, ({ request }) => {
+		resourceReads++;
 		return unauthorized(request) ?? HttpResponse.json({ errors: [], data: read() });
 	});
+
+// Test controls for e2e, where the mock runs in the server process. A real bridge has none.
+const controls = [
+	http.post('*/mock/events', async ({ request }) => {
+		const { type = 'update', data } = (await request.json()) as {
+			type?: BridgeEvent['type'];
+			data: BridgeEvent['data'];
+		};
+		publishEvents([{ ...updateEvent(data), type }]);
+		return new HttpResponse(null, { status: 204 });
+	}),
+	http.post('*/mock/hold-events', async ({ request }) => {
+		holdEvents(((await request.json()) as { hold: boolean }).hold);
+		return new HttpResponse(null, { status: 204 });
+	}),
+	http.get('*/mock/resource-reads', () => HttpResponse.json({ count: resourceReads }))
+];
 
 const command = (rtype: 'light' | 'grouped_light', apply: (id: string, body: never) => boolean) =>
 	http.put(`*/clip/v2/resource/${rtype}/:id`, async ({ request, params }) => {
@@ -102,6 +127,7 @@ const eventStream = http.get('*/eventstream/clip/v2', ({ request }) => {
 });
 
 handlers.push(
+	...controls,
 	eventStream,
 	collection('room', () => home.rooms),
 	collection('zone', () => home.zones),

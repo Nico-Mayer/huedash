@@ -208,8 +208,16 @@ export const home = {
 	commands: [] as CommandLogEntry[]
 };
 
+let held = false;
+
 export function resetHome() {
 	Object.assign(home, initialHome(), { commands: [] });
+	held = false;
+}
+
+// Keeps bridge events back, so tests can tell huedash's own updates from the bridge's.
+export function holdEvents(hold: boolean) {
+	held = hold;
 }
 
 export function lightsOfGroup(group: MockGroup): MockLight[] {
@@ -283,6 +291,7 @@ export function onBridgeEvents(listener: (events: BridgeEvent[]) => void) {
 }
 
 export function publishEvents(events: BridgeEvent[]) {
+	if (held) return;
 	for (const listener of listeners) listener(events);
 }
 
