@@ -15,7 +15,7 @@ The specs in `openspec/specs/` are the source of truth for features and behavior
 
 ## Commands
 
-Tools (Node, pnpm) are pinned in `mise.toml`. Run `mise install` once.
+Tools (Node, pnpm, git-cliff, gh) are pinned in `mise.toml`. Run `mise install` once.
 
 | Command                                    | Does                                                                                    |
 | ------------------------------------------ | --------------------------------------------------------------------------------------- |
@@ -34,6 +34,7 @@ Tools (Node, pnpm) are pinned in `mise.toml`. Run `mise install` once.
 | `pnpm dev:lan`                             | Dev server reachable from other devices on the LAN                                      |
 | `pnpm docker:up`                           | Build the image from local source and run it (`compose.dev.yaml`, port 3000, `./data`)  |
 | `pnpm docker:down` / `pnpm docker:logs`    | Stop the local container / follow its logs                                              |
+| `mise run release [version] [--dry-run]`   | Release from `main`: next version, `CHANGELOG.md`, tag, push                            |
 
 Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder: `#lib/components/ui/card/index.js`.
 
@@ -50,6 +51,7 @@ Imports use SvelteKit 3 subpath aliases (`#lib`). Name the file, not the folder:
 
 - `.github/workflows/ci.yml` runs lint, check, unit, and e2e tests on every PR and push to `main`. Tool versions come from `mise.toml`.
 - `.github/workflows/image.yml` builds the Docker image. PRs build `amd64` only, without pushing. `main` pushes `edge` and `sha-*`; `v*` tags push semver tags and `latest`, both for `amd64` and `arm64`.
+- Release with `mise run release`. It needs a clean `main` in sync with `origin`, a passed CI run for `HEAD`, and `gh auth login` once. Versions and `CHANGELOG.md` come from conventional commits (`cliff.toml`); only `feat`, `fix`, `perf`, and `refactor` appear in the changelog.
 - CI builds and publishes the image. For local testing, `pnpm docker:up` builds the same Dockerfile from your working tree. Check CI results with `gh pr checks` or `gh run list`.
 - The runtime image contains only `build/`, `server.js`, and `package.json`. Anything the server needs at runtime must be bundled by the build.
 
