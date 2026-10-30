@@ -100,15 +100,6 @@ describe('buildHome', () => {
 		expect(lights(living).find((l) => l.name === 'Plug')?.whiteStops).toBeNull();
 	});
 
-	it('gives a scene no brightness when it sets none', async () => {
-		const reading = mockHome.scenes.find((scene) => scene.id === 'scene-reading')!;
-		for (const { action } of reading.actions) delete action.dimming;
-
-		const living = (await home()).rooms[1];
-
-		expect(living.scenes[0].brightness).toBeNull();
-	});
-
 	it('marks a light with a connectivity issue as unreachable', async () => {
 		const living = (await home()).rooms[1];
 
@@ -127,7 +118,6 @@ describe('buildHome', () => {
 			['Tropical', true, 'inactive']
 		]);
 		expect(kitchen.scenes[2].colors).toHaveLength(2);
-		expect(kitchen.scenes.map((s) => s.brightness)).toEqual([100, 56, 80]);
 		expect(living.scenes.map((s) => s.name)).toEqual(['Reading']);
 		expect((await home()).zones[0].scenes).toEqual([]);
 	});

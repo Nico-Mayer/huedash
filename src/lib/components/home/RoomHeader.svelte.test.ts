@@ -61,7 +61,6 @@ const kitchen: HomeGroup = {
 			id: 'scene-relax',
 			name: 'Relax',
 			colors: [],
-			brightness: 56,
 			dynamic: false,
 			active: 'static'
 		}

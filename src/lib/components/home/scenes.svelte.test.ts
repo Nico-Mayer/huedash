@@ -2,7 +2,8 @@ import { page } from 'vitest/browser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { live } from '#lib/home.svelte.ts';
-import type { HomeGroup } from '#lib/server/hue/home.ts';
+import type { HomeGroup, HomeScene } from '#lib/server/hue/home.ts';
+import '../../../routes/layout.css';
 import SceneList from './SceneList.svelte';
 
 vi.mock('$app/navigation', () => ({ refreshAll: vi.fn() }));
@@ -40,7 +41,6 @@ const kitchen: HomeGroup = {
 			id: 'scene-relax',
 			name: 'Relax',
 			colors: ['#ffaa55'],
-			brightness: 56,
 			dynamic: false,
 			active: 'inactive'
 		},
@@ -48,12 +48,18 @@ const kitchen: HomeGroup = {
 			id: 'scene-tropical',
 			name: 'Tropical',
 			colors: ['#ff0000', '#00ff00'],
-			brightness: null,
 			dynamic: true,
 			active: 'inactive'
 		}
 	]
 };
+
+function withActive(id: string, active: HomeScene['active']): HomeGroup {
+	return {
+		...kitchen,
+		scenes: kitchen.scenes.map((scene) => (scene.id === id ? { ...scene, active } : scene))
+	};
+}
 
 function sent() {
 	const [url, init] = fetchMock.mock.lastCall as [string, RequestInit];
@@ -61,7 +67,7 @@ function sent() {
 }
 
 describe('SceneList', () => {
-	it('recalls a scene and marks it active at once', async () => {
+	it('recalls a scene without a palette and marks it active at once', async () => {
 		render(SceneList, { group: kitchen });
 
 		await page.getByRole('button', { name: /Relax/ }).click();
@@ -70,20 +76,38 @@ describe('SceneList', () => {
 		expect(sent()).toEqual({ url: '/api/scenes/scene-relax', body: { mode: 'active' } });
 	});
 
-	it('offers play only for scenes with a palette', async () => {
+	it('plays a scene with a palette', async () => {
 		render(SceneList, { group: kitchen });
 
-		await expect.element(page.getByRole('button', { name: 'Play Tropical' })).toBeInTheDocument();
-		await expect.element(page.getByRole('button', { name: 'Play Relax' })).not.toBeInTheDocument();
+		await page.getByRole('button', { name: /Tropical/ }).click();
+
+		await expect.element(page.getByText('Playing')).toBeInTheDocument();
+		expect(sent()).toEqual({ url: '/api/scenes/scene-tropical', body: { mode: 'dynamic' } });
 	});
 
-	it('plays a scene dynamically', async () => {
-		render(SceneList, { group: kitchen });
+	it('switches a playing scene to static with its badge', async () => {
+		render(SceneList, { group: withActive('scene-tropical', 'dynamic_palette') });
 
-		await page.getByRole('button', { name: 'Play Tropical' }).click();
+		await page.getByRole('button', { name: 'Playing: switch Tropical to static' }).click();
+
+		await expect.element(page.getByText('Active')).toBeInTheDocument();
+		expect(sent().body).toEqual({ mode: 'static' });
+	});
+
+	it('plays a static scene again with its badge', async () => {
+		render(SceneList, { group: withActive('scene-tropical', 'static') });
+
+		await page.getByRole('button', { name: 'Active: switch Tropical to dynamic' }).click();
 
 		await expect.element(page.getByText('Playing')).toBeInTheDocument();
 		expect(sent().body).toEqual({ mode: 'dynamic' });
+	});
+
+	it('shows a badge that does not switch for a scene without a palette', async () => {
+		render(SceneList, { group: withActive('scene-relax', 'static') });
+
+		await expect.element(page.getByText('Active')).toBeInTheDocument();
+		await expect.element(page.getByRole('button', { name: /^Active/ })).not.toBeInTheDocument();
 	});
 
 	it('restores the state and tells the user when the bridge refuses', async () => {
@@ -99,14 +123,7 @@ describe('SceneList', () => {
 	it('shows a scene started elsewhere', async () => {
 		const { rerender } = await render(SceneList, { group: kitchen });
 
-		await rerender({
-			group: {
-				...kitchen,
-				scenes: kitchen.scenes.map((scene) =>
-					scene.id === 'scene-tropical' ? { ...scene, active: 'dynamic_palette' } : scene
-				)
-			}
-		});
+		await rerender({ group: withActive('scene-tropical', 'dynamic_palette') });
 
 		await expect.element(page.getByText('Playing')).toBeInTheDocument();
 	});
@@ -118,12 +135,34 @@ describe('SceneList', () => {
 	});
 });
 
-describe('SceneList brightness', () => {
-	it('shows the scene brightness when it has one', async () => {
+describe('SceneList cards', () => {
+	it('shows no brightness and no play button', async () => {
 		render(SceneList, { group: kitchen });
 
-		await expect.element(page.getByText('56 %')).toBeInTheDocument();
-		const tropical = page.getByRole('listitem').filter({ hasText: 'Tropical' }).element();
-		expect(tropical.textContent).not.toContain('%');
+		await expect.element(page.getByRole('list', { name: 'Scenes' })).toBeInTheDocument();
+		expect(page.getByRole('list', { name: 'Scenes' }).element().textContent).not.toContain('%');
+		await expect.element(page.getByRole('button', { name: /Play/ })).not.toBeInTheDocument();
+	});
+
+	it('puts the badge below the color strip', async () => {
+		render(SceneList, { group: withActive('scene-tropical', 'dynamic_palette') });
+
+		const card = page.getByRole('button', { name: /^Tropical/ }).element();
+		const strip = card.firstElementChild!.getBoundingClientRect();
+		const badge = page
+			.getByRole('button', { name: /^Playing/ })
+			.element()
+			.getBoundingClientRect();
+		expect(badge.top).toBeGreaterThanOrEqual(strip.bottom);
+		expect(badge.right).toBeLessThanOrEqual(card.getBoundingClientRect().right);
+	});
+
+	it('shows a pointer on the card and the badge toggle', async () => {
+		render(SceneList, { group: withActive('scene-tropical', 'dynamic_palette') });
+
+		const card = page.getByRole('button', { name: /Relax/ }).element();
+		const badge = page.getByRole('button', { name: /^Playing/ }).element();
+		expect(getComputedStyle(card).cursor).toBe('pointer');
+		expect(getComputedStyle(badge).cursor).toBe('pointer');
 	});
 });

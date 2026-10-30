@@ -30,7 +30,6 @@ const scene = (id: string, active: HomeScene['active'] = 'inactive'): HomeScene 
 	id,
 	name: id,
 	colors: [],
-	brightness: null,
 	dynamic: false,
 	active
 });

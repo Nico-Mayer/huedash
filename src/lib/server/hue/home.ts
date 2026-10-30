@@ -26,7 +26,6 @@ export type HomeScene = {
 	id: string;
 	name: string;
 	colors: string[];
-	brightness: number | null;
 	dynamic: boolean;
 	active: 'inactive' | 'static' | 'dynamic_palette';
 };
@@ -51,7 +50,6 @@ export type HomeResult = { status: 'ok'; revision: number; home: Home } | { stat
 
 type Group = Resource<'room'>;
 type Light = Resource<'light'>;
-type Scene = Resource<'scene'>;
 
 const byName = <T extends { name: string }>(a: T, b: T) => a.name.localeCompare(b.name);
 
@@ -66,7 +64,6 @@ export function buildHome(resources: Resources): Home {
 				id: scene.id,
 				name: scene.metadata.name ?? 'Scene',
 				colors: sceneColors(scene.actions),
-				brightness: averageBrightness(scene.actions),
 				dynamic: (scene.palette?.color?.length ?? 0) > 0,
 				active: scene.status?.active ?? 'inactive'
 			} satisfies HomeScene
@@ -161,11 +158,4 @@ export function buildHome(resources: Resources): Home {
 		rooms: groups('room', resources.room),
 		zones: groups('zone', resources.zone)
 	};
-}
-
-function averageBrightness(actions: Scene['actions']): number | null {
-	const levels = actions.flatMap(({ action }) => action.dimming?.brightness ?? []);
-	return levels.length
-		? Math.round(levels.reduce((sum, level) => sum + level, 0) / levels.length)
-		: null;
 }
