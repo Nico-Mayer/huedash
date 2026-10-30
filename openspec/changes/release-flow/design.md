@@ -18,7 +18,7 @@
 
 **Non-Goals:**
 
-- Releasing from CI, release PRs, GitHub Releases pages.
+- Releasing from CI, release PRs.
 - Enforcing conventional commits with a hook or linter.
 
 ## Decisions
@@ -61,11 +61,20 @@ checks (clean, main, fetch, HEAD == origin/main, CI passed)
   -> prettier --write CHANGELOG.md package.json
   -> commit "chore(release): vX.Y.Z", annotated tag vX.Y.Z
   -> git push --atomic origin main vX.Y.Z
+  -> gh release create vX.Y.Z --verify-tag --notes-file - (notes from `git cliff --latest`)
 ```
 
 `--atomic` pushes the commit and the tag together or not at all. If the push fails, the script prints how to undo the local commit and tag (`git tag -d`, `git reset --hard HEAD~1`) instead of doing it on its own.
 
 Alternative: an inline `run` script in `mise.toml`. It is harder to read, and mise uses a different default shell on Windows.
+
+### GitHub Release from the changelog
+
+After the push, the script creates a GitHub Release with `gh release create vX.Y.Z --verify-tag --title vX.Y.Z --notes-file -`. The notes are `git cliff --latest --strip all` without the version heading, because the Release title already shows the version. The tag message stays `vX.Y.Z`.
+
+If creating the Release fails, the tag and commit are already pushed, so the script does not undo anything. It prints the command to create the Release by hand.
+
+Alternative: write the notes into the annotated tag message. GitHub does not show tag messages prominently, and users look at the Releases page.
 
 ### CI check uses the GitHub CLI
 

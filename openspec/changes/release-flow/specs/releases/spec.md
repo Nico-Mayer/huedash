@@ -65,6 +65,18 @@ The release task SHALL update `CHANGELOG.md` and the `package.json` version, com
 - **WHEN** the push of the commit or the tag fails
 - **THEN** neither the commit nor the tag is on `origin`
 
+### Requirement: GitHub Release with changelog notes
+After the push, the release task SHALL create a GitHub Release for the tag `vX.Y.Z`, titled `vX.Y.Z`, with that version's changelog entry as its notes. If creating the Release fails, the task SHALL keep the pushed commit and tag and print how to create the Release by hand.
+
+#### Scenario: Release page created
+- **WHEN** the maintainer releases `v0.2.0`
+- **THEN** GitHub has a Release `v0.2.0` whose notes list the features and fixes of `0.2.0`
+
+#### Scenario: Release creation fails
+- **WHEN** the push succeeds but creating the GitHub Release fails
+- **THEN** the commit and tag stay on `origin`
+- **AND** the task prints the command to create the Release
+
 ### Requirement: Changelog from commits
 `CHANGELOG.md` SHALL list each release with its version and date, and group its `feat`, `fix`, `perf`, and `refactor` commits under headings. Breaking changes SHALL be marked. `chore`, `test`, `ci`, `docs`, `style`, `build`, and merge commits SHALL NOT be listed.
 

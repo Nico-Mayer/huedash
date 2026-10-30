@@ -17,7 +17,7 @@
 ## 3. Workflows
 
 - [x] 3.1 Change `image.yml` to run only on `v*` tags, always push both platforms, and keep only the semver tag rules, and verify with `actionlint` or a YAML check
-- [ ] 3.2 Add a `docker` job to `ci.yml` that builds `linux/amd64` without pushing, using the GitHub Actions cache, and verify it passes on the next push to `main` (`gh run list --workflow ci.yml`)
+- [x] 3.2 Add a `docker` job to `ci.yml` that builds `linux/amd64` without pushing, using the GitHub Actions cache, and verify it passes on the next push to `main` (`gh run list --workflow ci.yml`)
 - [x] 3.3 Update the image tags table in `README.md` (remove `edge` and `sha-*`) and the "CI and image" section in `AGENTS.md`, and verify `pnpm lint` passes
 
 ## 4. App version
@@ -26,8 +26,14 @@
 
 ## 5. First release
 
-- [ ] 5.1 After CI passes on `main`, run `mise run release --dry-run` and verify it shows `0.1.0` with a sensible changelog
-- [ ] 5.2 Run `mise run release` and verify the image workflow publishes `0.1.0`, `0.1`, and `latest` for both platforms (`gh run list --workflow image.yml`)
+- [x] 5.1 After CI passes on `main`, run `mise run release --dry-run` and verify it shows `0.1.0` with a sensible changelog
+- [x] 5.2 Run `mise run release` and verify the image workflow publishes `0.1.0`, `0.1`, and `latest` for both platforms (`gh run list --workflow image.yml`)
+
+## 6. GitHub Release
+
+- [x] 6.1 After the push, create a GitHub Release with the version's changelog entry as notes, and print a manual command if it fails; verify `--dry-run` still works and the notes text from `git cliff --latest --strip all` has no version heading
+- [x] 6.2 Mention the GitHub Release in the release bullet of `AGENTS.md` and verify `pnpm lint` passes
+- [x] 6.3 Create the missing GitHub Release for `v0.1.0` from its changelog entry and verify `gh release view v0.1.0` shows the notes
 
 ## Workflow follow-up
 

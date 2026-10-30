@@ -10,6 +10,7 @@ Every push to `main` builds and publishes a Docker image (`edge`, `sha-*`), but 
   - Checks that the working tree is clean, the branch is `main`, it matches `origin/main`, and CI passed for `HEAD`.
   - Computes the next semantic version from conventional commits since the last tag, or uses a version given as argument.
   - Updates `CHANGELOG.md` and the `version` in `package.json`, commits `chore(release): vX.Y.Z`, creates the tag `vX.Y.Z`, and pushes commit and tag.
+  - Creates a GitHub Release for the tag, with the version's changelog entry as its notes.
   - Has a dry run that shows the next version and the changelog entry without changing anything.
 - Pin git-cliff in `mise.toml` and add a `cliff.toml` with the changelog format and 0.x bump rules.
 - **BREAKING**: `image.yml` runs on `v*` tag pushes only. The `edge` and `sha-*` image tags are no longer published, and pull requests no longer build the image there.
@@ -34,4 +35,4 @@ None.
 - New tool dependency: git-cliff (through mise). The task also needs the GitHub CLI (`gh`), logged in.
 - Users who run `edge` must switch to `latest` or a version tag. The old `edge` image stays in GHCR but stops updating.
 - Open tabs reload only when the server runs a different release, not after a local rebuild of the same version.
-- Out of scope: GitHub Releases pages, image signing, pre-release tags, commit message linting.
+- Out of scope: image signing, pre-release tags, commit message linting.
