@@ -10,13 +10,11 @@ async function openKitchen(page: Page) {
 const sceneRow = (page: Page, name: string) =>
 	page.getByRole('list', { name: 'Scenes' }).getByRole('listitem').filter({ hasText: name });
 
-async function recall(page: Page, name: string, id: string, play = false) {
+async function recall(page: Page, name: string, id: string, button?: string) {
 	const sent = page.waitForResponse((r) => r.url().endsWith(`/api/scenes/${id}`));
-	if (play) await page.getByRole('button', { name: `Play ${name}` }).click();
-	else
-		await sceneRow(page, name)
-			.getByRole('button', { name: new RegExp(name) })
-			.click();
+	await sceneRow(page, name)
+		.getByRole('button', { name: button ?? new RegExp(`^${name}`) })
+		.click();
 	expect((await sent).status()).toBe(200);
 }
 
@@ -36,13 +34,25 @@ test('recalls a scene and shows it in the sidebar', async ({ page }) => {
 	await expect(page.getByRole('link', { name: /^Kitchen/ })).toContainText('Relax');
 });
 
-test('plays a scene dynamically', async ({ page }) => {
+test('selecting a scene with a palette plays it', async ({ page }) => {
 	await openKitchen(page);
 
-	await recall(page, 'Tropical', 'scene-tropical', true);
+	await recall(page, 'Tropical', 'scene-tropical');
 
 	await expect(sceneRow(page, 'Tropical').getByText('Playing')).toBeVisible();
 	await expect(sceneRow(page, 'Relax').getByText('Active')).not.toBeVisible();
+});
+
+test('the badge switches a playing scene to static', async ({ page }) => {
+	await openKitchen(page);
+	await recall(page, 'Tropical', 'scene-tropical');
+	await expect(sceneRow(page, 'Tropical').getByText('Playing')).toBeVisible();
+
+	await recall(page, 'Tropical', 'scene-tropical', 'Playing: switch Tropical to static');
+	await expect(sceneRow(page, 'Tropical').getByText('Active')).toBeVisible();
+
+	await openKitchen(page);
+	await expect(sceneRow(page, 'Tropical').getByText('Active')).toBeVisible();
 });
 
 test('a scene started in one page shows in another without reload', async ({ context }) => {
