@@ -36,6 +36,13 @@ describe('PUT /api/scenes/[id]', () => {
 		]);
 	});
 
+	it('recalls a scene as static', async () => {
+		expect((await call('scene-tropical', { mode: 'static' })).status).toBe(200);
+		expect(home.commands).toEqual([
+			{ rtype: 'scene', id: 'scene-tropical', body: { recall: { action: 'static' } } }
+		]);
+	});
+
 	it('answers 400 for an unknown mode', async () => {
 		expect((await call('scene-bright', { mode: 'party' })).status).toBe(400);
 		expect(home.commands).toEqual([]);

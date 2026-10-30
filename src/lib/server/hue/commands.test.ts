@@ -176,6 +176,18 @@ describe('createCommandSender', () => {
 		]);
 	});
 
+	it('recalls a playing scene as static', async () => {
+		const store = await loadedStore();
+		const { setScene } = createCommandSender();
+
+		await setScene(store, 'scene-tropical', { mode: 'static' });
+
+		expect(home.commands).toEqual([
+			{ rtype: 'scene', id: 'scene-tropical', body: { recall: { action: 'static' } } }
+		]);
+		expect(store.home?.rooms[0].scenes.find((s) => s.name === 'Tropical')?.active).toBe('static');
+	});
+
 	it('answers not found for an unknown target without a bridge request', async () => {
 		const store = await loadedStore();
 		const { setGroup, setLight, setScene } = createCommandSender();
@@ -306,8 +318,8 @@ describe('command rate limits', () => {
 		const { setScene } = createCommandSender();
 
 		const recalls = [
-			setScene(store, 'scene-tropical', { mode: 'active' }),
-			setScene(store, 'scene-tropical', { mode: 'dynamic' })
+			setScene(store, 'scene-tropical', { mode: 'dynamic' }),
+			setScene(store, 'scene-tropical', { mode: 'static' })
 		];
 		await vi.advanceTimersByTimeAsync(999);
 		expect(fetchSpy).toHaveBeenCalledTimes(1);
@@ -317,8 +329,8 @@ describe('command rate limits', () => {
 
 		await Promise.all(recalls);
 		expect(sent()).toEqual([
-			['scene-tropical', { recall: { action: 'active' } }],
-			['scene-tropical', { recall: { action: 'dynamic_palette' } }]
+			['scene-tropical', { recall: { action: 'dynamic_palette' } }],
+			['scene-tropical', { recall: { action: 'static' } }]
 		]);
 	});
 });

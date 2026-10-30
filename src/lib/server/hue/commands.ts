@@ -28,7 +28,15 @@ const stateCommandSchema = z
 export const lightCommandSchema = stateCommandSchema;
 export const groupCommandSchema = stateCommandSchema;
 
-export const sceneCommandSchema = z.object({ mode: z.enum(['active', 'dynamic']) }).strict();
+export const sceneCommandSchema = z
+	.object({ mode: z.enum(['active', 'static', 'dynamic']) })
+	.strict();
+
+const recallAction = {
+	active: 'active',
+	static: 'static',
+	dynamic: 'dynamic_palette'
+} as const satisfies Record<SceneCommand['mode'], string>;
 
 export type LightCommand = z.infer<typeof lightCommandSchema>;
 export type SceneCommand = z.infer<typeof sceneCommandSchema>;
@@ -168,7 +176,7 @@ export function createCommandSender({
 			const failed = await settle(
 				createHueClient(store.target).PUT('/clip/v2/resource/scene/{sceneId}', {
 					params: { path: { sceneId: id } },
-					body: { recall: { action: command.mode === 'dynamic' ? 'dynamic_palette' : 'active' } }
+					body: { recall: { action: recallAction[command.mode] } }
 				})
 			);
 			if (failed) return failed;
