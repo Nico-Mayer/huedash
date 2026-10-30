@@ -24,7 +24,7 @@ test('turns a room off and on', async ({ page }) => {
 	const sent = page.waitForResponse((r) => r.url().endsWith('/api/groups/grouped-kitchen'));
 	await kitchen().click();
 	await expect(kitchen()).not.toBeChecked();
-	expect((await sent).status()).toBe(204);
+	expect((await sent).status()).toBe(200);
 
 	await page.reload();
 	await expect(kitchen()).not.toBeChecked();
@@ -41,7 +41,7 @@ test('sets room brightness', async ({ page }) => {
 	// The group throttle may hold this command for up to a second; the response comes once it is sent.
 	const sent = page.waitForResponse((r) => r.url().endsWith('/api/groups/grouped-kitchen'));
 	await page.keyboard.press('End');
-	expect((await sent).status()).toBe(204);
+	expect((await sent).status()).toBe(200);
 
 	await expect(header(page).getByText('100 %', { exact: true }).last()).toBeVisible();
 });
@@ -53,7 +53,7 @@ test('switches a single light in a room', async ({ page }) => {
 	await expect(page.getByRole('heading', { name: 'Kitchen' })).toBeVisible();
 	const sent = page.waitForResponse((r) => r.url().endsWith('/api/lights/ceiling'));
 	await page.getByRole('switch', { name: 'Ceiling' }).click();
-	expect((await sent).status()).toBe(204);
+	expect((await sent).status()).toBe(200);
 
 	await page.reload();
 	await expect(

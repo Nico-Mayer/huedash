@@ -4,14 +4,24 @@
 	import LiveStatus from '#lib/components/live/LiveStatus.svelte';
 	import AppSidebar from '#lib/components/shell/AppSidebar.svelte';
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
-	import { live } from '#lib/live.svelte.ts';
+	import { findGroup } from '#lib/group-page.ts';
+	import { setHomeResult } from '#lib/home-context.ts';
+	import { live } from '#lib/home.svelte.ts';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
 
-	const title = $derived(
-		page.data.group?.name ?? (page.route.id === '/(app)/settings' ? 'Settings' : 'huedash')
-	);
+	const result = $derived(live.current(data.result));
+	setHomeResult(() => result);
+
+	const title = $derived.by(() => {
+		if (page.data.kind && page.data.id) {
+			return (
+				findGroup(data.bridgeName, result, page.data.kind, page.data.id).group?.name ?? 'huedash'
+			);
+		}
+		return page.route.id === '/(app)/settings' ? 'Settings' : 'huedash';
+	});
 
 	$effect(() => {
 		live.connect();
@@ -28,17 +38,10 @@
 			});
 		});
 	});
-
-	// Catches anything missed while the tab was in the background.
-	function refreshWhenVisible() {
-		if (document.visibilityState === 'visible') live.reload();
-	}
 </script>
 
-<svelte:document onvisibilitychange={refreshWhenVisible} />
-
 <Sidebar.Provider>
-	<AppSidebar bridgeName={data.bridgeName} result={data.result} />
+	<AppSidebar bridgeName={data.bridgeName} {result} />
 	<Sidebar.Inset class="[view-transition-name:page]" data-live={live.open ? 'open' : 'closed'}>
 		<header class="flex items-center gap-2 border-b px-4 py-2 md:hidden">
 			<Sidebar.Trigger aria-label="Open menu" />

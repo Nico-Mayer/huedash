@@ -1,53 +1,44 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MOCK_APP_KEY } from '../mocks/bridge/fixtures.ts';
-import { MOCK_BRIDGE_IP } from '../mocks/bridge/handlers.ts';
-import { getBridgeConfig } from './server/config/index.ts';
+import { describe, expect, it } from 'vitest';
+import { createMockStore } from '../mocks/bridge/store.ts';
 import { findGroup } from './group-page.ts';
-import { connectionFor } from './server/hue/connection.ts';
-import { loadHome } from './server/hue/home.ts';
 
-beforeEach(() => {
-	vi.stubEnv('HUE_BRIDGE_IP', MOCK_BRIDGE_IP);
-	vi.stubEnv('HUE_APP_KEY', MOCK_APP_KEY);
-});
-
-afterEach(() => vi.unstubAllEnvs());
-
-async function layoutData() {
-	const config = (await getBridgeConfig())!;
-	return {
-		bridgeName: config.name,
-		result: await loadHome({ ...connectionFor(config), appKey: config.appKey })
-	};
-}
+const result = () => createMockStore().ready();
 
 describe('findGroup', () => {
 	it('finds a room with its lights', async () => {
-		expect(findGroup(await layoutData(), 'room', 'room-kitchen')).toMatchObject({
+		expect(findGroup('Hue', await result(), 'room', 'room-kitchen')).toMatchObject({
 			status: 'ok',
 			kind: 'room',
-			group: { name: 'Kitchen', lights: [{ name: 'Ceiling' }, { name: 'Counter' }] }
+			group: { name: 'Kitchen' },
+			lights: [{ name: 'Ceiling' }, { name: 'Counter' }]
 		});
 	});
 
 	it('finds a zone', async () => {
-		expect(findGroup(await layoutData(), 'zone', 'zone-downstairs').group?.name).toBe('Downstairs');
+		expect(findGroup('Hue', await result(), 'zone', 'zone-downstairs').group?.name).toBe(
+			'Downstairs'
+		);
 	});
 
 	it('returns no group for an unknown id', async () => {
-		expect(findGroup(await layoutData(), 'room', 'nope')).toMatchObject({
+		expect(findGroup('Hue', await result(), 'room', 'nope')).toMatchObject({
 			status: 'ok',
-			group: null
+			group: null,
+			lights: []
 		});
 	});
 
 	it('does not find a zone under the room route', async () => {
-		expect(findGroup(await layoutData(), 'room', 'zone-downstairs').group).toBeNull();
+		expect(findGroup('Hue', await result(), 'room', 'zone-downstairs').group).toBeNull();
 	});
 
 	it('passes a bridge failure on', () => {
-		expect(
-			findGroup({ bridgeName: 'Hue', result: { status: 'unreachable' } }, 'room', 'room-kitchen')
-		).toEqual({ bridgeName: 'Hue', status: 'unreachable', kind: 'room', group: null });
+		expect(findGroup('Hue', { status: 'unreachable' }, 'room', 'room-kitchen')).toEqual({
+			bridgeName: 'Hue',
+			status: 'unreachable',
+			kind: 'room',
+			group: null,
+			lights: []
+		});
 	});
 });

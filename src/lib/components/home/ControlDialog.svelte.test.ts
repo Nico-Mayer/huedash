@@ -2,7 +2,7 @@ import { page, userEvent } from 'vitest/browser';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { lightTarget } from '#lib/control-target.svelte.ts';
-import { live } from '#lib/live.svelte.ts';
+import { live } from '#lib/home.svelte.ts';
 import type { HomeLight } from '#lib/server/hue/home.ts';
 import ControlDialog from './ControlDialog.svelte';
 

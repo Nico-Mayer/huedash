@@ -7,7 +7,6 @@ import {
 	lightHueSaturation,
 	lightMirek,
 	lightOn,
-	lightSwatch,
 	type Change
 } from './group-state.svelte.ts';
 import type { HueSaturation } from './live-updates.ts';
@@ -73,9 +72,7 @@ export function lightTarget(light: HomeLight): ControlTarget {
 		get hueSaturation() {
 			return lightHueSaturation(light);
 		},
-		get swatch() {
-			return lightSwatch(light) ?? GENERIC_LIGHT;
-		},
+		swatch: light.swatch ?? GENERIC_LIGHT,
 		apply: (change) => changeLight(light, change)
 	};
 }

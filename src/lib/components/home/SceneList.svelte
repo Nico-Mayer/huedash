@@ -5,19 +5,12 @@
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Empty from '#lib/components/ui/empty/index.js';
-	import { live } from '#lib/live.svelte.ts';
+	import { sceneStatus } from '#lib/group-state.svelte.ts';
+	import { live } from '#lib/home.svelte.ts';
 	import type { SceneStatus } from '#lib/live-updates.ts';
 	import type { HomeGroup, HomeScene } from '#lib/server/hue/home.ts';
 
-	// The live update can arrive shortly after the command succeeds.
-	const CONFIRM_MS = 2000;
-
 	let { group }: { group: HomeGroup } = $props();
-
-	let pending = $state<Record<string, SceneStatus>>({});
-
-	const statusOf = (scene: HomeScene): SceneStatus =>
-		pending[scene.id] ?? live.scenes.get(scene.id) ?? scene.active;
 
 	function strip(colors: string[]): string {
 		if (colors.length === 0) return 'var(--muted)';
@@ -27,15 +20,17 @@
 
 	async function recall(scene: HomeScene, mode: 'active' | 'dynamic') {
 		const started: SceneStatus = mode === 'dynamic' ? 'dynamic_palette' : 'static';
-		pending = Object.fromEntries(
-			group.scenes.map((s) => [s.id, s.id === scene.id ? started : 'inactive'])
+		const token = live.scenes.begin(
+			group.id,
+			Object.fromEntries(group.scenes.map((s) => [s.id, s.id === scene.id ? started : 'inactive']))
 		);
 
-		if (await sendCommand({ kind: 'scenes', id: scene.id, name: scene.name }, { mode })) {
-			setTimeout(() => (pending = {}), CONFIRM_MS);
-			return;
-		}
-		pending = {};
+		const revision = await sendCommand(
+			{ kind: 'scenes', id: scene.id, name: scene.name },
+			{ mode }
+		);
+		live.scenes.settle(group.id, token, revision, live.revision);
+		if (revision !== null) return;
 		toast.error(`Couldn't start ${scene.name}. Check that the bridge is on, then try again.`);
 	}
 </script>
@@ -50,7 +45,7 @@
 {:else}
 	<ul class="grid grid-cols-2 gap-3 lg:grid-cols-3 2xl:grid-cols-4" aria-label="Scenes">
 		{#each group.scenes as scene (scene.id)}
-			{@const status = statusOf(scene)}
+			{@const status = sceneStatus(group, scene)}
 			<li class="relative">
 				<button
 					type="button"

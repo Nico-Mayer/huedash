@@ -8,7 +8,7 @@ import {
 	lightsSummary,
 	onSwatches
 } from './group-state.svelte.ts';
-import { live } from './live.svelte.ts';
+import { live } from './home.svelte.ts';
 import type { HomeGroup, HomeLight, HomeScene } from './server/hue/home.ts';
 
 const light = (id: string, on: boolean, reachable = true): HomeLight => ({
@@ -42,7 +42,7 @@ const group = (lights: HomeLight[], scenes: HomeScene[] = []): HomeGroup => ({
 	groupedLightId: 'grouped',
 	on: lights.some((l) => l.on),
 	brightness: 50,
-	lights,
+	lightIds: lights.map((l) => l.id),
 	colorTemperature: null,
 	whiteStops: null,
 	color: false,
@@ -57,27 +57,25 @@ afterEach(() => {
 
 describe('lightCounts', () => {
 	it('counts reachable lights that are on', () => {
-		const counts = lightCounts(
-			group([light('a', true), light('b', false), light('c', true, false)])
-		);
+		const counts = lightCounts([light('a', true), light('b', false), light('c', true, false)]);
 
 		expect(counts).toEqual({ on: 1, total: 3, unreachable: 1 });
 	});
 
-	it('uses live overrides', () => {
-		const home = group([light('a', true), light('b', false)]);
+	it('uses pending changes', () => {
+		const lights = [light('a', true), light('b', false)];
 
-		live.apply({ kind: 'light', id: 'b', on: true });
+		live.lights.begin('b', { on: true });
 
-		expect(lightCounts(home).on).toBe(2);
+		expect(lightCounts(lights).on).toBe(2);
 	});
 });
 
 describe('groupOn', () => {
-	it('uses the live group state', () => {
+	it('uses a pending group change', () => {
 		const home = group([light('a', true)]);
 
-		live.apply({ kind: 'group', id: 'grouped', on: false });
+		live.groups.begin('grouped', { on: false });
 
 		expect(groupOn(home)).toBe(false);
 	});
@@ -88,28 +86,32 @@ describe('activeScene', () => {
 		expect(activeScene(group([], [scene('relax', 'static'), scene('bright')]))?.id).toBe('relax');
 	});
 
-	it('follows live scene changes', () => {
+	it('uses a pending recall', () => {
 		const home = group([], [scene('relax', 'static'), scene('bright')]);
 
-		live.apply({ kind: 'scene', id: 'relax', active: 'inactive' });
+		live.scenes.begin('room', { relax: 'inactive', bright: 'static' });
 
-		expect(activeScene(home)).toBeUndefined();
+		expect(activeScene(home)?.id).toBe('bright');
 	});
 });
 
 describe('groupSummary', () => {
 	it('names the active scene', () => {
-		expect(groupSummary(group([light('a', true)], [scene('Relax', 'static')]))).toBe('Relax');
+		const lights = [light('a', true)];
+
+		expect(groupSummary(group(lights, [scene('Relax', 'static')]), lights)).toBe('Relax');
 	});
 
 	it('counts lights that are on', () => {
 		const lights = [light('a', true), light('b', true), light('c', false)];
 
-		expect(groupSummary(group(lights))).toBe('2 of 3 on');
+		expect(groupSummary(group(lights), lights)).toBe('2 of 3 on');
 	});
 
 	it('says when all lights are off', () => {
-		expect(groupSummary(group([light('a', false), light('b', false)]))).toBe('All off');
+		const lights = [light('a', false), light('b', false)];
+
+		expect(groupSummary(group(lights), lights)).toBe('All off');
 	});
 });
 
@@ -117,11 +119,11 @@ describe('lightsSummary', () => {
 	it('mentions unreachable lights', () => {
 		const lights = [light('a', true), light('b', true), light('c', false, false)];
 
-		expect(lightsSummary(group(lights))).toBe('2 of 3 lights on · 1 unreachable');
+		expect(lightsSummary(lights)).toBe('2 of 3 lights on · 1 unreachable');
 	});
 
 	it('leaves out unreachable when all lights answer', () => {
-		expect(lightsSummary(group([light('a', true), light('b', false)]))).toBe('1 of 2 lights on');
+		expect(lightsSummary([light('a', true), light('b', false)])).toBe('1 of 2 lights on');
 	});
 });
 
@@ -141,32 +143,32 @@ describe('onSwatches', () => {
 			colored('f', '#ffffff')
 		];
 
-		expect(onSwatches(group(lights))).toEqual(['#ff0000', null, '#0000ff']);
+		expect(onSwatches(lights)).toEqual(['#ff0000', null, '#0000ff']);
 	});
 
-	it('follows live swatches', () => {
-		const home = group([colored('a', '#ff0000')]);
+	it('leaves out a light that a pending change turns off', () => {
+		live.lights.begin('a', { on: false });
 
-		live.apply({ kind: 'light', id: 'a', swatch: '#00ff00' });
-
-		expect(onSwatches(home)).toEqual(['#00ff00']);
+		expect(onSwatches([colored('a', '#ff0000')])).toEqual([]);
 	});
 });
 
 describe('homeSummary', () => {
-	it('counts each light once and only reachable lights as on', () => {
-		const shared = light('shared', true);
-		const room = { ...group([shared, light('b', false)]), id: 'room' };
-		const zone = { ...group([shared, light('c', true, false)]), id: 'zone', kind: 'zone' as const };
-
-		expect(homeSummary({ rooms: [room], zones: [zone] })).toBe('1 of 3 lights on');
+	const homeOf = (lights: HomeLight[]) => ({
+		lights: Object.fromEntries(lights.map((l) => [l.id, l])),
+		rooms: [group(lights)],
+		zones: []
 	});
 
-	it('follows live changes', () => {
-		const home = { rooms: [group([light('a', false)])], zones: [] };
+	it('counts only reachable lights as on', () => {
+		const home = homeOf([light('a', true), light('b', false), light('c', true, false)]);
 
-		live.apply({ kind: 'light', id: 'a', on: true });
+		expect(homeSummary(home)).toBe('1 of 3 lights on');
+	});
 
-		expect(homeSummary(home)).toBe('1 of 1 lights on');
+	it('uses pending changes', () => {
+		live.lights.begin('a', { on: true });
+
+		expect(homeSummary(homeOf([light('a', false)]))).toBe('1 of 1 lights on');
 	});
 });

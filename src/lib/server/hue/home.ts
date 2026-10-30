@@ -1,24 +1,8 @@
-import { failureFromError, failureFromResponse, type BridgeFailure } from './bridge.ts';
 import type { HueSaturation } from '../../live-updates.ts';
-import { createHueClient } from './client.ts';
+import type { BridgeFailure } from './bridge.ts';
 import { xyToHueSaturation } from './color.ts';
-import type { Connection } from './connection.ts';
+import type { Resource, Resources } from './resources.ts';
 import { sceneColors, swatchOf, whiteStops } from './scene-colors.ts';
-import type { paths } from './schema.d.ts';
-
-type ResourceData<P extends keyof paths> = paths[P] extends {
-	get: { responses: { 200: { content: { 'application/json': { data?: (infer D)[] } } } } };
-}
-	? D
-	: never;
-
-type Room = ResourceData<'/clip/v2/resource/room'>;
-type Zone = ResourceData<'/clip/v2/resource/zone'>;
-type Device = ResourceData<'/clip/v2/resource/device'>;
-type Light = ResourceData<'/clip/v2/resource/light'>;
-type GroupedLight = ResourceData<'/clip/v2/resource/grouped_light'>;
-type Connectivity = ResourceData<'/clip/v2/resource/zigbee_connectivity'>;
-type Scene = ResourceData<'/clip/v2/resource/scene'>;
 
 export type MirekRange = { minMirek: number; maxMirek: number };
 
@@ -54,33 +38,29 @@ export type HomeGroup = {
 	groupedLightId: string;
 	on: boolean;
 	brightness: number;
-	lights: HomeLight[];
+	lightIds: string[];
 	colorTemperature: MirekRange | null;
 	whiteStops: string[] | null;
 	color: boolean;
 	scenes: HomeScene[];
 };
 
-export type Home = { rooms: HomeGroup[]; zones: HomeGroup[] };
+export type Home = { lights: Record<string, HomeLight>; rooms: HomeGroup[]; zones: HomeGroup[] };
 
-export type HomeResources = {
-	rooms: Room[];
-	zones: Zone[];
-	devices: Device[];
-	lights: Light[];
-	groupedLights: GroupedLight[];
-	connectivity: Connectivity[];
-	scenes: Scene[];
-};
+export type HomeResult = { status: 'ok'; revision: number; home: Home } | { status: BridgeFailure };
+
+type Group = Resource<'room'>;
+type Light = Resource<'light'>;
+type Scene = Resource<'scene'>;
 
 const byName = <T extends { name: string }>(a: T, b: T) => a.name.localeCompare(b.name);
 
-export function buildHome(resources: HomeResources): Home {
-	const devices = new Map(resources.devices.map((d) => [d.id, d]));
-	const connectivity = new Map(resources.connectivity.map((c) => [c.id, c.status]));
-	const groupedLights = new Map(resources.groupedLights.map((g) => [g.id, g]));
+export function buildHome(resources: Resources): Home {
+	const devices = new Map(resources.device.map((d) => [d.id, d]));
+	const connectivity = new Map(resources.zigbee_connectivity.map((c) => [c.id, c.status]));
+	const groupedLights = new Map(resources.grouped_light.map((g) => [g.id, g]));
 	const scenesByGroup = Map.groupBy(
-		resources.scenes.map((scene) => ({
+		resources.scene.map((scene) => ({
 			groupId: scene.group.rid,
 			scene: {
 				id: scene.id,
@@ -102,21 +82,22 @@ export function buildHome(resources: HomeResources): Home {
 	}
 
 	const lights = new Map<string, HomeLight>(
-		resources.lights.map((light) => {
+		resources.light.map((light) => {
 			const schema = light.color_temperature?.mirek_schema;
 			const mirekRange =
 				schema?.mirek_minimum !== undefined && schema.mirek_maximum !== undefined
 					? { minMirek: schema.mirek_minimum, maxMirek: schema.mirek_maximum }
 					: null;
-			const white = light.color_temperature?.mirek_valid ? light.color_temperature.mirek : null;
+			const mirek = light.color_temperature?.mirek_valid
+				? (light.color_temperature.mirek ?? null)
+				: null;
 			const xy = light.color?.xy;
-			const mirek = white ?? null;
 			return [
 				light.id,
 				{
 					id: light.id,
 					name: light.metadata.name,
-					on: light.on.on ?? false,
+					on: light.on.on,
 					brightness: light.dimming ? Math.round(light.dimming.brightness ?? 0) : null,
 					reachable: reachable(light),
 					product: devices.get(light.owner.rid)?.product_data.product_name ?? null,
@@ -131,7 +112,7 @@ export function buildHome(resources: HomeResources): Home {
 		})
 	);
 
-	function lightIds(group: Room | Zone): string[] {
+	function lightIds(group: Group): string[] {
 		return group.children.flatMap((child) => {
 			if (child.rtype === 'light') return [child.rid];
 			if (child.rtype !== 'device') return [];
@@ -140,13 +121,12 @@ export function buildHome(resources: HomeResources): Home {
 		});
 	}
 
-	function toGroup(kind: HomeGroup['kind'], group: Room | Zone): HomeGroup | null {
+	function toGroup(kind: HomeGroup['kind'], group: Group): HomeGroup | null {
 		const groupedLightId = group.services.find((s) => s.rtype === 'grouped_light')?.rid;
 		if (!groupedLightId) return null;
 
 		const members = lightIds(group)
-			.map((id) => lights.get(id))
-			.filter((light) => light !== undefined)
+			.flatMap((id) => lights.get(id) ?? [])
 			.sort(byName);
 		const ranges = members.flatMap((light) => light.mirekRange ?? []);
 		const colorTemperature = ranges.length
@@ -164,7 +144,7 @@ export function buildHome(resources: HomeResources): Home {
 			groupedLightId,
 			on: state?.on?.on ?? false,
 			brightness: Math.round(state?.dimming?.brightness ?? 0),
-			lights: members,
+			lightIds: members.map((light) => light.id),
 			colorTemperature,
 			whiteStops:
 				colorTemperature && whiteStops(colorTemperature.minMirek, colorTemperature.maxMirek),
@@ -173,10 +153,14 @@ export function buildHome(resources: HomeResources): Home {
 		};
 	}
 
-	const groups = (kind: HomeGroup['kind'], list: (Room | Zone)[]) =>
+	const groups = (kind: HomeGroup['kind'], list: Group[]) =>
 		list.flatMap((g) => toGroup(kind, g) ?? []).sort(byName);
 
-	return { rooms: groups('room', resources.rooms), zones: groups('zone', resources.zones) };
+	return {
+		lights: Object.fromEntries(lights),
+		rooms: groups('room', resources.room),
+		zones: groups('zone', resources.zone)
+	};
 }
 
 function averageBrightness(actions: Scene['actions']): number | null {
@@ -184,42 +168,4 @@ function averageBrightness(actions: Scene['actions']): number | null {
 	return levels.length
 		? Math.round(levels.reduce((sum, level) => sum + level, 0) / levels.length)
 		: null;
-}
-
-export type HomeResult = { status: 'ok'; home: Home } | { status: BridgeFailure };
-
-export async function loadHome(connection: Connection & { appKey: string }): Promise<HomeResult> {
-	const client = createHueClient(connection);
-	try {
-		const responses = await Promise.all([
-			client.GET('/clip/v2/resource/room'),
-			client.GET('/clip/v2/resource/zone'),
-			client.GET('/clip/v2/resource/device'),
-			client.GET('/clip/v2/resource/light'),
-			client.GET('/clip/v2/resource/grouped_light'),
-			client.GET('/clip/v2/resource/zigbee_connectivity'),
-			client.GET('/clip/v2/resource/scene')
-		]);
-
-		const failed = responses.find(({ response }) => !response.ok);
-		if (failed) return { status: failureFromResponse(failed.response) };
-
-		const [rooms, zones, devices, lights, groupedLights, connectivity, scenes] = responses.map(
-			({ data }) => data?.data ?? []
-		);
-		return {
-			status: 'ok',
-			home: buildHome({
-				rooms: rooms as Room[],
-				zones: zones as Zone[],
-				devices: devices as Device[],
-				lights: lights as Light[],
-				groupedLights: groupedLights as GroupedLight[],
-				connectivity: connectivity as Connectivity[],
-				scenes: scenes as Scene[]
-			})
-		};
-	} catch (error) {
-		return { status: failureFromError(error) };
-	}
 }

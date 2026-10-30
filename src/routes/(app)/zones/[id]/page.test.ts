@@ -3,16 +3,9 @@ import type { PageLoadEvent } from './$types';
 import { load } from './+page.ts';
 
 describe('zone page load', () => {
-	it('uses the home from the layout without calling the bridge', async () => {
-		const home = {
-			rooms: [],
-			zones: [{ kind: 'zone', id: 'zone-downstairs', name: 'Downstairs' }]
-		};
-		const event = {
-			params: { id: 'zone-downstairs' },
-			parent: async () => ({ bridgeName: 'Hue', result: { status: 'ok', home } })
-		} as unknown as PageLoadEvent;
+	it('passes the zone id on without loading anything', async () => {
+		const event = { params: { id: 'zone-downstairs' } } as unknown as PageLoadEvent;
 
-		expect(await load(event)).toMatchObject({ status: 'ok', group: { name: 'Downstairs' } });
+		expect(await load(event)).toEqual({ kind: 'zone', id: 'zone-downstairs' });
 	});
 });

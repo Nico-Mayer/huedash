@@ -1,7 +1,7 @@
 import { page, userEvent } from 'vitest/browser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
-import { live } from '#lib/live.svelte.ts';
+import { live } from '#lib/home.svelte.ts';
 import type { HomeGroup, HomeLight } from '#lib/server/hue/home.ts';
 import '../../../routes/layout.css';
 import RoomHeader from './RoomHeader.svelte';
@@ -12,7 +12,7 @@ vi.mock('svelte-sonner', () => ({ toast: { error: vi.fn() } }));
 const fetchMock = vi.fn();
 
 beforeEach(() => {
-	fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+	fetchMock.mockImplementation(async () => Response.json({ revision: 1 }));
 	vi.stubGlobal('fetch', fetchMock);
 });
 
@@ -39,6 +39,12 @@ const light = (id: string, name: string, extra: Partial<HomeLight> = {}): HomeLi
 	...extra
 });
 
+const lights = [
+	light('ceiling', 'Ceiling'),
+	light('counter', 'Counter', { on: false }),
+	light('plug', 'Plug', { reachable: false })
+];
+
 const kitchen: HomeGroup = {
 	kind: 'room',
 	id: 'room-kitchen',
@@ -46,11 +52,7 @@ const kitchen: HomeGroup = {
 	groupedLightId: 'grouped-kitchen',
 	on: true,
 	brightness: 60,
-	lights: [
-		light('ceiling', 'Ceiling'),
-		light('counter', 'Counter', { on: false }),
-		light('plug', 'Plug', { reachable: false })
-	],
+	lightIds: lights.map((l) => l.id),
 	colorTemperature: { minMirek: 153, maxMirek: 500 },
 	whiteStops: ['#ff8b14', '#ffd6aa', '#dce6ff'],
 	color: true,
@@ -68,7 +70,7 @@ const kitchen: HomeGroup = {
 
 describe('RoomHeader', () => {
 	it('shows the name, scene, lights summary, and brightness', async () => {
-		render(RoomHeader, { group: kitchen, onOpenColor: () => {} });
+		render(RoomHeader, { group: kitchen, lights, onOpenColor: () => {} });
 
 		await expect.element(page.getByRole('heading', { name: 'Kitchen' })).toBeInTheDocument();
 		await expect
@@ -82,7 +84,7 @@ describe('RoomHeader', () => {
 	});
 
 	it('sends one group command when the slider is released', async () => {
-		render(RoomHeader, { group: kitchen, onOpenColor: () => {} });
+		render(RoomHeader, { group: kitchen, lights, onOpenColor: () => {} });
 
 		(page.getByRole('slider', { name: 'Kitchen brightness' }).element() as HTMLElement).focus();
 		await userEvent.keyboard('{End}');
@@ -99,7 +101,7 @@ describe('RoomHeader', () => {
 
 	it('opens the color and white dialog', async () => {
 		const onOpenColor = vi.fn();
-		render(RoomHeader, { group: kitchen, onOpenColor });
+		render(RoomHeader, { group: kitchen, lights, onOpenColor });
 
 		await page.getByRole('button', { name: 'Color and white for Kitchen' }).click();
 
@@ -107,7 +109,7 @@ describe('RoomHeader', () => {
 	});
 
 	it('shows a swatch for each color of a light that is on', async () => {
-		render(RoomHeader, { group: kitchen, onOpenColor: () => {} });
+		render(RoomHeader, { group: kitchen, lights, onOpenColor: () => {} });
 
 		const button = page.getByRole('button', { name: 'Color and white for Kitchen' }).element();
 		expect(button.querySelectorAll('[style*="--swatch"]')).toHaveLength(1);
@@ -116,6 +118,7 @@ describe('RoomHeader', () => {
 	it('hides the button without white or color', async () => {
 		render(RoomHeader, {
 			group: { ...kitchen, colorTemperature: null, color: false },
+			lights,
 			onOpenColor: () => {}
 		});
 
@@ -133,9 +136,10 @@ describe('RoomHeader', () => {
 		const amber = getComputedStyle(probe).backgroundColor;
 		probe.remove();
 
-		const on = await render(RoomHeader, { group: kitchen, onOpenColor: () => {} });
+		const on = await render(RoomHeader, { group: kitchen, lights, onOpenColor: () => {} });
 		const off = await render(RoomHeader, {
 			group: { ...kitchen, id: 'room-off', groupedLightId: 'grouped-off', on: false },
+			lights,
 			onOpenColor: () => {}
 		});
 		const fill = (container: HTMLElement) =>

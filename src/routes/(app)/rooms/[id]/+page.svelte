@@ -5,4 +5,4 @@
 	let { data }: PageProps = $props();
 </script>
 
-<GroupDetail {data} />
+<GroupDetail bridgeName={data.bridgeName} kind={data.kind} id={data.id} />

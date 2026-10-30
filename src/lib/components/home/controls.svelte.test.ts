@@ -7,7 +7,7 @@ import '../../../routes/layout.css';
 import Controls from './Controls.svelte';
 import LightCard from './LightCard.svelte';
 import { groupTarget, lightTarget } from '#lib/control-target.svelte.ts';
-import { live } from '#lib/live.svelte.ts';
+import { live } from '#lib/home.svelte.ts';
 
 vi.mock('$app/navigation', () => ({ refreshAll: vi.fn() }));
 vi.mock('$app/paths', () => ({
@@ -21,7 +21,7 @@ vi.mock('svelte-sonner', () => ({ toast }));
 const fetchMock = vi.fn();
 
 beforeEach(() => {
-	fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+	fetchMock.mockImplementation(async () => Response.json({ revision: 1 }));
 	vi.stubGlobal('fetch', fetchMock);
 	toast.error.mockClear();
 });
@@ -54,7 +54,7 @@ const kitchen: HomeGroup = {
 	groupedLightId: 'grouped-kitchen',
 	on: true,
 	brightness: 60,
-	lights: [light],
+	lightIds: ['ceiling'],
 	colorTemperature: { minMirek: 153, maxMirek: 500 },
 	whiteStops: ['#ff8b14', '#ffd6aa', '#dce6ff'],
 	color: true,
@@ -80,7 +80,7 @@ describe('Controls for a group', () => {
 	});
 
 	it('restores the power button and tells the user when the bridge refuses', async () => {
-		fetchMock.mockResolvedValue(new Response(null, { status: 502 }));
+		fetchMock.mockImplementation(async () => new Response(null, { status: 502 }));
 		render(Controls, { control: groupTarget(kitchen) });
 
 		await page.getByRole('button', { name: 'Power' }).click();
@@ -102,10 +102,10 @@ describe('Controls for a group', () => {
 	});
 
 	it('moves the brightness and the value to a live change', async () => {
-		render(Controls, { control: groupTarget(kitchen) });
+		const { rerender } = await render(Controls, { control: groupTarget(kitchen) });
 		const slider = page.getByRole('slider', { name: 'Kitchen brightness' });
 
-		live.apply({ kind: 'group', id: 'grouped-kitchen', brightness: 30 });
+		await rerender({ control: groupTarget({ ...kitchen, brightness: 30 }) });
 
 		await expect.element(slider).toHaveAttribute('aria-valuenow', '30');
 		await expect.element(page.getByText('30 %', { exact: true })).toBeInTheDocument();
@@ -252,18 +252,19 @@ describe('ColorControl', () => {
 	});
 
 	it('moves the marker to a color change from outside', async () => {
-		render(ColorControl, {
+		const { rerender } = await render(ColorControl, {
 			control: lightTarget({ ...light, mirek: null, hueSaturation: { hue: 0, saturation: 100 } })
 		});
 		const pad = page.getByRole('slider', { name: 'Ceiling color' });
 		await expect.element(pad).toHaveAttribute('aria-valuenow', '0');
 
-		live.apply({
-			kind: 'light',
-			id: 'ceiling',
-			mirek: null,
-			hueSaturation: { hue: 240, saturation: 80 },
-			swatch: '#3333ff'
+		await rerender({
+			control: lightTarget({
+				...light,
+				mirek: null,
+				hueSaturation: { hue: 240, saturation: 80 },
+				swatch: '#3333ff'
+			})
 		});
 
 		await expect.element(pad).toHaveAttribute('aria-valuetext', 'hue 240, 80 % saturation');
@@ -278,18 +279,18 @@ describe('live updates', () => {
 	});
 
 	it('shows a group change from the bridge without reloading', async () => {
-		render(Controls, { control: groupTarget(kitchen) });
+		const { rerender } = await render(Controls, { control: groupTarget(kitchen) });
 
-		live.apply({ kind: 'group', id: 'grouped-kitchen', on: false });
+		await rerender({ control: groupTarget({ ...kitchen, on: false }) });
 
 		await expect.element(page.getByText('Off')).toBeInTheDocument();
 		expect(fetchMock).not.toHaveBeenCalled();
 	});
 
 	it('shows a light change from the bridge', async () => {
-		render(LightCard, { light, onOpen: () => {} });
+		const { rerender } = await render(LightCard, { light, onOpen: () => {} });
 
-		live.apply({ kind: 'light', id: 'ceiling', brightness: 20 });
+		await rerender({ light: { ...light, brightness: 20 } });
 
 		await expect.element(page.getByText('On, 20 %')).toBeInTheDocument();
 	});

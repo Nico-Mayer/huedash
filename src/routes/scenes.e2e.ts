@@ -17,7 +17,7 @@ async function recall(page: Page, name: string, id: string, play = false) {
 		await sceneRow(page, name)
 			.getByRole('button', { name: new RegExp(name) })
 			.click();
-	expect((await sent).status()).toBe(204);
+	expect((await sent).status()).toBe(200);
 }
 
 test('lists the scenes of a room', async ({ page }) => {

@@ -62,7 +62,7 @@ test('keeps live state after a switch', async ({ page }) => {
 	const toggle = async () => {
 		const sent = page.waitForResponse((r) => r.url().endsWith('/api/lights/lamp'));
 		await lamp.click();
-		expect((await sent).status()).toBe(204);
+		expect((await sent).status()).toBe(200);
 	};
 	const requests = trackDataRequests(page);
 

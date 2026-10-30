@@ -20,7 +20,7 @@ async function setGroup(page: Page, name: string, groupedLightId: string, on: bo
 	if ((await toggle.getAttribute('aria-checked')) === String(on)) return;
 	const sent = page.waitForResponse((r) => r.url().endsWith(`/api/groups/${groupedLightId}`));
 	await toggle.click();
-	expect((await sent).status()).toBe(204);
+	expect((await sent).status()).toBe(200);
 }
 
 test('the home summary follows switches', async ({ page }) => {
@@ -50,7 +50,7 @@ test('the light color follows a change without a reload', async ({ page }) => {
 	const response = await page.request.put('/api/lights/ceiling', {
 		data: { on: true, color: { hue: 240, saturation: 100 } }
 	});
-	expect(response.status()).toBe(204);
+	expect(response.status()).toBe(200);
 
 	await expect.poll(() => indicator.evaluate((el) => getComputedStyle(el).color)).not.toBe(before);
 	const swatch = await indicator.evaluate((el) => el.style.getPropertyValue('--swatch'));

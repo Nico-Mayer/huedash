@@ -4,6 +4,8 @@ import { MOCK_APP_KEY } from '../../mocks/bridge/fixtures.ts';
 import { MOCK_BRIDGE_IP } from '../../mocks/bridge/handlers.ts';
 import { home } from '../../mocks/bridge/home.ts';
 import { server } from '../../mocks/server.ts';
+import { getBridgeConfig } from '#lib/server/config/index.ts';
+import { getHomeStore } from '#lib/server/hue/store.ts';
 import { PUT as putGroup } from './groups/[id]/+server.ts';
 import { PUT as putLight } from './lights/[id]/+server.ts';
 
@@ -25,10 +27,13 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe('PUT /api/groups/[id]', () => {
-	it('answers 204 and sends the mapped command', async () => {
+	it('answers with the revision that holds the change and sends the mapped command', async () => {
 		const response = await call(putGroup, 'grouped-living', { brightness: 40 });
+		const store = getHomeStore((await getBridgeConfig())!);
 
-		expect(response.status).toBe(204);
+		expect(response.status).toBe(200);
+		expect(await response.json()).toEqual({ revision: store.revision });
+		expect(store.home?.rooms[1].brightness).toBe(40);
 		expect(home.commands).toEqual([
 			{ rtype: 'grouped_light', id: 'grouped-living', body: { dimming: { brightness: 40 } } }
 		]);
@@ -50,15 +55,15 @@ describe('PUT /api/groups/[id]', () => {
 });
 
 describe('PUT /api/lights/[id]', () => {
-	it('answers 204 and switches the light', async () => {
+	it('answers 200 and switches the light', async () => {
 		const response = await call(putLight, 'lamp', { on: true });
 
-		expect(response.status).toBe(204);
+		expect(response.status).toBe(200);
 		expect(home.commands).toEqual([{ rtype: 'light', id: 'lamp', body: { on: { on: true } } }]);
 	});
 
 	it('sets the white of a light', async () => {
-		expect((await call(putLight, 'ceiling', { mirek: 250 })).status).toBe(204);
+		expect((await call(putLight, 'ceiling', { mirek: 250 })).status).toBe(200);
 
 		expect(home.commands).toEqual([
 			{ rtype: 'light', id: 'ceiling', body: { color_temperature: { mirek: 250 } } }
@@ -66,12 +71,20 @@ describe('PUT /api/lights/[id]', () => {
 	});
 
 	it('sets the color of a light as xy', async () => {
-		expect((await call(putLight, 'lamp', { color: { hue: 0, saturation: 100 } })).status).toBe(204);
+		expect((await call(putLight, 'lamp', { color: { hue: 0, saturation: 100 } })).status).toBe(200);
 
 		const [command] = home.commands;
 		expect(command.body).toEqual({
 			color: { xy: { x: expect.any(Number), y: expect.any(Number) } }
 		});
+	});
+
+	it('answers 404 for an unknown light without a bridge command', async () => {
+		const response = await call(putLight, 'missing', { on: true });
+
+		expect(response.status).toBe(404);
+		expect(await response.json()).toEqual({ error: 'not-found' });
+		expect(home.commands).toEqual([]);
 	});
 
 	it('answers 409 without a configured bridge', async () => {

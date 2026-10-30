@@ -5,7 +5,8 @@
 	import GroupSwitch from '#lib/components/home/GroupSwitch.svelte';
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
 	import { groupSummary, homeSummary, onSwatches } from '#lib/group-state.svelte.ts';
-	import { live } from '#lib/live.svelte.ts';
+	import { live } from '#lib/home.svelte.ts';
+	import { lightsOf } from '#lib/group-page.ts';
 	import type { HomeGroup, HomeResult } from '#lib/server/hue/home.ts';
 
 	let { bridgeName, result }: { bridgeName: string; result: HomeResult } = $props();
@@ -48,6 +49,7 @@
 					<Sidebar.Menu>
 						{#each section.groups as group (group.id)}
 							{@const current = page.url.pathname === href(group)}
+							{@const lights = result.status === 'ok' ? lightsOf(result.home, group) : []}
 							<Sidebar.MenuItem class="flex items-center gap-2">
 								<Sidebar.MenuButton size="lg" isActive={current}>
 									{#snippet child({ props })}
@@ -60,7 +62,7 @@
 											<span class="flex min-w-0 flex-col">
 												<span class="truncate">{group.name}</span>
 												<span class="flex items-center gap-1.5 text-xs text-muted-foreground">
-													{#each onSwatches(group) as swatch, i (i)}
+													{#each onSwatches(lights) as swatch, i (i)}
 														<span
 															class={[
 																'size-1.5 shrink-0 rounded-full',
@@ -71,7 +73,7 @@
 															aria-hidden="true"
 														></span>
 													{/each}
-													<span class="truncate">{groupSummary(group)}</span>
+													<span class="truncate">{groupSummary(group, lights)}</span>
 												</span>
 											</span>
 										</a>

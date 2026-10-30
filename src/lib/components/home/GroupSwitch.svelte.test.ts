@@ -1,7 +1,7 @@
 import { page } from 'vitest/browser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
-import { live } from '#lib/live.svelte.ts';
+import { live } from '#lib/home.svelte.ts';
 import type { HomeGroup } from '#lib/server/hue/home.ts';
 import GroupSwitch from './GroupSwitch.svelte';
 
@@ -11,7 +11,7 @@ vi.mock('svelte-sonner', () => ({ toast }));
 const fetchMock = vi.fn();
 
 beforeEach(() => {
-	fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+	fetchMock.mockImplementation(async () => Response.json({ revision: 1 }));
 	vi.stubGlobal('fetch', fetchMock);
 	toast.error.mockClear();
 });
@@ -28,7 +28,7 @@ const kitchen: HomeGroup = {
 	groupedLightId: 'grouped-kitchen',
 	on: true,
 	brightness: 60,
-	lights: [],
+	lightIds: [],
 	colorTemperature: null,
 	whiteStops: null,
 	color: false,
@@ -48,7 +48,7 @@ describe('GroupSwitch', () => {
 	});
 
 	it('restores the switch when the command fails', async () => {
-		fetchMock.mockResolvedValue(new Response(null, { status: 502 }));
+		fetchMock.mockImplementation(async () => new Response(null, { status: 502 }));
 		render(GroupSwitch, { group: kitchen });
 
 		await page.getByRole('switch', { name: 'Kitchen' }).click();
@@ -58,9 +58,9 @@ describe('GroupSwitch', () => {
 	});
 
 	it('follows live updates', async () => {
-		render(GroupSwitch, { group: kitchen });
+		const { rerender } = await render(GroupSwitch, { group: kitchen });
 
-		live.apply({ kind: 'group', id: 'grouped-kitchen', on: false });
+		await rerender({ group: { ...kitchen, on: false } });
 
 		await expect.element(page.getByRole('switch', { name: 'Kitchen' })).not.toBeChecked();
 	});

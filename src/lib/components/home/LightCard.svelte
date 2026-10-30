@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Switch } from '#lib/components/ui/switch/index.js';
-	import { changeLight, lightBrightness, lightOn, lightSwatch } from '#lib/group-state.svelte.ts';
+	import { changeLight, lightBrightness, lightOn } from '#lib/group-state.svelte.ts';
 	import { lightTarget } from '#lib/control-target.svelte.ts';
 	import type { HomeLight } from '#lib/server/hue/home.ts';
 	import { SmoothValue } from '#lib/smooth-value.svelte.ts';
@@ -30,7 +30,7 @@
 			disabled={!light.reachable}
 			onclick={onOpen}
 		>
-			<LightIndicator swatch={lightSwatch(light)} on={light.reachable && on} />
+			<LightIndicator swatch={light.swatch} on={light.reachable && on} />
 			<span class="flex min-w-0 flex-col">
 				<span class="truncate font-medium">{light.name}</span>
 				<span class="truncate text-sm text-muted-foreground tabular-nums">

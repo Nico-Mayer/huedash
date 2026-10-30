@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { clampMirek, groupTarget, lightTarget } from './control-target.svelte.ts';
-import { live } from './live.svelte.ts';
+import { live } from './home.svelte.ts';
 import type { HomeGroup, HomeLight } from './server/hue/home.ts';
 
 const fetchMock = vi.fn();
 
 beforeEach(() => {
-	fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+	fetchMock.mockImplementation(async () => Response.json({ revision: 1 }));
 	vi.stubGlobal('fetch', fetchMock);
 });
 

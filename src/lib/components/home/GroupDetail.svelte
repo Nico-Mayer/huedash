@@ -4,14 +4,19 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Empty from '#lib/components/ui/empty/index.js';
 	import { groupTarget, lightTarget } from '#lib/control-target.svelte.ts';
-	import type { GroupPageData } from '#lib/group-page.ts';
+	import { findGroup } from '#lib/group-page.ts';
+	import { getHomeResult } from '#lib/home-context.ts';
 	import type { HomeGroup } from '#lib/server/hue/home.ts';
 	import ControlDialog from './ControlDialog.svelte';
 	import LightCard from './LightCard.svelte';
 	import RoomHeader from './RoomHeader.svelte';
 	import SceneList from './SceneList.svelte';
 
-	let { data }: { data: GroupPageData } = $props();
+	let { bridgeName, kind, id }: { bridgeName: string; kind: HomeGroup['kind']; id: string } =
+		$props();
+
+	const result = getHomeResult();
+	const data = $derived(findGroup(bridgeName, result(), kind, id));
 
 	const noun = $derived(data.kind === 'room' ? 'room' : 'zone');
 
@@ -22,7 +27,7 @@
 	// The light is looked up again on every data change, so the dialog closes when it goes away.
 	const openLightId = $derived(target?.kind === 'light' ? target.id : null);
 	const openLight = $derived(
-		data.group?.lights.find((light) => light.id === openLightId && light.reachable)
+		data.lights.find((light) => light.id === openLightId && light.reachable)
 	);
 	const control = $derived(
 		!target || !data.group
@@ -35,8 +40,8 @@
 	);
 
 	function groupDescription(group: HomeGroup): string {
-		const lights = group.lights.length === 1 ? '1 light' : `${group.lights.length} lights`;
-		return `${group.kind === 'room' ? 'Room' : 'Zone'} · ${lights}`;
+		const count = group.lightIds.length;
+		return `${group.kind === 'room' ? 'Room' : 'Zone'} · ${count === 1 ? '1 light' : `${count} lights`}`;
 	}
 
 	const description = $derived(
@@ -71,7 +76,7 @@
 	{:else}
 		{@const group = data.group}
 		{#key group.id}
-			<RoomHeader {group} onOpenColor={() => open({ kind: 'group' })} />
+			<RoomHeader {group} lights={data.lights} onOpenColor={() => open({ kind: 'group' })} />
 		{/key}
 
 		<div class="flex flex-col gap-8 p-6">
@@ -83,7 +88,7 @@
 			<section class="flex flex-col gap-3" aria-labelledby="lights-heading">
 				<h2 id="lights-heading" class="text-sm font-medium text-muted-foreground">Lights</h2>
 				<ul class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" aria-label="Lights">
-					{#each group.lights as light (light.id)}
+					{#each data.lights as light (light.id)}
 						<LightCard {light} onOpen={() => open({ kind: 'light', id: light.id })} />
 					{/each}
 				</ul>

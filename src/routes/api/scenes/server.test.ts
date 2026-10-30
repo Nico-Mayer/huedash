@@ -23,14 +23,14 @@ afterEach(() => vi.unstubAllEnvs());
 
 describe('PUT /api/scenes/[id]', () => {
 	it('recalls a scene the way the Hue app does', async () => {
-		expect((await call('scene-relax', { mode: 'active' })).status).toBe(204);
+		expect((await call('scene-relax', { mode: 'active' })).status).toBe(200);
 		expect(home.commands).toEqual([
 			{ rtype: 'scene', id: 'scene-relax', body: { recall: { action: 'active' } } }
 		]);
 	});
 
 	it('starts a scene dynamically', async () => {
-		expect((await call('scene-tropical', { mode: 'dynamic' })).status).toBe(204);
+		expect((await call('scene-tropical', { mode: 'dynamic' })).status).toBe(200);
 		expect(home.commands).toEqual([
 			{ rtype: 'scene', id: 'scene-tropical', body: { recall: { action: 'dynamic_palette' } } }
 		]);

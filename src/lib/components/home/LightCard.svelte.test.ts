@@ -1,7 +1,7 @@
 import { page } from 'vitest/browser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
-import { live } from '#lib/live.svelte.ts';
+import { live } from '#lib/home.svelte.ts';
 import type { HomeLight } from '#lib/server/hue/home.ts';
 import '../../../routes/layout.css';
 import LightCard from './LightCard.svelte';
@@ -9,7 +9,7 @@ import LightCard from './LightCard.svelte';
 const fetchMock = vi.fn();
 
 beforeEach(() => {
-	fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+	fetchMock.mockImplementation(async () => Response.json({ revision: 1 }));
 	vi.stubGlobal('fetch', fetchMock);
 });
 

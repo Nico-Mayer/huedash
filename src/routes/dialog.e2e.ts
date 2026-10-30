@@ -49,7 +49,7 @@ test.describe('desktop', () => {
 		for (const pressed of ['false', 'true']) {
 			const sent = page.waitForResponse((r) => r.url().endsWith('/api/lights/counter'));
 			await power.click();
-			expect((await sent).status()).toBe(204);
+			expect((await sent).status()).toBe(200);
 			await expect(power).toHaveAttribute('aria-pressed', pressed);
 		}
 	});
@@ -89,7 +89,7 @@ test.describe('desktop', () => {
 		const response = await page.request.put('/api/lights/lamp', {
 			data: { color: { hue: 240, saturation: 100 } }
 		});
-		expect(response.status()).toBe(204);
+		expect(response.status()).toBe(200);
 
 		await expect(fill).toHaveCSS('background-color', 'rgb(0, 0, 255)');
 		await dialog.getByRole('radio', { name: 'Color' }).click();
@@ -119,7 +119,7 @@ test.describe('desktop', () => {
 		const sent = page.waitForResponse((r) => r.url().endsWith('/api/groups/grouped-kitchen'));
 		await dialog.getByRole('slider', { name: 'Kitchen color temperature' }).press('Home');
 
-		expect((await sent).status()).toBe(204);
+		expect((await sent).status()).toBe(200);
 		await expect(dialog.getByText('2000 K', { exact: true })).toBeVisible();
 	});
 

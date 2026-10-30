@@ -15,7 +15,7 @@ async function setLivingRoom(page: Page, on: boolean) {
 	if (isOn === on) return;
 	const sent = page.waitForResponse((r) => r.url().endsWith('/api/groups/grouped-living'));
 	await card.getByRole('switch').click();
-	expect((await sent).status()).toBe(204);
+	expect((await sent).status()).toBe(200);
 }
 
 // Updates sent before a page's live connection opens never reach it.

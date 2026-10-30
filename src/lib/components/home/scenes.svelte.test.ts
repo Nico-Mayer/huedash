@@ -1,7 +1,7 @@
 import { page } from 'vitest/browser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
-import { live } from '#lib/live.svelte.ts';
+import { live } from '#lib/home.svelte.ts';
 import type { HomeGroup } from '#lib/server/hue/home.ts';
 import SceneList from './SceneList.svelte';
 
@@ -14,7 +14,7 @@ vi.mock('svelte-sonner', () => ({ toast }));
 const fetchMock = vi.fn();
 
 beforeEach(() => {
-	fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+	fetchMock.mockImplementation(async () => Response.json({ revision: 1 }));
 	vi.stubGlobal('fetch', fetchMock);
 	toast.error.mockClear();
 });
@@ -31,7 +31,7 @@ const kitchen: HomeGroup = {
 	groupedLightId: 'grouped-kitchen',
 	on: true,
 	brightness: 60,
-	lights: [],
+	lightIds: [],
 	colorTemperature: null,
 	whiteStops: null,
 	color: false,
@@ -87,7 +87,7 @@ describe('SceneList', () => {
 	});
 
 	it('restores the state and tells the user when the bridge refuses', async () => {
-		fetchMock.mockResolvedValue(new Response(null, { status: 502 }));
+		fetchMock.mockImplementation(async () => new Response(null, { status: 502 }));
 		render(SceneList, { group: kitchen });
 
 		await page.getByRole('button', { name: /Relax/ }).click();
@@ -97,9 +97,16 @@ describe('SceneList', () => {
 	});
 
 	it('shows a scene started elsewhere', async () => {
-		render(SceneList, { group: kitchen });
+		const { rerender } = await render(SceneList, { group: kitchen });
 
-		live.apply({ kind: 'scene', id: 'scene-tropical', active: 'dynamic_palette' });
+		await rerender({
+			group: {
+				...kitchen,
+				scenes: kitchen.scenes.map((scene) =>
+					scene.id === 'scene-tropical' ? { ...scene, active: 'dynamic_palette' } : scene
+				)
+			}
+		});
 
 		await expect.element(page.getByText('Playing')).toBeInTheDocument();
 	});

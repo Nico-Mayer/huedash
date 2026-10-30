@@ -9,17 +9,23 @@
 		onSwatches
 	} from '#lib/group-state.svelte.ts';
 	import { GENERIC_LIGHT } from '#lib/control-target.svelte.ts';
-	import type { HomeGroup } from '#lib/server/hue/home.ts';
+	import type { HomeGroup, HomeLight } from '#lib/server/hue/home.ts';
 	import { SmoothValue } from '#lib/smooth-value.svelte.ts';
 	import GroupSwitch from './GroupSwitch.svelte';
 	import LevelSlider from './LevelSlider.svelte';
 
-	let { group, onOpenColor }: { group: HomeGroup; onOpenColor: () => void } = $props();
+	let {
+		group,
+		lights,
+		onOpenColor
+	}: { group: HomeGroup; lights: HomeLight[]; onOpenColor: () => void } = $props();
 
 	const brightness = new SmoothValue(() => groupBrightness(group));
 	const scene = $derived(activeScene(group));
-	const status = $derived(scene ? `${scene.name} · ${lightsSummary(group)}` : lightsSummary(group));
-	const swatches = $derived(onSwatches(group).filter((swatch) => swatch !== null));
+	const status = $derived(
+		scene ? `${scene.name} · ${lightsSummary(lights)}` : lightsSummary(lights)
+	);
+	const swatches = $derived(onSwatches(lights).filter((swatch) => swatch !== null));
 </script>
 
 <section
