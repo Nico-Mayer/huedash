@@ -14,6 +14,10 @@ import type { HomeGroup, HomeLight, MirekRange } from './server/hue/home.ts';
 
 export const GENERIC_LIGHT = 'var(--light)';
 
+export function lightSwatch(light: HomeLight): string | null {
+	return light.swatch ?? (light.brightness !== null ? GENERIC_LIGHT : null);
+}
+
 export type ControlTarget = {
 	readonly name: string;
 	readonly on: boolean;

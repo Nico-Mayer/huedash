@@ -56,5 +56,8 @@ test('the light color follows a change without a reload', async ({ page }) => {
 	const swatch = await indicator.evaluate((el) => el.style.getPropertyValue('--swatch'));
 	const [r, , b] = [1, 3, 5].map((i) => parseInt(swatch.slice(i, i + 2), 16));
 	expect(b).toBeGreaterThan(r);
+	const card = lightCard(page, 'Ceiling');
+	await expect(card).toHaveAttribute('data-glow', 'true');
+	expect(await card.evaluate((el) => el.style.getPropertyValue('--swatch'))).toBe(swatch);
 	await expect(entry(page, 'Kitchen').locator('[data-swatch^="#"]').first()).toBeVisible();
 });

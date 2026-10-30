@@ -105,12 +105,43 @@ describe('LightCard details', () => {
 		expect(indicator().style.getPropertyValue('--swatch')).toBe('#ff0000');
 	});
 
-	it('mutes the indicator of a light that is off or has no swatch', async () => {
+	it('glows in the swatch color while lit', async () => {
+		render(LightCard, { light: { ...light('ceiling', 'Ceiling'), swatch: '#ff0000' }, onOpen });
+
+		const item = page.getByRole('listitem');
+		await expect.element(item).toHaveAttribute('data-glow', 'true');
+		expect(item.element().getAttribute('style')).toContain('--swatch: #ff0000');
+	});
+
+	it('glows and lights the indicator in the generic white for a dim-only light', async () => {
+		render(LightCard, { light: light('luster', 'Luster'), onOpen });
+
+		const item = page.getByRole('listitem');
+		await expect.element(item).toHaveAttribute('data-glow', 'true');
+		expect(item.element().getAttribute('style')).toContain('--swatch: var(--light)');
+		expect(indicator().dataset.lit).toBe('true');
+	});
+
+	it('does not glow when off, unreachable, or without dimming', async () => {
 		render(LightCard, {
 			light: { ...light('ceiling', 'Ceiling'), on: false, swatch: '#ff0000' },
 			onOpen
 		});
-		render(LightCard, { light: light('plug', 'Plug'), onOpen });
+		render(LightCard, {
+			light: { ...light('lamp', 'Lamp', false), swatch: '#ff0000' },
+			onOpen
+		});
+		render(LightCard, { light: { ...light('plug', 'Plug'), brightness: null }, onOpen });
+
+		await expect.poll(() => document.querySelectorAll('[data-glow="false"]').length).toBe(3);
+	});
+
+	it('mutes the indicator of a light that is off or cannot dim', async () => {
+		render(LightCard, {
+			light: { ...light('ceiling', 'Ceiling'), on: false, swatch: '#ff0000' },
+			onOpen
+		});
+		render(LightCard, { light: { ...light('plug', 'Plug'), brightness: null }, onOpen });
 
 		await expect.poll(() => document.querySelectorAll('[data-lit="false"]').length).toBe(2);
 	});

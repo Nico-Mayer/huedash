@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Switch } from '#lib/components/ui/switch/index.js';
 	import { changeLight, lightBrightness, lightOn } from '#lib/group-state.svelte.ts';
-	import { lightTarget } from '#lib/control-target.svelte.ts';
+	import { lightSwatch, lightTarget } from '#lib/control-target.svelte.ts';
 	import type { HomeLight } from '#lib/server/hue/home.ts';
 	import { SmoothValue } from '#lib/smooth-value.svelte.ts';
 	import LevelSlider from './LevelSlider.svelte';
@@ -12,15 +12,19 @@
 	const on = $derived(lightOn(light));
 	const brightness = new SmoothValue(() => lightBrightness(light));
 	const target = $derived(lightTarget(light));
+	const swatch = $derived(lightSwatch(light));
+	const lit = $derived(light.reachable && on && swatch !== null);
 </script>
 
 <!-- The open button stretches over the whole card; the switch and slider sit above it. -->
 <li
 	class={[
-		'relative flex min-w-0 flex-col gap-4 rounded-xl border bg-card p-4 text-card-foreground',
+		'group/card relative isolate flex min-w-0 flex-col gap-4 overflow-hidden rounded-xl border bg-card p-4 text-card-foreground [--glow:22%] dark:[--glow:15%]',
 		!light.reachable && 'opacity-60',
 		'has-[button:focus-visible]:ring-[3px] has-[button:focus-visible]:ring-ring/50'
 	]}
+	style:--swatch={swatch}
+	data-glow={lit}
 >
 	<div class="flex items-center justify-between gap-3">
 		<button
@@ -30,7 +34,15 @@
 			disabled={!light.reachable}
 			onclick={onOpen}
 		>
-			<LightIndicator swatch={light.swatch} on={light.reachable && on} />
+			<span
+				class={[
+					'relative shrink-0 before:pointer-events-none before:absolute before:top-1/2 before:left-1/2 before:-z-10 before:size-48 before:-translate-1/2 before:rounded-full before:bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--swatch)_var(--glow),transparent),transparent)] before:opacity-0 before:transition-[scale,opacity] before:duration-500 before:ease-out motion-reduce:before:transition-none',
+					lit &&
+						'before:opacity-100 group-hover/card:before:scale-600 group-hover/card:before:opacity-40 group-has-[button:focus-visible]/card:before:scale-600 group-has-[button:focus-visible]/card:before:opacity-40'
+				]}
+			>
+				<LightIndicator {swatch} on={light.reachable && on} />
+			</span>
 			<span class="flex min-w-0 flex-col">
 				<span class="truncate font-medium">{light.name}</span>
 				<span class="truncate text-sm text-muted-foreground tabular-nums">

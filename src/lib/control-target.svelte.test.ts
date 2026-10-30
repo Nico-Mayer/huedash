@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { clampMirek, groupTarget, lightTarget } from './control-target.svelte.ts';
+import {
+	clampMirek,
+	GENERIC_LIGHT,
+	groupTarget,
+	lightSwatch,
+	lightTarget
+} from './control-target.svelte.ts';
 import { live } from './home.svelte.ts';
 import type { HomeGroup, HomeLight } from './server/hue/home.ts';
 
@@ -104,6 +110,20 @@ describe('groupTarget', () => {
 		await expect
 			.poll(() => sent())
 			.toEqual([['/api/groups/grouped-kitchen', { on: true, mirek: 250 }]]);
+	});
+});
+
+describe('lightSwatch', () => {
+	it('uses the light swatch when it has one', () => {
+		expect(lightSwatch(light('ceiling', 'Ceiling', { swatch: '#ff0000' }))).toBe('#ff0000');
+	});
+
+	it('falls back to the generic white for a dim-only light', () => {
+		expect(lightSwatch(light('luster', 'Luster'))).toBe(GENERIC_LIGHT);
+	});
+
+	it('has no swatch for a light without dimming', () => {
+		expect(lightSwatch(light('plug', 'Plug', { brightness: null }))).toBeNull();
 	});
 });
 
