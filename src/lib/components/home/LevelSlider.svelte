@@ -40,6 +40,15 @@
 			? `linear-gradient(to ${vertical ? 'top' : 'right'}, ${tone.stops.join(', ')})`
 			: undefined
 	);
+	const behindThumb = $derived(
+		tone.kind === 'light'
+			? tone.color
+			: (tone.stops[Math.round(fraction * (tone.stops.length - 1))] ?? null)
+	);
+	// White on dark or saturated colors, dark gray on pale ones such as yellow or daylight.
+	const thumbLine = $derived(
+		behindThumb ? `oklch(from ${behindThumb} clamp(0.3, (0.82 - l) * 1000, 1) 0 0)` : undefined
+	);
 </script>
 
 <SliderPrimitive.Root
@@ -53,7 +62,12 @@
 		vertical ? 'h-[clamp(15rem,40svh,18rem)] w-24 flex-col' : 'w-full',
 		className
 	)}
-	style={lit && tone.kind === 'light' ? `--tone: ${tone.color}` : undefined}
+	style={[
+		lit && tone.kind === 'light' && `--tone: ${tone.color}`,
+		thumbLine && `--thumb-line: ${thumbLine}`
+	]
+		.filter(Boolean)
+		.join('; ')}
 	{...restProps}
 >
 	{#snippet children({ thumbItems })}
@@ -88,7 +102,7 @@
 				aria-valuetext={format(value)}
 				class={[
 					'flex cursor-grab items-center justify-center rounded-lg ring-ring/50 outline-hidden transition-shadow focus-visible:ring-[3px] data-disabled:cursor-not-allowed data-active:cursor-grabbing',
-					'after:rounded-full after:bg-white after:shadow-[0_0_0_1.5px_rgb(0_0_0/0.6),0_1px_3px_rgb(0_0_0/0.3)]',
+					'after:rounded-full after:bg-(--thumb-line,white) after:shadow-[0_1px_2px_rgb(0_0_0/0.25)]',
 					vertical
 						? 'h-6 w-full after:h-1 after:w-10'
 						: ['w-6 after:w-1', size === 'sm' ? 'h-6 after:h-3' : 'h-10 after:h-5']
