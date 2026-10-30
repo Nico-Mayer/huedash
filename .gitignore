@@ -27,6 +27,7 @@ dist
 coverage
 test-results
 playwright-report
+.playwright-cli
 
 # App data volume
 /data/
