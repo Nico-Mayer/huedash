@@ -1,5 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 
+declare global {
+	interface Window {
+		viewTransitions: number;
+	}
+}
+
 const entry = (page: Page, name: string) =>
 	page.getByRole('link', { name: new RegExp(`^${name}`) });
 
@@ -67,6 +73,38 @@ test('keeps live state after a switch', async ({ page }) => {
 	await expect(lamp).toHaveAttribute('aria-checked', String(!wasOn));
 	expect(requests).toEqual([]);
 	await toggle();
+});
+
+async function countViewTransitions(page: Page) {
+	await page.addInitScript(() => {
+		const start = document.startViewTransition.bind(document);
+		window.viewTransitions = 0;
+		document.startViewTransition = ((update) => {
+			window.viewTransitions += 1;
+			return start(update);
+		}) as typeof document.startViewTransition;
+	});
+}
+
+test('cross-fades the page when switching rooms', async ({ page }) => {
+	await countViewTransitions(page);
+	await page.goto('/rooms/room-kitchen');
+
+	await entry(page, 'Living room').click();
+
+	await expect(page.getByRole('heading', { name: 'Living room' })).toBeVisible();
+	expect(await page.evaluate(() => window.viewTransitions)).toBe(1);
+});
+
+test('switches rooms without a transition for reduced motion', async ({ page }) => {
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	await countViewTransitions(page);
+	await page.goto('/rooms/room-kitchen');
+
+	await entry(page, 'Living room').click();
+
+	await expect(page.getByRole('heading', { name: 'Living room' })).toBeVisible();
+	expect(await page.evaluate(() => window.viewTransitions)).toBe(0);
 });
 
 test('marks no room on the settings page', async ({ page }) => {

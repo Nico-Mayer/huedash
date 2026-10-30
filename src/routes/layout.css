@@ -131,3 +131,13 @@
 		@apply font-sans;
 	}
 }
+
+/* The sidebar is outside the page group, so animating only that group keeps it still. */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation: none;
+}
+
+::view-transition-group(page) {
+	animation-duration: 200ms;
+}

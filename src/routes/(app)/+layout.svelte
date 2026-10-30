@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import LiveStatus from '#lib/components/live/LiveStatus.svelte';
 	import AppSidebar from '#lib/components/shell/AppSidebar.svelte';
@@ -16,6 +17,18 @@
 		live.connect();
 	});
 
+	onNavigate((navigation) => {
+		if (!document.startViewTransition) return;
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
+
 	// Catches anything missed while the tab was in the background.
 	function refreshWhenVisible() {
 		if (document.visibilityState === 'visible') live.reload();
@@ -26,7 +39,7 @@
 
 <Sidebar.Provider>
 	<AppSidebar bridgeName={data.bridgeName} result={data.result} />
-	<Sidebar.Inset data-live={live.open ? 'open' : 'closed'}>
+	<Sidebar.Inset class="[view-transition-name:page]" data-live={live.open ? 'open' : 'closed'}>
 		<header class="flex items-center gap-2 border-b px-4 py-2 md:hidden">
 			<Sidebar.Trigger aria-label="Open menu" />
 			<span class="truncate font-semibold">{title}</span>
