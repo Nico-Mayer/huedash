@@ -141,9 +141,7 @@ describe('Controls tabs', () => {
 			.toHaveAttribute('aria-selected', 'true');
 		await page.getByRole('tab', { name: 'Color' }).click();
 
-		await expect
-			.element(page.getByRole('slider', { name: 'Kitchen saturation' }))
-			.toBeInTheDocument();
+		await expect.element(page.getByRole('slider', { name: 'Kitchen color' })).toBeInTheDocument();
 		await expect
 			.element(page.getByRole('slider', { name: 'Kitchen color temperature' }))
 			.not.toBeInTheDocument();
@@ -169,7 +167,7 @@ describe('Controls for a light', () => {
 			.element(page.getByRole('tab', { name: 'Color' }))
 			.toHaveAttribute('aria-selected', 'true');
 		await expect
-			.element(page.getByRole('slider', { name: 'Ceiling hue' }))
+			.element(page.getByRole('slider', { name: 'Ceiling color' }))
 			.toHaveAttribute('aria-valuenow', '0');
 	});
 
@@ -204,15 +202,38 @@ describe('ColorTemperatureControl', () => {
 });
 
 describe('ColorControl', () => {
-	it('sends hue and saturation as a color command', async () => {
+	it('starts a group at white and sends one color command per key', async () => {
 		render(ColorControl, { control: groupTarget(kitchen) });
-		const slider = page.getByRole('slider', { name: 'Kitchen saturation' });
+		const pad = page.getByRole('slider', { name: 'Kitchen color' });
+		await expect.element(pad).toHaveAttribute('aria-valuetext', 'hue 30, 0 % saturation');
 
-		(slider.element() as HTMLElement).focus();
-		await userEvent.keyboard('{End}');
+		(pad.element() as HTMLElement).focus();
+		await userEvent.keyboard('{Shift>}{ArrowUp}{/Shift}');
 
-		await expect.poll(() => fetchMock.mock.calls.length).toBeGreaterThan(0);
-		expect(sentBody().body).toEqual({ on: true, color: { hue: 30, saturation: 100 } });
+		await expect.poll(() => fetchMock.mock.calls.length).toBe(1);
+		expect(sentBody()).toEqual({
+			url: '/api/groups/grouped-kitchen',
+			body: { on: true, color: { hue: 30, saturation: 10 } }
+		});
+	});
+
+	it('moves the marker to a color change from outside', async () => {
+		render(ColorControl, {
+			control: lightTarget({ ...light, mirek: null, hueSaturation: { hue: 0, saturation: 100 } })
+		});
+		const pad = page.getByRole('slider', { name: 'Ceiling color' });
+		await expect.element(pad).toHaveAttribute('aria-valuenow', '0');
+
+		live.apply({
+			kind: 'light',
+			id: 'ceiling',
+			mirek: null,
+			hueSaturation: { hue: 240, saturation: 80 },
+			swatch: '#3333ff'
+		});
+
+		await expect.element(pad).toHaveAttribute('aria-valuetext', 'hue 240, 80 % saturation');
+		expect(fetchMock).not.toHaveBeenCalled();
 	});
 });
 
