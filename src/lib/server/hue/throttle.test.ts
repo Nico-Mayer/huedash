@@ -60,6 +60,22 @@ describe('createThrottle', () => {
 		]);
 	});
 
+	it('merges waiting values with the merge function', async () => {
+		const throttled = createThrottle(1000, send, (previous, next) => previous + next);
+
+		throttled('kitchen', 1);
+		const second = throttled('kitchen', 2);
+		const third = throttled('kitchen', 3);
+		await vi.advanceTimersByTimeAsync(1000);
+
+		expect(sent).toEqual([
+			['kitchen', 1],
+			['kitchen', 5]
+		]);
+		expect(await second).toBe('sent 5');
+		expect(await third).toBe('sent 5');
+	});
+
 	it('passes a failed send to every waiting caller', async () => {
 		const throttled = createThrottle(1000, async (_key: string, value: number) => {
 			if (value === 2) throw new Error('bridge said no');

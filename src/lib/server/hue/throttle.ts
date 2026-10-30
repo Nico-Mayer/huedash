@@ -6,11 +6,12 @@ type KeyState<T, R> = {
 };
 
 // Leading and trailing throttle per key: the first call in a window goes out at once, later
-// calls replace each other, and the last one goes out when the window ends. Replaced callers
-// receive the result of the command that superseded their value.
+// calls are merged, and the result goes out when the window ends. Merged callers receive the
+// result of the combined command.
 export function createThrottle<T, R>(
 	windowMs: number,
-	send: (key: string, value: T) => Promise<R>
+	send: (key: string, value: T) => Promise<R>,
+	merge: (previous: T, next: T) => T = (_, next) => next
 ): (key: string, value: T) => Promise<R> {
 	const keys = new Map<string, KeyState<T, R>>();
 
@@ -36,7 +37,7 @@ export function createThrottle<T, R>(
 
 		return new Promise<R>((resolve, reject) => {
 			if (state.pending) {
-				state.pending.value = value;
+				state.pending.value = merge(state.pending.value, value);
 				state.pending.waiters.push({ resolve, reject });
 				return;
 			}
