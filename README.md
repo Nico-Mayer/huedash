@@ -57,14 +57,12 @@ huedash works over plain http on your network. If you put a TLS reverse proxy in
 
 ### Image tags
 
-Images are published to `ghcr.io/nico-mayer/huedash` for `linux/amd64` and `linux/arm64`.
+Images are published to `ghcr.io/nico-mayer/huedash` for `linux/amd64` and `linux/arm64`, one for each release. [CHANGELOG.md](CHANGELOG.md) lists the changes in each release.
 
-| Tag            | Contents                    |
-| -------------- | --------------------------- |
-| `latest`       | Latest release              |
-| `1.2.3`, `1.2` | A specific release          |
-| `edge`         | Latest commit on `main`     |
-| `sha-<commit>` | A specific commit on `main` |
+| Tag            | Contents           |
+| -------------- | ------------------ |
+| `latest`       | Latest release     |
+| `1.2.3`, `1.2` | A specific release |
 
 ## Development
 
