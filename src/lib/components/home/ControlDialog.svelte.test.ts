@@ -45,14 +45,14 @@ describe('ControlDialog', () => {
 			.toBeInTheDocument();
 	});
 
-	it('shows only the switch for a light without dimming', async () => {
+	it('shows only the power button for a plug', async () => {
 		const plug = { ...ceiling, brightness: null, mirekRange: null, color: false };
 		render(ControlDialog, { control: lightTarget(plug), open: true, onOpenChange: () => {} });
 
 		const dialog = page.getByRole('dialog');
-		await expect.element(dialog.getByRole('switch', { name: 'Ceiling' })).toBeInTheDocument();
+		await expect.element(dialog.getByRole('button', { name: 'Power' })).toBeInTheDocument();
 		await expect.element(dialog.getByRole('slider')).not.toBeInTheDocument();
-		await expect.element(dialog.getByRole('button', { name: '25 %' })).not.toBeInTheDocument();
+		await expect.element(dialog.getByRole('radio')).not.toBeInTheDocument();
 	});
 
 	it('closes on Escape', async () => {

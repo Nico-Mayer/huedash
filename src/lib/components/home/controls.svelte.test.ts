@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import type { HomeGroup, HomeLight } from '#lib/server/hue/home.ts';
 import ColorControl from './ColorControl.svelte';
-import ColorTemperatureControl from './ColorTemperatureControl.svelte';
+import '../../../routes/layout.css';
 import Controls from './Controls.svelte';
 import LightCard from './LightCard.svelte';
 import { groupTarget, lightTarget } from '#lib/control-target.svelte.ts';
@@ -67,22 +67,25 @@ function sentBody() {
 }
 
 describe('Controls for a group', () => {
-	it('turns the group off with one command', async () => {
+	it('turns the group off with the power button', async () => {
 		render(Controls, { control: groupTarget(kitchen) });
+		const power = page.getByRole('button', { name: 'Power' });
+		await expect.element(power).toHaveAttribute('aria-pressed', 'true');
 
-		await page.getByRole('switch', { name: 'Kitchen' }).click();
+		await power.click();
 
 		await expect.element(page.getByText('Off')).toBeInTheDocument();
+		await expect.element(power).toHaveAttribute('aria-pressed', 'false');
 		expect(sentBody()).toEqual({ url: '/api/groups/grouped-kitchen', body: { on: false } });
 	});
 
-	it('restores the switch and tells the user when the bridge refuses', async () => {
+	it('restores the power button and tells the user when the bridge refuses', async () => {
 		fetchMock.mockResolvedValue(new Response(null, { status: 502 }));
 		render(Controls, { control: groupTarget(kitchen) });
 
-		await page.getByRole('switch', { name: 'Kitchen' }).click();
+		await page.getByRole('button', { name: 'Power' }).click();
 
-		await expect.element(page.getByText('On, 60 %')).toBeInTheDocument();
+		await expect.element(page.getByText('60 %', { exact: true })).toBeInTheDocument();
 		expect(toast.error).toHaveBeenCalledWith(expect.stringContaining("Couldn't change Kitchen"));
 	});
 
@@ -93,19 +96,19 @@ describe('Controls for a group', () => {
 		(slider.element() as HTMLElement).focus();
 		expect(fetchMock).toHaveBeenCalledTimes(0);
 
-		await userEvent.keyboard('{ArrowRight}');
+		await userEvent.keyboard('{ArrowUp}');
 		await expect.poll(() => fetchMock.mock.calls.length).toBe(1);
 		expect(sentBody().body).toEqual({ on: true, brightness: 61 });
 	});
 
-	it('moves the brightness to a live change', async () => {
+	it('moves the brightness and the value to a live change', async () => {
 		render(Controls, { control: groupTarget(kitchen) });
 		const slider = page.getByRole('slider', { name: 'Kitchen brightness' });
 
 		live.apply({ kind: 'group', id: 'grouped-kitchen', brightness: 30 });
 
 		await expect.element(slider).toHaveAttribute('aria-valuenow', '30');
-		await expect.element(page.getByText('On, 30 %')).toBeInTheDocument();
+		await expect.element(page.getByText('30 %', { exact: true })).toBeInTheDocument();
 	});
 });
 
@@ -132,72 +135,103 @@ describe('LightCard', () => {
 	});
 });
 
-describe('Controls tabs', () => {
-	it('shows white and color as tabs', async () => {
+describe('Controls modes', () => {
+	const mode = (name: string) => page.getByRole('radio', { name });
+
+	it('opens on brightness and offers color and white', async () => {
 		render(Controls, { control: groupTarget(kitchen) });
 
-		await expect
-			.element(page.getByRole('tab', { name: 'White' }))
-			.toHaveAttribute('aria-selected', 'true');
-		await page.getByRole('tab', { name: 'Color' }).click();
-
-		await expect.element(page.getByRole('slider', { name: 'Kitchen color' })).toBeInTheDocument();
-		await expect
-			.element(page.getByRole('slider', { name: 'Kitchen color temperature' }))
-			.not.toBeInTheDocument();
+		await expect.element(mode('Brightness')).toHaveAttribute('aria-checked', 'true');
+		await expect.element(mode('Color')).toBeInTheDocument();
+		await expect.element(mode('White')).toBeInTheDocument();
+		await expect.element(page.getByRole('slider', { name: 'Kitchen brightness' })).toBeVisible();
+		await expect.element(page.getByText('60 %', { exact: true })).toBeInTheDocument();
 	});
 
-	it('shows only the white control without color', async () => {
-		render(Controls, { control: groupTarget({ ...kitchen, color: false }) });
+	it('shows the color pad and keeps brightness as the value in color mode', async () => {
+		render(Controls, { control: groupTarget(kitchen) });
 
-		await expect.element(page.getByRole('tab')).not.toBeInTheDocument();
+		await mode('Color').click();
+
+		await expect.element(mode('Color')).toHaveAttribute('aria-checked', 'true');
+		await expect.element(page.getByRole('slider', { name: 'Kitchen color' })).toBeVisible();
 		await expect
-			.element(page.getByRole('slider', { name: 'Kitchen color temperature' }))
-			.toBeInTheDocument();
+			.element(page.getByRole('slider', { name: 'Kitchen brightness' }))
+			.not.toBeInTheDocument();
+		await expect.element(page.getByText('60 %', { exact: true })).toBeInTheDocument();
+	});
+
+	it('shows the white slider in kelvin over the range', async () => {
+		render(Controls, { control: lightTarget({ ...light, mirek: 370 }) });
+
+		await mode('White').click();
+
+		const slider = page.getByRole('slider', { name: 'Ceiling color temperature' });
+		await expect.element(slider).toHaveAttribute('aria-valuenow', '2700');
+		await expect.element(slider).toHaveAttribute('aria-valuemin', '2000');
+		await expect.element(slider).toHaveAttribute('aria-valuemax', '6536');
+		await expect.element(page.getByText('2700 K', { exact: true })).toBeInTheDocument();
+	});
+
+	it('keeps the mode when the selected button is clicked again', async () => {
+		render(Controls, { control: groupTarget(kitchen) });
+
+		await mode('Brightness').click();
+
+		await expect.element(mode('Brightness')).toHaveAttribute('aria-checked', 'true');
+		await expect.element(page.getByRole('slider', { name: 'Kitchen brightness' })).toBeVisible();
+	});
+
+	it('offers no color for a light without color', async () => {
+		render(Controls, { control: lightTarget({ ...light, color: false }) });
+
+		await expect.element(mode('White')).toBeInTheDocument();
+		await expect.element(mode('Color')).not.toBeInTheDocument();
+	});
+
+	it('opens on white for a light without dimming', async () => {
+		render(Controls, { control: lightTarget({ ...light, brightness: null }) });
+
+		await expect.element(mode('White')).toHaveAttribute('aria-checked', 'true');
+		await expect.element(mode('Brightness')).not.toBeInTheDocument();
+	});
+
+	it('shows only the power button for a plug', async () => {
+		render(Controls, {
+			control: lightTarget({ ...light, brightness: null, mirekRange: null, color: false })
+		});
+
+		await expect.element(page.getByRole('button', { name: 'Power' })).toBeInTheDocument();
+		await expect.element(page.getByRole('radio')).not.toBeInTheDocument();
+		await expect.element(page.getByText('On', { exact: true })).toBeInTheDocument();
+	});
+
+	it('says Off at the top while off', async () => {
+		render(Controls, { control: lightTarget({ ...light, on: false }) });
+
+		await expect.element(page.getByText('Off', { exact: true })).toBeInTheDocument();
 	});
 });
 
 describe('Controls for a light', () => {
-	it('starts on the Color tab for a light that shows a color', async () => {
+	it('starts the color pad at the light color', async () => {
 		render(Controls, {
 			control: lightTarget({ ...light, mirek: null, hueSaturation: { hue: 0, saturation: 100 } })
 		});
 
-		await expect
-			.element(page.getByRole('tab', { name: 'Color' }))
-			.toHaveAttribute('aria-selected', 'true');
+		await page.getByRole('radio', { name: 'Color' }).click();
+
 		await expect
 			.element(page.getByRole('slider', { name: 'Ceiling color' }))
-			.toHaveAttribute('aria-valuenow', '0');
-	});
-
-	it('starts at the light white', async () => {
-		render(Controls, { control: lightTarget({ ...light, mirek: 370 }) });
-
-		await expect
-			.element(page.getByRole('slider', { name: 'Ceiling color temperature' }))
-			.toHaveAttribute('aria-valuenow', '2700');
+			.toHaveAttribute('aria-valuetext', 'hue 0, 100 % saturation');
 	});
 
 	it('sends a light command, not a group command', async () => {
 		render(Controls, { control: lightTarget(light) });
 
-		await page.getByRole('switch', { name: 'Ceiling' }).click();
+		await page.getByRole('button', { name: 'Power' }).click();
 
 		expect(sentBody()).toEqual({ url: '/api/lights/ceiling', body: { on: false } });
-	});
-});
-
-describe('ColorTemperatureControl', () => {
-	it('covers the warm to cool range in kelvin', async () => {
-		render(ColorTemperatureControl, {
-			control: groupTarget(kitchen),
-			range: kitchen.colorTemperature!
-		});
-		const slider = page.getByRole('slider', { name: 'Kitchen color temperature' });
-
-		await expect.element(slider).toHaveAttribute('aria-valuemin', '2000');
-		await expect.element(slider).toHaveAttribute('aria-valuemax', '6536');
 	});
 });
 
