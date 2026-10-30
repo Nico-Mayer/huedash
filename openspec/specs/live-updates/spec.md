@@ -31,7 +31,8 @@ When the bridge reports a new on/off state or brightness for a light, room, or z
 
 #### Scenario: Light color changes
 - **WHEN** the dialog for "Ceiling" is open and the user sets it to red in the Hue app
-- **THEN** the dialog shows the Color tab at red without a reload
+- **THEN** the dialog's brightness slider fill turns red without a reload
+- **AND** the color pad marker is at red when the user selects color
 
 ### Requirement: Reload on structural changes
 When the bridge reports a change that the page cannot apply in place (a room, zone, or light added, removed, or renamed, or a change in reachability), the system SHALL reload the page data once, at most once per second.

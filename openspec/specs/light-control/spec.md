@@ -70,26 +70,23 @@ The system SHALL send at most one command per 100 ms to the same light. When the
 - **THEN** the bridge receives both changes at once
 
 ### Requirement: Start at the current light state
-The control dialog for a light SHALL start at the current brightness, color temperature, or color of the light, and SHALL follow live changes to it.
+The control dialog for a light SHALL open on brightness. Each mode SHALL start at the current brightness, color temperature, or color of the light, and SHALL follow live changes to it.
+
+#### Scenario: Opens on brightness
+- **WHEN** "Ceiling" is at 2700 K and 70 % and the user opens it
+- **THEN** the dialog shows the brightness mode at 70 %
 
 #### Scenario: Light in white mode
-- **WHEN** "Ceiling" is at 2700 K and the user opens it
-- **THEN** the dialog shows the White tab at 2700 K
+- **WHEN** "Ceiling" is at 2700 K and the user opens it and selects white
+- **THEN** the dialog shows the white slider at 2700 K
 
 #### Scenario: Light in color mode
-- **WHEN** "Lamp" shows a color and the user opens it
-- **THEN** the dialog shows the Color tab at that color
+- **WHEN** "Lamp" shows a color and the user opens it and selects color
+- **THEN** the color pad marker is at that color
 
-### Requirement: Light presets
-The control dialog for a light SHALL offer brightness presets 10, 25, 50, and 100 % and, when white is shown, white presets Warm (2200 K), Soft (2700 K), Neutral (4000 K), and Daylight (6500 K). A white preset outside a light's range SHALL be clamped to the nearest temperature the light supports. A preset SHALL turn the light on.
-
-#### Scenario: Brightness preset
-- **WHEN** the dialog for "Ceiling" is open and the user selects 25 %
-- **THEN** the bridge receives a command turning "Ceiling" on at 25 % brightness
-
-#### Scenario: White preset clamped
-- **WHEN** the dialog for "Counter" is open, its warmest white is 454 mirek (about 2203 K), and the user selects Warm
-- **THEN** the bridge receives a command setting "Counter" to 454 mirek
+#### Scenario: Light without dimming
+- **WHEN** the user opens a light that supports white but not dimming
+- **THEN** the dialog opens on white
 
 ### Requirement: Open a light's controls
 Clicking a light's card outside its switch and slider SHALL open the control dialog for that light. The dialog SHALL show the light's name as title, its product name when the bridge reports one, and the controls the light supports: on/off, brightness, white, and color. Unreachable lights SHALL NOT open the dialog.
@@ -105,7 +102,7 @@ Clicking a light's card outside its switch and slider SHALL open the control dia
 
 #### Scenario: Only supported controls
 - **WHEN** the user opens a light that supports white but not color
-- **THEN** the dialog shows brightness and white, and no Color tab
+- **THEN** the mode bar offers power, brightness, and white, and no color
 
 #### Scenario: Unreachable light
 - **WHEN** the user clicks the "Plug" card while the plug is unreachable

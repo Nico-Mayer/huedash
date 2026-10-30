@@ -60,7 +60,7 @@ On the room or zone detail page, the system SHALL offer a color temperature cont
 - **THEN** the color temperature control is not shown
 
 ### Requirement: Set group color
-On the room or zone detail page, the system SHALL offer a color control with hue and saturation when at least one light in the group supports color. The system SHALL convert the chosen color to the bridge's CIE xy color space.
+On the room or zone detail page, the system SHALL offer a color pad with hue and saturation when at least one light in the group supports color. The system SHALL convert the chosen color to the bridge's CIE xy color space.
 
 #### Scenario: Pick red
 - **WHEN** the user picks hue 0 and full saturation for the Living room
@@ -98,19 +98,8 @@ The system SHALL update rooms, zones, and lights from the bridge's live updates 
 - **THEN** the page does not reload its data
 - **AND** the switch stays off once the bridge reports the change
 
-### Requirement: Group presets
-The control dialog for a room or zone SHALL offer brightness presets 10, 25, 50, and 100 % and, when the color temperature control is shown, white presets Warm (2200 K), Soft (2700 K), Neutral (4000 K), and Daylight (6500 K), clamped to the group's range. A preset SHALL send one group command and turn the group on.
-
-#### Scenario: Brightness preset
-- **WHEN** the Kitchen dialog is open and the user selects 50 %
-- **THEN** the bridge receives one command turning the Kitchen group on at 50 % brightness
-
-#### Scenario: White preset
-- **WHEN** the Kitchen dialog is open and the user selects Neutral
-- **THEN** the bridge receives one command setting the Kitchen group to 250 mirek (4000 K)
-
 ### Requirement: Room header
-The room or zone page SHALL show a header with the group's name, a status line, an on/off switch, and a brightness slider with its value in percent for the whole group. The status line SHALL start with the active scene's name when one is active, followed by the lights summary. Brightness presets SHALL NOT show in the header.
+The room or zone page SHALL show a header with the group's name, a status line, an on/off switch, and a brightness slider with its value in percent for the whole group. The status line SHALL start with the active scene's name when one is active, followed by the lights summary.
 
 #### Scenario: Header content
 - **WHEN** the Kitchen page is open, the scene "Relax" is active, 2 of 3 lights are on, and 1 is unreachable
