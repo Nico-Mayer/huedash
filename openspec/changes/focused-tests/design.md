@@ -6,7 +6,7 @@
 - The value label in `LevelSlider.svelte` shows on hover, on keyboard focus, and while dragging. The flaky test focuses and blurs the thumb, then polls the computed opacity. On CI it read exactly `1` after blur in two runs in a row, both times right after `controls.svelte.test.ts`. It did not fail locally.
 - About 20 assertions in 5 component test files read computed styles, inline style values, or element positions.
 - e2e runs 10 files on one worker against one shared mock bridge. Playwright has no retries configured.
-- The CI failure artifact uploads `playwright-report/` and `test-results/`, not Vitest's `__screenshots__/`.
+- The CI failure artifact uploads `playwright-report/` and `test-results/`, not Vitest's failure screenshots. Vitest 5 writes them to `.vitest/attachments/failure-screenshots/`.
 
 ## Goals / Non-Goals
 
@@ -46,7 +46,9 @@ Alternative: keep style tests and make them stable (reset the mouse before each 
 | `RoomHeader.svelte.test.ts` | slider fill color, muted when off | the other 5 |
 | `LightCard.svelte.test.ts` | `--swatch` style checks, slider fill color and muted fill | `data-glow` and `data-lit` checks, opening tests, product text |
 
-`color-pad.svelte.test.ts` keeps its `getBoundingClientRect` calls, because it only uses them to click and drag.
+`color-pad.svelte.test.ts` drops "places the marker at the color", which read the marker's inline `left` and `top`; the ARIA value test covers the color. It keeps its `getBoundingClientRect` calls, because it only uses them to click and drag.
+
+`level-slider.svelte.test.ts` keeps two element checks from the removed tests: a vertical slider has no value label, and white mode has no fill.
 
 If a removed test leaves a component's `describe` block with no test, delete the block.
 
@@ -73,7 +75,7 @@ Alternative: Vitest `retry` for component tests. Not needed once the style tests
 
 ### Screenshots in the CI artifact
 
-Add `src/**/__screenshots__/` to the `upload-artifact` paths in `ci.yml`, and `__screenshots__` to `.gitignore`, because a local failure writes them next to the test file.
+Add `.vitest/attachments/` to the `upload-artifact` paths in `ci.yml`, and `.vitest` to `.gitignore`, because a local failure writes screenshots there.
 
 ## Risks / Trade-offs
 

@@ -10,7 +10,7 @@ CI failed on the last two pushes because of one component test that reads the co
 - Remove the style and layout assertions from the component tests for the level slider, scene cards, room header, and light card. This removes the flaky value-label test.
 - Remove e2e tests that only check layout, animation, or repeat a component test. e2e keeps the main flows: pairing, rooms, light dialog, scenes, live updates, navigation, theme.
 - Playwright retries a failed e2e test once on CI. Tests that pass on retry are reported as flaky.
-- The CI failure artifact includes Vitest browser screenshots (`__screenshots__`), and `.gitignore` ignores them.
+- The CI failure artifact includes Vitest failure screenshots (`.vitest/attachments/`), and `.gitignore` ignores `.vitest`.
 - Add the test rules to `AGENTS.md`.
 - Server and unit tests stay as they are. CI stays a blocking check.
 
