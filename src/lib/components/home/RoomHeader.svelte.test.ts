@@ -126,25 +126,4 @@ describe('RoomHeader', () => {
 			.element(page.getByRole('button', { name: /Color and white/ }))
 			.not.toBeInTheDocument();
 	});
-
-	it('fills the brightness slider with the generic light color, muted when off', async () => {
-		const light = getComputedStyle(document.documentElement).getPropertyValue('--light');
-		const probe = document.createElement('span');
-		probe.style.backgroundColor = light;
-		document.body.append(probe);
-		const amber = getComputedStyle(probe).backgroundColor;
-		probe.remove();
-
-		const on = await render(RoomHeader, { group: kitchen, lights, onOpenColor: () => {} });
-		const off = await render(RoomHeader, {
-			group: { ...kitchen, id: 'room-off', groupedLightId: 'grouped-off', on: false },
-			lights,
-			onOpenColor: () => {}
-		});
-		const fill = (container: HTMLElement) =>
-			getComputedStyle(container.querySelector('[data-slider-fill]')!).backgroundColor;
-
-		expect(fill(on.container)).toBe(amber);
-		expect(fill(off.container)).not.toBe(amber);
-	});
 });

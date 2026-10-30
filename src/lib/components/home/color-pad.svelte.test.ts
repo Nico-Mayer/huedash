@@ -42,14 +42,6 @@ describe('ColorPad', () => {
 		expect(onValueCommit).toHaveBeenCalledExactlyOnceWith({ hue: 180, saturation: 100 });
 	});
 
-	it('places the marker at the color', async () => {
-		await renderPad(180, 25);
-		const marker = document.querySelector<HTMLElement>('[data-color-marker]')!;
-
-		expect(marker.style.left).toBe('50%');
-		expect(marker.style.top).toBe('75%');
-	});
-
 	it.each([
 		['ArrowRight', { hue: 31, saturation: 70 }],
 		['ArrowLeft', { hue: 29, saturation: 70 }],

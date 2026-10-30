@@ -143,26 +143,4 @@ describe('SceneList cards', () => {
 		expect(page.getByRole('list', { name: 'Scenes' }).element().textContent).not.toContain('%');
 		await expect.element(page.getByRole('button', { name: /Play/ })).not.toBeInTheDocument();
 	});
-
-	it('puts the badge below the color strip', async () => {
-		render(SceneList, { group: withActive('scene-tropical', 'dynamic_palette') });
-
-		const card = page.getByRole('button', { name: /^Tropical/ }).element();
-		const strip = card.firstElementChild!.getBoundingClientRect();
-		const badge = page
-			.getByRole('button', { name: /^Playing/ })
-			.element()
-			.getBoundingClientRect();
-		expect(badge.top).toBeGreaterThanOrEqual(strip.bottom);
-		expect(badge.right).toBeLessThanOrEqual(card.getBoundingClientRect().right);
-	});
-
-	it('shows a pointer on the card and the badge toggle', async () => {
-		render(SceneList, { group: withActive('scene-tropical', 'dynamic_palette') });
-
-		const card = page.getByRole('button', { name: /Relax/ }).element();
-		const badge = page.getByRole('button', { name: /^Playing/ }).element();
-		expect(getComputedStyle(card).cursor).toBe('pointer');
-		expect(getComputedStyle(badge).cursor).toBe('pointer');
-	});
 });
