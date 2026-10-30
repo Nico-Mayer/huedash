@@ -19,15 +19,14 @@
 	const SPECTRUM =
 		'linear-gradient(to top, white, transparent), linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red)';
 
-	// Keeps the marker inside the pad at the edges; matches the marker's radius.
-	const INSET = 14;
+	const MARKER_RADIUS = 14;
 
 	const clamp = (value: number, max: number) => Math.round(Math.min(max, Math.max(0, value)));
 
 	function colorAt(event: PointerEvent & { currentTarget: HTMLElement }): HueSaturation {
 		const { left, top, width, height } = event.currentTarget.getBoundingClientRect();
-		const x = (event.clientX - left - INSET) / (width - 2 * INSET);
-		const y = (event.clientY - top - INSET) / (height - 2 * INSET);
+		const x = (event.clientX - left - MARKER_RADIUS) / (width - 2 * MARKER_RADIUS);
+		const y = (event.clientY - top - MARKER_RADIUS) / (height - 2 * MARKER_RADIUS);
 		return { hue: clamp(x * 360, 360), saturation: clamp((1 - y) * 100, 100) };
 	}
 
