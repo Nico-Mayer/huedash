@@ -104,6 +104,9 @@ importers:
       selfsigned:
         specifier: ^5.5.0
         version: 5.5.0
+      semver:
+        specifier: ^7.8.5
+        version: 7.8.5
       shadcn-svelte:
         specifier: ^1.7.1
         version: 1.7.1(svelte@5.57.3(@typescript-eslint/types@8.72.1))
